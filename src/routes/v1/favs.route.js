@@ -10,6 +10,7 @@
 const express = require('express')
 const router = express.Router()
 const { favsController } = require('../../controllers')
+const { checkAuth } = require('../../middlewares/auth')
 /**
  * @swagger
  * /favs:
@@ -58,9 +59,11 @@ const { favsController } = require('../../controllers')
  *           $ref: '#/definitions/Fav'
  *
  */
-
+router.use(function (req, res, next) {
+    checkAuth(req, res, next)
+})
 router.post('/:photoid', (req, res) => {
-    res.sendStatus(favsController.status)
+    favsController.add_fav(req, res)
 })
 /**
  * @swagger
@@ -105,7 +108,7 @@ router.post('/:photoid', (req, res) => {
  */
 
 router.delete('/:photo_id', (req, res) => {
-    console.log(req.body.name)
+    favsController.remove_fav(req, res)
 })
 
 module.exports = router
