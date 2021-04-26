@@ -1,4 +1,5 @@
-export const setup = (router) => {
+const express = require('express');
+const router = express.Router();
 /**
 * @swagger
 * /group:
@@ -83,19 +84,9 @@ router.post("/",(req,res)=>{
 
 
 
-router.post("/",(req,res)=>{
-
-
-
+router.get("/:group_id",(req,res)=>{
+    res.sendStatus(200)
 });
-
-
-
-
-
-
-
-
 /**
 * @swagger
 * /group/photo:
@@ -141,11 +132,6 @@ router.post("/",(req,res)=>{
 *             }
 *
 */
-
-
-
-
-
 router.post("/photo",(req,res)=>{
 
 
@@ -202,11 +188,6 @@ router.post("/photo",(req,res)=>{
 *            }
 *
 */
-
-
-
-
-
 router.delete("/",(req,res)=>{
 
 
@@ -247,7 +228,7 @@ router.delete("/",(req,res)=>{
 *       
 *
 */
-router.get("/group",(req,res)=>{
+router.get("/members/:id",(req,res)=>{
 
 
 
@@ -290,14 +271,115 @@ router.get("/group",(req,res)=>{
 *       
 *
 */
-router.get("/group",(req,res)=>{
+router.get("/photos/:id",(req,res)=>{
+
+
+
+});
+/**
+* @swagger
+* /group/{group_id}/join:
+*   get:
+*     description: Join group
+*     tags: [Group]
+*     parameters:
+*       - name: group_id
+*         in: path
+*         required: true
+*         description: group id
+*         schema:
+*           type: int
+*     responses:
+*       200: 
+*         description: Success
+*         schema: 
+*           type: array
+*           items:
+*             $ref: addRefHere
+*         
+*       
+*       404:
+*         description: Not found
+*         examples:
+*           application/json:
+*            
+*             {
+*                     "message": "Group not found",
+*             }
+*       401:
+*         description: Unauthorized access
+*         examples:
+*           application/json:
+*            
+*             {
+*                     "message": "Unauthorized request",
+*             }
+*        
+*       
+*
+*/
+router.delete("/:group_id/leave",(req,res)=>{
 
 
 
 });
 
+/**
+* @swagger
+* /group/{group_id}/leave:
+*   delete:
+*     description: Leave group
+*     tags: [Group]
+*     parameters:
+*       - name: group_id
+*         in: path
+*         required: true
+*         description: group id
+*         schema:
+*           type: int
+*     responses:
+*       200: 
+*         description: Success
+*         schema: 
+*           type: array
+*           items:
+*             $ref: addRefHere
+*         
+*       
+*       404:
+*         description: Not found
+*         examples:
+*           application/json:
+*            
+*             {
+*                     "message": "Group not found",
+*             }
+*       401:
+*         description: Unauthorized access
+*         examples:
+*           application/json:
+*            
+*             {
+*                     "message": "Unauthorized request",
+*             }
+*       500:
+*         description: Unauthorized access
+*         examples:
+*           application/json:
+*            
+*             {
+*                     "message": "User is not a member of the group",
+*             }
+*        
+*       
+*
+*/
+router.delete("/:group_id/leave",(req,res)=>{
 
-}
+
+
+});
+
 /**
  * @swagger
  * responses:
@@ -335,3 +417,4 @@ router.get("/group",(req,res)=>{
  *        format: int32
  *  
  */
+module.exports = router

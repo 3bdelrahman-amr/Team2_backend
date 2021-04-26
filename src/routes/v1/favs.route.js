@@ -7,7 +7,9 @@
 *       photo_id:
 *         type: integer   
 */
-export const setup = (router) => {
+const express = require('express');
+const router = express.Router();
+const {favsController} = require('../../controllers');
 /**
 * @swagger
 * /favs:
@@ -57,16 +59,9 @@ export const setup = (router) => {
 *     
 */
 
-router.post("/people/folowing",(req,res)=>{
-
-
-    console.log(req.body.name);
-    
-    
-    
-    
-    
-    })  ;  
+router.post("/:photoid",(req,res)=>{
+    res.sendStatus(favsController.status)
+    });  
     
    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
@@ -75,7 +70,7 @@ router.post("/people/folowing",(req,res)=>{
 * /favs/{photo_id}:
 *   delete:
 *     tags: [Favs]
-*     description: delete a photo to favs list and add the user to that photo's fav list.
+*     description: Delete a photo to favs list and add the user to that photo's fav list.
 *     responses:
 *       200: 
 *         description: Success
@@ -104,7 +99,7 @@ router.post("/people/folowing",(req,res)=>{
 *      
 *     parameters:
 *       - name: photo_id
-*         in: body
+*         in: path
 *         required: true
 *         description: Photo id to delete from fav list
 *         schema:
@@ -112,18 +107,8 @@ router.post("/people/folowing",(req,res)=>{
 *     
 */
 
-router.post("/fav/:photo_id",(req,res)=>{
-
-
+router.delete("/:photo_id",(req,res)=>{
     console.log(req.body.name);
-    
-    
-    
-    
-    
     })  ;     
 
-
-
-
-}
+module.exports = router

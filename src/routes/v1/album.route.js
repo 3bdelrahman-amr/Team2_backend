@@ -1,4 +1,3 @@
-export const setup=(app)=>{
 /**
 * @swagger
 * /album:
@@ -49,12 +48,12 @@ export const setup=(app)=>{
 *         schema: 
 *           $ref: '#/definitions/Album'     
 */
+const express = require('express');
+const router = express.Router();
 
- app .get("/album",(req,res)=>
+router.get("/",(req,res)=>
  {
-   
-
-
+   res.sendStatus(200)
 });
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -101,7 +100,7 @@ export const setup=(app)=>{
 *           format: int32     
 */
 
-app .delete("/album",(req,res)=>
+router.delete("/",(req,res)=>
 {
   
 
@@ -153,7 +152,7 @@ app .delete("/album",(req,res)=>
 *  
 */
 
-app .put("/album/",(req,res)=>
+router.put("/",(req,res)=>
 {
   
 
@@ -202,7 +201,7 @@ app .put("/album/",(req,res)=>
 *           format: int32                 
 */
 
-app.get("/album/:album_id",(req,res)=>
+router.get("/:album_id",(req,res)=>
 {
   
 
@@ -249,13 +248,4 @@ app.get("/album/:album_id",(req,res)=>
  *         items: 
  *           $ref: '#/responses/image'  
  */
-
-
-
-
-
-
-
-
-
-}
+ module.exports = router;
