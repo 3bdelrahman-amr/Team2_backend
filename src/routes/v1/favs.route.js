@@ -62,7 +62,7 @@ const { checkAuth } = require('../../middlewares/auth')
 router.use(function (req, res, next) {
     checkAuth(req, res, next)
 })
-router.post('/:photoid', (req, res) => {
+router.post('/', (req, res) => {
     favsController.add_fav(req, res)
 })
 /**
@@ -96,7 +96,14 @@ router.post('/:photoid', (req, res) => {
  *            {
  *                       "message": "Missing photo parameter",
  *            }
+ *       500:
+ *         description: Photo not in favourites
+ *         examples:
+ *          application/json:
  *
+ *            {
+ *                       "message": "Photo not in favourites list",
+ *            }
  *     parameters:
  *       - name: photo_id
  *         in: path
@@ -107,7 +114,7 @@ router.post('/:photoid', (req, res) => {
  *
  */
 
-router.delete('/:photo_id', (req, res) => {
+router.delete('/:photoid', (req, res) => {
     favsController.remove_fav(req, res)
 })
 
