@@ -5,8 +5,13 @@ exports.checkAuth = function (req, res, next) {
     if (req.headers && req.headers.authorization) {
         token = req.headers.authorization.split(' ')[1]
     }
-    if (!token || !jwt.verify(token, config.get('JWT_KEY'))) {
-        next(res.status(401).json({ message: 'User is not authorized' }))
+    if (!token) {
+        return next(res.status(401).json({ message: 'User is not authorized' }))
+    }
+    try {
+        jwt.verify(token, config.get('JWT_KEY'))
+    } catch (e) {
+        return next(res.status(400).json({ message: 'Token invalid' }))
     }
     next()
 }

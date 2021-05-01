@@ -16,6 +16,7 @@ const router = express.Router()
  *         type: string
  *         format: base64
  *
+ *
  */
 /**
  * @swagger
@@ -221,7 +222,9 @@ router.put('/comment', (req, res) => {})
  *       200:
  *         description: Success
  *         schema:
- *           $ref: '#/responses/image'
+ *           type: array
+ *           items:
+ *              $ref: '#/responses/image'
  *
  *       404:
  *         description: Not found
@@ -245,18 +248,26 @@ router.get('/image/explore', (req, res) => {})
  *     description: change photo mode between { private public friends}
  *     tags: [Image]
  *     parameters:
- *       - name: image_id
- *         in: path
- *         required: true
- *         description: photo_id to edit it
- *         schema:
- *           type: integer
- *       - name: privacy
+ *       - name: data
  *         in: body
  *         required: true
- *         description: mode of photo
- *         schema:
- *           type: string
+ *         description: Image id to add tag to the corresponding image
+ *         type: object
+ *         properties:
+ *           title:
+ *             type: string
+ *           description:
+ *             type: string
+ *           privacy:
+ *             type: string
+ *             enum:
+ *               -public
+ *               -private
+ *           visibility:
+ *             type: string
+ *             enum:
+ *                -public
+ *               -Invites
  *
  *     responses:
  *       200:
@@ -404,12 +415,8 @@ router.put('/image/:image_id/tag/{tag_id}', (req, res) => {})
  *     responses:
  *       200:
  *         description: Success
- *         examples:
- *          application/json:
- *
- *            {
- *                     "message": "Success",
- *            }
+ *         schema:
+ *            $ref: '#/definitions/Image'
  *       404:
  *         description: Not found
  *         examples:
@@ -433,13 +440,13 @@ router.get('/image/:image_id', (req, res) => {})
 
 /**
  * @swagger
- * /image/{title}:
+ * /image/{image_id}:
  *   get:
  *     description: get a photo by title
  *     tags: [Image]
  *     parameters:
  *
- *       - name: image_title
+ *       - name: image_id
  *         in: path
  *         required: true
  *         description: image id
@@ -478,6 +485,8 @@ router.get('/image/:image_id', (req, res) => {})
  *   image:
  *     type: object
  *     properties:
+ *       title:
+ *         type: string
  *       photo_id:
  *         type: integer
  *       photo_url:
@@ -494,6 +503,8 @@ router.get('/image/:image_id', (req, res) => {})
  *           $ref: '#/responses/comment'
  *       description:
  *         type: string
+ *       favs:
+ *         type: object
  *
  */
 /**
@@ -537,6 +548,10 @@ router.get('/image/:image_id', (req, res) => {})
  *         type: integer
  *       photo_owner_name:
  *         type: string
+ *       title:
+ *         type: string
+ *       privacy:
+ *         type: boolean
  *
  *       description:
  *         type: string

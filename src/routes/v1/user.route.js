@@ -421,7 +421,9 @@ export const setup = (router) => {
      *   get:
      *     description: Return public and private photos for the user
      *     tags: [User]
-     *
+     *     parameters:
+     *       - name: privacy
+     *         in: url
      *     responses:
      *       200:
      *         description: success

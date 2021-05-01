@@ -1,5 +1,9 @@
-const { Fav, favsSchema } = require('./favs.model')
+const { User, UserSchema } = require('./user.model')
+const { Photo, PhotoSchema } = require('./photo.model')
+
 module.exports = {
-    Fav,
-    favsSchema,
+    User,
+    UserSchema,
+    Photo,
+    PhotoSchema,
 }
