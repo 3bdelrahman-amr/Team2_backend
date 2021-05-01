@@ -31,15 +31,13 @@ const albumController = require('../../controllers/album.controller');
  *          type: _id
  *       
  *       schema:
- *          $ref: "#/definitions/Album"
+ *          $ref: "#/definitions/CreateAlbumRequest"
  *     responses:
  *       201:
  *         description: Created successfully
- *         examples:
- *          application/json:
- *            {
- *              album_id: 0
- *            }
+ *         schema:
+ *            $ref: "#/definitions/CreateAlbumResponse"
+ *          
  *           
  *       401:
  *         description: Unauthorized
@@ -66,6 +64,66 @@ router.post('/album',auth, albumController.createAlbum)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * @swagger
+ * /album/{album:id}:
+ *   put:
+ *     tags: [album]
+ *     description: Update album.
+ *     parameters:
+ *       - name: album_id
+ *         in: url
+ *         required: true
+ *         description: album id
+ *         schema:
+ *       - name: title
+ *         in: body
+ *         type: string 
+ *         required: false
+ *         description: album new updated title
+ *         schema:
+ *       - name: description
+ *         in: body
+ *         type: string 
+ *         required: false
+ *         description: album description
+ *         schema:
+ *           $ref: '#/definitions/EditAlbum'
+ *           photo_id:
+ *               type: integer
+ *     responses:
+ *       200:
+ *         description: Success
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                       "message": "Album updated successfully"
+ *            }
+ *       404:
+ *         description: Not found
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                       "message": "Album not found",
+ *            }
+ *       400:
+ *         description: Bad request
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                       "message": "Invalid updates",
+ *            }
+ *
+ */
+
+ router.put('/album/:id',auth, albumController.updateAlbum);
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * @swagger
  * /album/{album_id}:
@@ -111,50 +169,6 @@ router.delete('/', (req, res) => { })
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * @swagger
- * /album:
- *   put:
- *     tags: [album]
- *     description: Update album.
- *     responses:
- *       200:
- *         description: Success
- *         examples:
- *          application/json:
- *
- *            {
- *                       "message": "Album updated successfully"
- *            }
- *       404:
- *         description: Not found
- *         examples:
- *          application/json:
- *
- *            {
- *                       "message": "Album not found",
- *            }
- *       422:
- *         description: Mising update parameters
- *         examples:
- *          application/json:
- *
- *            {
- *                       "message": "Mising update parameters",
- *            }
- *     parameters:
- *       - name: album_title
- *         in: body
- *         required: true
- *         description: album id
- *         schema:
- *           $ref: '#/definitions/EditAlbum'
- *           photo_id:
- *               type: integer
- *
- */
-
-router.put('/', (req, res) => { })
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -210,6 +224,15 @@ router.get('/:album_id', (req, res) => { })
  *  Album:
  *    type: object
  *    properties:
+ *      album_id:
+ *        type: integer
+ *      title:
+ *        type: string
+ *      description:
+ *        type: string
+ *  CreateAlbumRequest:
+ *    type: object
+ *    properties:
  *      title:
  *        type: string
  *      description:
@@ -218,11 +241,20 @@ router.get('/:album_id', (req, res) => { })
  *        type: array
  *        items:
  *          type: integer
+ *  CreateAlbumResponse:
+ *    type: object
+ *    properties:
+ *      _id:
+ *        type: integer
+ *      title:
+ *        type: string
+ *      description:
+ *        type: string
+ *      createdAt:
+ *        type: string
  *  EditAlbum:
  *    type: object
  *    properties:
- *      album_id:
- *        type: integer
  *      title:
  *        type: string
  *      description:
