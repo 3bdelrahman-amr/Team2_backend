@@ -1,29 +1,46 @@
+const express = require('express');
+const router = express.Router();
+const auth = require('../../middlewares/auth');
+const albumController = require('../../controllers/album.controller');
+
 /**
  * @swagger
  * /album:
  *   post:
  *     tags: [album]
  *     description: Create new album.
+ *     
+ *     parameters:
+ *     - name: title
+ *       in: body
+ *       required: true
+ *       description: Album title
+ *       schema:
+ *     - name: description
+ *       in: body
+ *       required: true
+ *       description: Album description
+ *       type: string
+ *       schema:
+ *     - name: photos
+ *       description: The photos that the album is created with
+ *       in: body
+ *       required: false
+ *       type: array
+ *       items:
+ *          type: _id
+ *       
+ *       schema:
+ *          $ref: "#/definitions/Album"
  *     responses:
- *       200:
- *         description: Success
+ *       201:
+ *         description: Created successfully
  *         examples:
  *          application/json:
- *
- *            [
- *              {
- *                           "photo_id": 0,
- *                           "photo_url": "http://localhost:3000/photos/photo.png",
- *                           "tag": "$$$$",
- *                           "title": "Photo 1"
- *               },
- *               {
- *                           "photo_id": 1,
- *                           "photo_url": "http://localhost:3000/photos/photo2.png",
- *                           "tag": "$$$$",
- *                           "title": "Photo 2"
- *               }
- *            ]
+ *            {
+ *              album_id: 0
+ *            }
+ *           
  *       401:
  *         description: Unauthorized
  *         examples:
@@ -38,22 +55,13 @@
  *          application/json:
  *
  *            {
- *                       "message": "Parameter missing",
+ *                       "message": "An error has occured",
  *            }
- *     parameters:
- *       - name: body
- *         in: body
- *         required: true
- *         description: Album title and description
- *         schema:
- *           $ref: '#/definitions/Album'
+ *       $ref: "#/definitions/ApiResponse"
  */
-const express = require('express')
-const router = express.Router()
 
-router.get('/', (req, res) => {
-    res.sendStatus(200)
-})
+
+router.post('/album',auth, albumController.createAlbum)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -99,7 +107,7 @@ router.get('/', (req, res) => {
  *           format: int32
  */
 
-router.delete('/', (req, res) => {})
+router.delete('/', (req, res) => { })
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -146,7 +154,7 @@ router.delete('/', (req, res) => {})
  *
  */
 
-router.put('/', (req, res) => {})
+router.put('/', (req, res) => { })
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -162,7 +170,7 @@ router.put('/', (req, res) => {})
  *         schema:
  *           type: array
  *           items:
- *             $ref: '#/responses/photo'
+ *             $ref: '#/responses/image'
  *
  *       404:
  *         description: Not found
@@ -190,7 +198,7 @@ router.put('/', (req, res) => {})
  *           format: int32
  */
 
-router.get('/:album_id', (req, res) => {})
+router.get('/:album_id', (req, res) => { })
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -229,6 +237,6 @@ router.get('/:album_id', (req, res) => {})
  *       Albums:
  *         type: array
  *         items:
- *           $ref: '#/responses/photo'
+ *           $ref: '#/responses/image'
  */
 module.exports = router
