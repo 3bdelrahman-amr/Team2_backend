@@ -193,7 +193,7 @@ router.get('/getInfo', (req, res) => {})
  *       200:
  *         description: Success
  *         schema:
- *           $ref: '#/responses/image'
+ *           $ref: '#/responses/photo'
  *       401:
  *         description: Unauthorized
  *         examples:
@@ -208,7 +208,7 @@ router.get('/getInfo', (req, res) => {})
  *           application/json:
  *
  *             {
- *                     "message": "Image not found",
+ *                     "message": "photo not found",
  *             }
  *       500:
  *         description: Gallery not found
@@ -267,7 +267,7 @@ router.post('/getphotos', (req, res) => {})
  *          application/json:
  *
  *            {
- *                     "message": "Image/Gallery not found",
+ *                     "message": "photo/Gallery not found",
  *            }
  *       500:
  *         description: Unauthorized
@@ -275,7 +275,7 @@ router.post('/getphotos', (req, res) => {})
  *          application/json:
  *
  *            {
- *                     "message": "Image not member of the gallery",
+ *                     "message": "photo not member of the gallery",
  *            }
  */
 
@@ -290,7 +290,7 @@ router.post('/removephoto', (req, res) => {})
  *       photos:
  *         type: array
  *         items:
- *           $ref: '#/responses/image'
+ *           $ref: '#/responses/photo'
 
  *        
  */

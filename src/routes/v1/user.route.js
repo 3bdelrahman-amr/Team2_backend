@@ -428,7 +428,7 @@ export const setup = (router) => {
      *         schema:
      *           type: array
      *           items:
-     *             $ref: '#/responses/user_image'
+     *             $ref: '#/responses/user_photo'
      *       401:
      *         description: Unauthorized request
      *         examples:

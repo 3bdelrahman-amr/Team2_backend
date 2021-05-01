@@ -82,12 +82,12 @@ router.get('/:group_id', (req, res) => {
  *       - name: data
  *         in: body
  *         required: true
- *         description: Image and group data
+ *         description: photo and group data
  *         type: object
  *         properties:
  *           group_id:
  *             type: integer
- *           image_id:
+ *           photo_id:
  *             type: integer
  *     responses:
  *       200:
@@ -113,7 +113,7 @@ router.get('/:group_id', (req, res) => {
  *           application/json:
  *
  *             {
- *                     "message": "Group/Image not found",
+ *                     "message": "Group/photo not found",
  *             }
  *
  */
@@ -226,7 +226,7 @@ router.get('/members/:id', (req, res) => {})
 *         schema: 
 *           type: array
 *           items:
-*             $ref: '#/responses/image'
+*             $ref: '#/responses/photo'
 *         
 *       
 *       404:

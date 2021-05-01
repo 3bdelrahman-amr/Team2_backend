@@ -1,7 +1,7 @@
 {
   "name": "Dropoid",
   "version": "1.0.0",
-  "description": "Image sharing application Node.js Express",
+  "description": "photo sharing application Node.js Express",
   "main": "src/index.js",
   "license": "MIT",
   "engines": {

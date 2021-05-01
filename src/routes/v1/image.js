@@ -4,7 +4,7 @@ const router = express.Router()
 /**
  * @swagger
  * definitions:
- *   Image:
+ *   photo:
  *     type: object
  *     properties:
  *       title:
@@ -19,25 +19,25 @@ const router = express.Router()
  */
 /**
  * @swagger
- *  /image:
+ *  /photo:
  *   post:
- *     description: Add Image
- *     tags: [Image]
+ *     description: Add photo
+ *     tags: [photo]
  *     parameters:
  *       - name: body
  *         in: body
  *         required: true
- *         description: Image's data
+ *         description: photo's data
  *         schema:
- *           $ref: '#/definitions/Image'
+ *           $ref: '#/definitions/photo'
  *     responses:
  *       201:
- *         description: Image created successfully
+ *         description: photo created successfully
  *         examples:
  *          application/json:
  *
  *            {
- *                     "image_id": 0,
+ *                     "photo_id": 0,
  *            }
  *       401:
  *         description: Unauthorized
@@ -57,7 +57,7 @@ const router = express.Router()
  *            }
  */
 
-router.post('/uploadimage/image', (req, res) => {})
+router.post('/uploadphoto/photo', (req, res) => {})
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -65,18 +65,18 @@ router.post('/uploadimage/image', (req, res) => {})
 
 /**
  * @swagger
- *  /image/tag:
+ *  /photo/tag:
  *   post:
  *     description: Add tag to photo
- *     tags: [Image]
+ *     tags: [photo]
  *     parameters:
  *       - name: data
  *         in: body
  *         required: true
- *         description: Image id to add tag to the corresponding image
+ *         description: photo id to add tag to the corresponding photo
  *         type: object
  *         properties:
- *           image_id:
+ *           photo_id:
  *             type: integer
  *             format: int64
  *             description: Tag to add to photo
@@ -91,7 +91,7 @@ router.post('/uploadimage/image', (req, res) => {})
  *          application/json:
  *
  *            {
- *                     "image_id": 0,
+ *                     "photo_id": 0,
  *            }
  *       401:
  *         description: Unauthorized
@@ -111,15 +111,15 @@ router.put('/tag', (req, res) => {})
 
 /**
  * @swagger
- *  /image/{image_id}:
+ *  /photo/{photo_id}:
  *   delete:
  *     description: Delete a photo
- *     tags: [Image]
+ *     tags: [photo]
  *     parameters:
- *       - name: image_id
+ *       - name: photo_id
  *         in: path
  *         required: true
- *         description: image id to add tag to the corresponding image
+ *         description: photo id to add tag to the corresponding photo
  *         schema:
  *           type: integer
  *     responses:
@@ -129,7 +129,7 @@ router.put('/tag', (req, res) => {})
  *          application/json:
  *
  *            {
- *                     "message": "Image deleted successfully",
+ *                     "message": "photo deleted successfully",
  *            }
  *       401:
  *         description: Unauthorized
@@ -145,11 +145,11 @@ router.put('/tag', (req, res) => {})
  *          application/json:
  *
  *            {
- *                     "message": "Image not found",
+ *                     "message": "photo not found",
  *            }
  */
 
-router.delete('/delete/:image_id', (req, res) => {})
+router.delete('/delete/:photo_id', (req, res) => {})
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -157,18 +157,18 @@ router.delete('/delete/:image_id', (req, res) => {})
 
 /**
  * @swagger
- * /image/comment:
+ * /photo/comment:
  *   post:
  *     description: Add comment to photo
- *     tags: [Image]
+ *     tags: [photo]
  *     parameters:
  *       - name: data
  *         in: body
  *         required: true
- *         description: Image id to add tag to the corresponding image
+ *         description: photo id to add tag to the corresponding photo
  *         type: object
  *         properties:
- *           image_id:
+ *           photo_id:
  *             type: integer
  *           comment:
  *             type: string
@@ -187,7 +187,7 @@ router.delete('/delete/:image_id', (req, res) => {})
  *          application/json:
  *
  *            {
- *                     "message": "Image not found",
+ *                     "message": "photo not found",
  *            }
  *       401:
  *         description: Unauthorized request
@@ -211,17 +211,17 @@ router.put('/comment', (req, res) => {})
 
 /**
  * @swagger
- * /image/explore:
+ * /photo/explore:
  *   get:
- *     description: return list of images that are public and above certain number of likes.
- *     tags: [Image]
+ *     description: return list of photos that are public and above certain number of likes.
+ *     tags: [photo]
  *
  *
  *     responses:
  *       200:
  *         description: Success
  *         schema:
- *           $ref: '#/responses/image'
+ *           $ref: '#/responses/photo'
  *
  *       404:
  *         description: Not found
@@ -230,22 +230,22 @@ router.put('/comment', (req, res) => {})
  *          application/json:
  *
  *            {
- *                     "message": "images not found",
+ *                     "message": "photos not found",
  *            }
  *
  *
  */
 
-router.get('/image/explore', (req, res) => {})
+router.get('/photo/explore', (req, res) => {})
 
 /**
  * @swagger
- * /image/{photo_id}:
+ * /photo/{photo_id}:
  *   put:
  *     description: change photo mode between { private public friends}
- *     tags: [Image]
+ *     tags: [photo]
  *     parameters:
- *       - name: image_id
+ *       - name: photo_id
  *         in: path
  *         required: true
  *         description: photo_id to edit it
@@ -290,7 +290,7 @@ router.get('/image/explore', (req, res) => {})
  *
  */
 
-router.put('/image/{image_id}', (req, res) => {})
+router.put('/photo/{photo_id}', (req, res) => {})
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -298,19 +298,19 @@ router.put('/image/{image_id}', (req, res) => {})
 
 /**
  * @swagger
- * /image{image_id}/comment/{comment_id}:
+ * /photo{photo_id}/comment/{comment_id}:
  *   delete:
  *     description: delete comment from a photo
- *     tags: [Image]
+ *     tags: [photo]
  *     parameters:
  *       - name: comment_id
  *         in: path
  *         required: true
  *         description: comment_id to delete a comment from a photo
- *       - name: image_id
+ *       - name: photo_id
  *         in: path
  *         required: true
- *         description: image_id to delete a comment from a it
+ *         description: photo_id to delete a comment from a it
  *
  *     responses:
  *       200:
@@ -327,7 +327,7 @@ router.put('/image/{image_id}', (req, res) => {})
  *          application/json:
  *
  *            {
- *                     "message": "Image not found",
+ *                     "message": "photo not found",
  *            }
  *       401:
  *         description: Unauthorized request
@@ -340,23 +340,23 @@ router.put('/image/{image_id}', (req, res) => {})
  *
  */
 
-router.put('/image/comment/{comment_id}', (req, res) => {})
+router.put('/photo/comment/{comment_id}', (req, res) => {})
 
 /**
  * @swagger
- * /image/{image_id}/tag/{tag_id}:
+ * /photo/{photo_id}/tag/{tag_id}:
  *   delete:
  *     description: delete a tag from a photo
- *     tags: [Image]
+ *     tags: [photo]
  *     parameters:
  *       - name: tag_id
  *         in: path
  *         required: true
  *         description: tag_id to delete a comment from a photo
- *       - name: image_id
+ *       - name: photo_id
  *         in: path
  *         required: true
- *         description: image_id to delete a comment from a it
+ *         description: photo_id to delete a comment from a it
  *
  *     responses:
  *       200:
@@ -373,7 +373,7 @@ router.put('/image/comment/{comment_id}', (req, res) => {})
  *          application/json:
  *
  *            {
- *                     "message": "Image not found",
+ *                     "message": "photo not found",
  *            }
  *       401:
  *         description: Unauthorized request
@@ -386,20 +386,20 @@ router.put('/image/comment/{comment_id}', (req, res) => {})
  *
  */
 
-router.put('/image/:image_id/tag/{tag_id}', (req, res) => {})
+router.put('/photo/:photo_id/tag/{tag_id}', (req, res) => {})
 
 /**
  * @swagger
- * /image/{image_id}:
+ * /photo/{photo_id}:
  *   get:
  *     description: get a photo by id
- *     tags: [Image]
+ *     tags: [photo]
  *     parameters:
  *
- *       - name: image_id
+ *       - name: photo_id
  *         in: path
  *         required: true
- *         description: image id
+ *         description: photo id
  *
  *     responses:
  *       200:
@@ -416,7 +416,7 @@ router.put('/image/:image_id/tag/{tag_id}', (req, res) => {})
  *          application/json:
  *
  *            {
- *                     "message": "Image not found",
+ *                     "message": "photo not found",
  *            }
  *       401:
  *         description: Unauthorized request
@@ -429,20 +429,20 @@ router.put('/image/:image_id/tag/{tag_id}', (req, res) => {})
  *
  */
 
-router.get('/image/:image_id', (req, res) => {})
+router.get('/photo/:photo_id', (req, res) => {})
 
 /**
  * @swagger
- * /image/{title}:
+ * /photo/{title}:
  *   get:
  *     description: get a photo by title
- *     tags: [Image]
+ *     tags: [photo]
  *     parameters:
  *
- *       - name: image_title
+ *       - name: photo_title
  *         in: path
  *         required: true
- *         description: image id
+ *         description: photo id
  *
  *     responses:
  *       200:
@@ -450,14 +450,14 @@ router.get('/image/:image_id', (req, res) => {})
  *         schema:
  *           type: array
  *           items:
- *             $ref: '#/responses/image'
+ *             $ref: '#/responses/photo'
  *       404:
  *         description: Not found
  *         examples:
  *          application/json:
  *
  *            {
- *                     "message": "Image not found",
+ *                     "message": "photo not found",
  *            }
  *       401:
  *         description: Unauthorized request
@@ -470,12 +470,12 @@ router.get('/image/:image_id', (req, res) => {})
  *
  */
 
-router.get('/image/:image_id', (req, res) => {})
+router.get('/photo/:photo_id', (req, res) => {})
 
 /**
  * @swagger
  * responses:
- *   image:
+ *   photo:
  *     type: object
  *     properties:
  *       photo_id:
@@ -522,7 +522,7 @@ router.get('/image/:image_id', (req, res) => {})
  *       taged_user_id:
  *         type: integer
  *
- *   user_image:
+ *   user_photo:
  *     type: object
  *     properties:
  *       photo_id:
