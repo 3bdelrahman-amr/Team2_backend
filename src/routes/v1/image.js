@@ -109,6 +109,65 @@ router.put('/tag', (req, res) => {})
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+/**
+ * @swagger
+ * /{photo_id}/comments:
+ *   get:
+ *     description: return list of comments for a given photo.
+ *     tags: [photo]
+ *     parameters:
+ *       - name: photo_id
+ *         in: path
+ *         required: true
+ *         description: photo id to get comments for the corresponding photo
+ *         schema:
+ *           type: integer
+ *
+ * 
+ *     responses:
+ * 
+ *       200:
+ *         description: Success
+ *         examples:
+ *          application/json:
+ *              [
+ *                  {
+ *                     "comment": "comment title",
+ *                     "id": "123456",
+ *                     "userName": "John Smith",
+ *                     "createdAt":"2020-5-23",
+ *                     "updatedAt":"2021-4-2"
+ *                  }
+ *              ]
+ *
+ *       404:
+ *         description: Not found
+ *
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                     "message": "photos not found",
+ *            }
+ *       401:
+ *         description: invalid token
+ *
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                     "message": "Invalid token",
+ *            }
+ *
+ *
+ */
+
+ router.get('/{photo/_id}/comments', (req, res) => {})
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * @swagger
  *  /photo/{photo_id}:
@@ -122,6 +181,7 @@ router.put('/tag', (req, res) => {})
  *         description: photo id to add tag to the corresponding photo
  *         schema:
  *           type: integer
+ * 
  *     responses:
  *       200:
  *         description: Success
@@ -157,19 +217,19 @@ router.delete('/delete/:photo_id', (req, res) => {})
 
 /**
  * @swagger
- * /photo/comment:
+ * /{photo_id}/comments:
  *   post:
  *     description: Add comment to photo
  *     tags: [photo]
  *     parameters:
- *       - name: data
- *         in: body
+ *       - name: photo_id
+ *         in: path
  *         required: true
- *         description: photo id to add tag to the corresponding photo
- *         type: object
- *         properties:
- *           photo_id:
- *             type: integer
+ *         description: photo id to add comment to the corresponding photo
+ *         schema:
+ *           type: integer
+ *
+ *     properties:
  *           comment:
  *             type: string
  *     responses:
@@ -177,10 +237,10 @@ router.delete('/delete/:photo_id', (req, res) => {})
  *         description: Success
  *         examples:
  *          application/json:
- *
  *            {
- *                     "message": "Success",
+ *                     "message": "success"
  *            }
+ *         
  *       404:
  *         description: Not found
  *         examples:
@@ -200,8 +260,75 @@ router.delete('/delete/:photo_id', (req, res) => {})
  *
  */
 
-router.put('/comment', (req, res) => {})
-////
+router.post('{photo_id}/comment', (req, res) => {})
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @swagger
+ * /{photo_id}/comments/{comment_id}:
+ *   put:
+ *     description: edit comment on a given photo
+ *     tags: [photo]
+ *     parameters:
+ *       - name: photo_id
+ *         in: path
+ *         required: true
+ *         description: photo id to edit its comment 
+ *         schema:
+ *           type: integer
+ *       - name: comment_id
+ *         in: path
+ *         required: true
+ *         description: comment id to edit it
+ *         schema:
+ *           type: integer
+ *
+ *     properties:
+ *           comment:
+ *             type: string
+ *     responses:
+ *       200:
+ *         description: Success
+ *         examples:
+ *          application/json:
+ *            {
+ *                     "message": "comment updated"
+ *            }
+ *         
+ *       404:
+ *         description: Not found
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                     "message": "photo not found",
+ *            }
+ *          
+ *       401:
+ *         description: Unauthorized request
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                     "message": "Unauthorized",
+ *            }
+ *       403:
+ *         description: Unauthorized request
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                     "message": "Access denied",
+ *            }
+ *
+ */
+
+ router.post('{photo_id}/comment', (req, res) => {})
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -298,7 +425,7 @@ router.put('/photo/{photo_id}', (req, res) => {})
 
 /**
  * @swagger
- * /photo{photo_id}/comment/{comment_id}:
+ * /photo/{photo_id}/comment/{comment_id}:
  *   delete:
  *     description: delete comment from a photo
  *     tags: [photo]
@@ -310,7 +437,7 @@ router.put('/photo/{photo_id}', (req, res) => {})
  *       - name: photo_id
  *         in: path
  *         required: true
- *         description: photo_id to delete a comment from a it
+ *         description: photo_id to delete a comment from it
  *
  *     responses:
  *       200:
@@ -329,18 +456,28 @@ router.put('/photo/{photo_id}', (req, res) => {})
  *            {
  *                     "message": "photo not found",
  *            }
+ *
  *       401:
+ *         description: Invalid token
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                     "message": "Invalid token",
+ *            }
+ *       403:
  *         description: Unauthorized request
  *         examples:
  *          application/json:
  *
  *            {
- *                     "message": "Unauthorized",
+ *                     "message": "Access denied",
  *            }
+ *          
  *
  */
 
-router.put('/photo/comment/{comment_id}', (req, res) => {})
+router.delete('/{photo_id}/comment/{comment_id}', (req, res) => {})
 
 /**
  * @swagger
@@ -503,13 +640,19 @@ router.get('/photo/:photo_id', (req, res) => {})
  *     type: object
  *     properties:
  *       id:
- *         type: integer
+ *         type: string
  *       comment:
  *         type: string
  *       photo_id:
  *         type: integer
  *       commented_user_id:
  *         type: integer
+ *       userName:
+ *          typre:string
+ *       createdAt:
+ *          type:date
+ *       updatedAt:
+ *          type:date
  *   tag:
  *     type: object
  *     properties:
