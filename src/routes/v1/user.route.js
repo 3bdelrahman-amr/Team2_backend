@@ -1,5 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const UserController=require("../../controllers/user.controller");
+const auth=require("../../middlewares/auth");
+const { use } = require('./album.route');
 //schemas
 
 /**
@@ -130,7 +133,7 @@ const router = express.Router();
  *         type: string
  *    
  */
- export const setup = (router) => {
+// export const setup = (router) => {
   /**
   * @swagger
   * /user:
@@ -284,16 +287,7 @@ const router = express.Router();
   *     
   */
   
-  router.post("/user", (req, res) => {
-  
-  
-      console.log(req.body.name);
-  
-  
-  
-  
-  
-  });
+  router.post("/",UserController.register,auth.authentication );
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -334,16 +328,7 @@ const router = express.Router();
   *     
   */
   
-  router.post("/user/login", (req, res) => {
-  
-  
-      console.log(req.body.name);
-  
-  
-  
-  
-  
-  });
+  router.post("/login",UserController.login,auth.authentication);
   /**
       * @swagger
       * /user/followers:
@@ -776,5 +761,5 @@ const router = express.Router();
    */
   
   
-  }
-module.exports = router;
+  //}
+  module.exports=router;

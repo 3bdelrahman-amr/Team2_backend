@@ -1,2 +1,3 @@
 const { Group, groupSchema } = require('./groups.model');
-module.exports = {Group, groupSchema};
+const{User,UserSchema}=require("./user.model")
+module.exports = {Group,User, groupSchema,UserSchema};

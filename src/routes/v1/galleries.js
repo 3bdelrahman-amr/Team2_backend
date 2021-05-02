@@ -1,3 +1,5 @@
+const express=require('express');
+const router=express.Router();
 //schemas
 
 /**
@@ -12,7 +14,7 @@
 *         type: string
 *       
 */
-export const setup = (router) => {
+ 
 /**
 * @swagger
 *  /galleries:
@@ -340,4 +342,4 @@ router.post("/removephoto",(req,res)=>{
 
 
 
-}
+module.exports=router;
