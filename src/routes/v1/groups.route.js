@@ -1,5 +1,10 @@
 const express = require('express')
 const router = express.Router()
+const groupsController = require('../../controllers/group.controller')
+const { checkAuth } = require('../../middlewares/auth')
+router.use(function (req, res, next) {
+    checkAuth(req, res, next)
+})
 /**
  * @swagger
  * /group:
@@ -35,7 +40,9 @@ const router = express.Router()
  *
  */
 
-router.post('/', (req, res) => {})
+router.post('/', (req, res) => {
+    groupsController.create_group(req, res)
+})
 
 /**
  * @swagger
@@ -44,7 +51,7 @@ router.post('/', (req, res) => {})
  *     description: get a group by id
  *     tags: [Group]
  *     parameters:
- *       - name: data
+ *       - name: group_id
  *         in: path
  *         required: true
  *         description: Group data
@@ -55,8 +62,13 @@ router.post('/', (req, res) => {})
  *
  *         examples:
  *           application/json:
- *             {
- *                     "description": "string",
+ *              {
+ *                  "_id": "608c80ce54e3d74b34d9bb5a",
+ *                  "Photos": [],
+ *                  "privacy": "public",
+ *                  "visibility": "public",
+ *                  "name": "ABC",
+ *                  "role": "member"
  *             }
  *       401:
  *         description: Unauthorized request
@@ -70,7 +82,7 @@ router.post('/', (req, res) => {})
  */
 
 router.get('/:group_id', (req, res) => {
-    res.sendStatus(200)
+    groupsController.get_group(req, res)
 })
 /**
  * @swagger
@@ -284,7 +296,7 @@ router.get('/photos/:id', (req, res) => {})
  *
  *
  */
-router.delete('/:group_id/leave', (req, res) => {})
+router.get('/:group_id/join', (req, res) => groupsController.join(req, res))
 
 /**
  * @swagger
@@ -336,7 +348,9 @@ router.delete('/:group_id/leave', (req, res) => {})
  *
  *
  */
-router.delete('/:group_id/leave', (req, res) => {})
+router.delete('/:group_id/leave', (req, res) => {
+    groupsController.leave(req, res)
+})
 
 /**
  * @swagger
