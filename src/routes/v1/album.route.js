@@ -240,15 +240,7 @@ router.get('/album/:id',auth,albumController.getAlbumbyId)
  *            type: array
  *            items:
  *              $ref: "#/definitions/getAlbumByID"
- *
- *       404:
- *         description: Not found
- *         examples:
- *          application/json:
- *
- *            {
- *                       "error": "Album not found",
- *            }
+
  *       500:
  *         description: No value passed
  *         examples:
@@ -265,6 +257,51 @@ router.get('/album/:id',auth,albumController.getAlbumbyId)
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @swagger
+ * /album/user/{username}:
+ *   get:
+ *     tags: [Album]
+ *     description: Return albums of the user with the given username
+ *     parameters:
+ *       - name: username
+ *         in: url
+ *         required: true
+ *         description: username
+ *         schema:
+ *     responses:
+ *       200:
+ *         description: Success
+ *         schema:
+ *            type: array
+ *            items:
+ *              $ref: "#/definitions/getAlbumByID"
+ * 
+ *       404:
+ *         description: User not found
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                       "error": "User not found",
+ *            }
+ *       500:
+ *         description: No value passed
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                       "error": "Username is not sent",
+ *            }
+ */
+
+ router.get('/album/user/:username',auth,albumController.getAlbumbyUsername)
+
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+
 /**
  * @swagger
  *

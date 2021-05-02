@@ -98,9 +98,9 @@ const getUserAlbums = async (req, res) => {
     try {
         await user.populate('albums').execPopulate();
         const albums = user.albums;
-        var albumsObj= [];
-        Array.prototype.forEach.call(albums,(album)=>{
-            const albumObj= album.toObject();
+        var albumsObj = [];
+        Array.prototype.forEach.call(albums, (album) => {
+            const albumObj = album.toObject();
             delete albumObj.owner_id
             delete albumObj.__v
             albumsObj.push(albumObj);
@@ -113,8 +113,25 @@ const getUserAlbums = async (req, res) => {
     }
 }
 
-const getAlbumbyUsername = async (req,res) => {
+const getAlbumbyUsername = async (req, res) => {
+    try {
+        const user = await User.findOne({ UserName: req.params.username });
+        if (!user)
+            res.status(404).send({ error: "User is not found" });
 
+        await user.populate('albums').execPopulate();
+        const albums = user.albums;
+        var albumsObj = [];
+        Array.prototype.forEach.call(albums, (album) => {
+            const albumObj = album.toObject();
+            delete albumObj.owner_id
+            delete albumObj.__v
+            albumsObj.push(albumObj);
+        })
+        res.status(200).send(albumsObj);
+    } catch (error) {
+        res.status(500).send({ error: "Username is not sent correctly" });
+    }
 }
 
 module.exports = {
@@ -122,6 +139,7 @@ module.exports = {
     updateAlbum,
     deleteAlbum,
     getAlbumbyId,
-    getUserAlbums
+    getUserAlbums,
+    getAlbumbyUsername
 };
 
