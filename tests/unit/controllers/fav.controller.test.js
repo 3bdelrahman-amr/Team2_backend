@@ -15,9 +15,10 @@ describe('Favs Controller Add fav', () => {
         })
         await mongoose.connection.dropDatabase()
         req = { headers: {}, params: {}, body: {} }
-        req.headers.authorization =
-            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwODgzNDUzNmRlMTM2MzI5MDM3MDFiNyJ9.dOWzfn2laD5YWqfgKhbFgk17_cCCbkW4K6lN6CV8GSg'
+        req.headers.token =
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwODgzNDUzNmRlMTM2MzI5MDM3MDFiNyJ9.dOWzfn2laD5YWqfgKhbFgk17_cCCbkW4K6lN6CV8GSg'
         res = {
+            locals: {},
             response: null,
             statusCode: 0,
             status: function (code) {
@@ -98,9 +99,12 @@ describe('Favs Controller Remove Fav', () => {
         })
         await mongoose.connection.dropDatabase()
         req = { headers: {}, params: {} }
-        req.headers.authorization =
-            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwODgzNDUzNmRlMTM2MzI5MDM3MDFiNyJ9.dOWzfn2laD5YWqfgKhbFgk17_cCCbkW4K6lN6CV8GSg'
+        req.headers.token =
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwODgzNDUzNmRlMTM2MzI5MDM3MDFiNyJ9.dOWzfn2laD5YWqfgKhbFgk17_cCCbkW4K6lN6CV8GSg'
         res = {
+            locals: {
+                userid: '608834536de13632903701b7',
+            },
             response: null,
             statusCode: 0,
             status: function (code) {

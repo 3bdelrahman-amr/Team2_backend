@@ -10,7 +10,7 @@
 const express = require('express')
 const router = express.Router()
 const { favsController } = require('../../controllers')
-const { checkAuth } = require('../../middlewares/auth')
+const { authorization } = require('../../middlewares/auth')
 /**
  * @swagger
  * /favs:
@@ -60,7 +60,7 @@ const { checkAuth } = require('../../middlewares/auth')
  *
  */
 router.use(function (req, res, next) {
-    checkAuth(req, res, next)
+    authorization(req, res, next)
 })
 router.post('/', (req, res) => {
     favsController.add_fav(req, res)

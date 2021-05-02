@@ -1,12 +1,10 @@
 const { Photo } = require('../models/photo.model')
 const { User } = require('../models/user.model')
-const jwt = require('jsonwebtoken')
+const mongoose = require('mongoose')
 exports.add_fav = async function (req, res) {
-    let token, tokenData, user, photo, photoId, userId
-    token = req.headers.authorization.split(' ')[1]
-    tokenData = jwt.decode(token)
+    let user, photo, photoId, userId
     photoId = req.body.photo_id
-    userId = tokenData.id
+    userId = res.locals.userid
     photo = await Photo.findById(photoId).exec()
     user = await User.findById(userId).exec()
     if (!photoId) {
@@ -37,12 +35,10 @@ exports.add_fav = async function (req, res) {
     }
 }
 exports.remove_fav = async function (req, res) {
-    let token, tokenData, photo, photoId, userId
-    token = req.headers.authorization.split(' ')[1]
-    tokenData = jwt.decode(token)
+    let photo, photoId, userId
     photoId = req.params.photoid
-    userId = tokenData.id
     photo = await Photo.findById(photoId).exec()
+    userId = res.locals.userid
     if (!photoId) {
         res.status(422).json({ message: 'Missing photo parameter' })
     } else if (!photo) {

@@ -41,29 +41,29 @@ describe('Favs add integration tests', function () {
         const response = await supertest(app)
             .post(base + 'favs/')
             .send(photoid)
-        expect(response.status).toBe(401)
+        expect(response.status).toBe(403)
     })
     it('Should post to api/v1/favs with token and a photoId that does not exist', async () => {
         const token =
-            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwODgzNDUzNmRlMTM2MzI5MDM3MDFiNyJ9.dOWzfn2laD5YWqfgKhbFgk17_cCCbkW4K6lN6CV8GSg'
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwODgzNDUzNmRlMTM2MzI5MDM3MDFiNyJ9.dOWzfn2laD5YWqfgKhbFgk17_cCCbkW4K6lN6CV8GSg'
         const photoid = {
             photo_id: '608834536de13632903701b5',
         }
         const response = await supertest(app)
             .post(base + 'favs/')
-            .set({ Authorization: token })
+            .set({ token: token })
             .send(photoid)
         expect(response.status).toBe(404)
     })
     it('Should post to api/v1/favs with token and a photoId that exists', async () => {
         const token =
-            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwODgzNDUzNmRlMTM2MzI5MDM3MDFiNyJ9.dOWzfn2laD5YWqfgKhbFgk17_cCCbkW4K6lN6CV8GSg'
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwODgzNDUzNmRlMTM2MzI5MDM3MDFiNyJ9.dOWzfn2laD5YWqfgKhbFgk17_cCCbkW4K6lN6CV8GSg'
         const photoid = {
             photo_id: '608834536de13632903701b7',
         }
         const response = await supertest(app)
             .post(base + 'favs/')
-            .set({ Authorization: token })
+            .set({ token: token })
             .send(photoid)
         expect(response.status).toBe(200)
     })
@@ -110,33 +110,33 @@ describe('Favs delete integration tests', function () {
         const photoid = '608834536de13632903701b7'
         const response = await supertest(app).delete(base + 'favs/' + photoid)
 
-        expect(response.status).toBe(401)
+        expect(response.status).toBe(403)
     })
     it('Should Fail when req contains an incorrect photoId', async () => {
         const token =
-            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwODgzNDUzNmRlMTM2MzI5MDM3MDFiNyJ9.dOWzfn2laD5YWqfgKhbFgk17_cCCbkW4K6lN6CV8GSg'
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwODgzNDUzNmRlMTM2MzI5MDM3MDFiNyJ9.dOWzfn2laD5YWqfgKhbFgk17_cCCbkW4K6lN6CV8GSg'
         const photoid = '608834536de13632903701b9'
         const response = await supertest(app)
             .delete(base + 'favs/' + photoid)
-            .set({ Authorization: token })
+            .set({ token: token })
         expect(response.status).toBe(404)
     })
     it('Should fail as photo is not favourite', async () => {
         const token =
-            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwODgzNDUzNmRlMTM2MzI5MDM3MDFiNyJ9.dOWzfn2laD5YWqfgKhbFgk17_cCCbkW4K6lN6CV8GSg'
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwODgzNDUzNmRlMTM2MzI5MDM3MDFiNyJ9.dOWzfn2laD5YWqfgKhbFgk17_cCCbkW4K6lN6CV8GSg'
         const photoid = '608834536de13632903701b5'
         const response = await supertest(app)
             .delete(base + 'favs/' + photoid)
-            .set({ Authorization: token })
+            .set({ token: token })
         expect(response.status).toBe(500)
     })
     it('Should successfully remove photo', async () => {
         const token =
-            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwODgzNDUzNmRlMTM2MzI5MDM3MDFiNyJ9.dOWzfn2laD5YWqfgKhbFgk17_cCCbkW4K6lN6CV8GSg'
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwODgzNDUzNmRlMTM2MzI5MDM3MDFiNyJ9.dOWzfn2laD5YWqfgKhbFgk17_cCCbkW4K6lN6CV8GSg'
         const photoid = '608834536de13632903701b7'
         const response = await supertest(app)
             .delete(base + 'favs/' + photoid)
-            .set({ Authorization: token })
+            .set({ token: token })
         expect(response.status).toBe(200)
     })
 })
