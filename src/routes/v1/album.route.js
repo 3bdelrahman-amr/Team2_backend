@@ -7,7 +7,7 @@ const albumController = require('../../controllers/album.controller');
  * @swagger
  * /album:
  *   post:
- *     tags: [album]
+ *     tags: [Album]
  *     description: Create new album.
  *     
  *     parameters:
@@ -38,14 +38,22 @@ const albumController = require('../../controllers/album.controller');
  *         schema:
  *            $ref: "#/definitions/CreateAlbumResponse"
  *          
- *           
+ *          
  *       401:
  *         description: Unauthorized
  *         examples:
  *          application/json:
  *
  *            {
- *                       "message": "User is not authorized to create album",
+ *                       "error": "User is not authorized to create album",
+ *            }
+ *       400:
+ *         description: Invalid parameters
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                       "error": "Bad request",
  *            }
  *       500:
  *         description: Internal Server error
@@ -53,7 +61,7 @@ const albumController = require('../../controllers/album.controller');
  *          application/json:
  *
  *            {
- *                       "message": "An error has occured",
+ *                       "error": "An error has occured",
  *            }
  *       $ref: "#/definitions/ApiResponse"
  */
@@ -68,7 +76,7 @@ router.post('/album',auth, albumController.createAlbum)
  * @swagger
  * /album/{album:id}:
  *   put:
- *     tags: [album]
+ *     tags: [Album]
  *     description: Update album.
  *     parameters:
  *       - name: album_id
@@ -106,7 +114,7 @@ router.post('/album',auth, albumController.createAlbum)
  *          application/json:
  *
  *            {
- *                       "message": "Album not found",
+ *                       "error": "Album not found",
  *            }
  *       400:
  *         description: Bad request
@@ -114,7 +122,7 @@ router.post('/album',auth, albumController.createAlbum)
  *          application/json:
  *
  *            {
- *                       "message": "Invalid updates",
+ *                       "error": "Invalid updates",
  *            }
  *
  */
@@ -128,7 +136,7 @@ router.post('/album',auth, albumController.createAlbum)
  * @swagger
  * /album/{album_id}:
  *   delete:
- *     tags: [album]
+ *     tags: [Album]
  *     description: delete album by id.
  *     responses:
  *       200:
@@ -145,7 +153,7 @@ router.post('/album',auth, albumController.createAlbum)
  *          application/json:
  *
  *            {
- *                       "message": "Album not found",
+ *                       "error": "Album not found",
  *            }
  *       401:
  *         description: Unauthorized
@@ -153,7 +161,7 @@ router.post('/album',auth, albumController.createAlbum)
  *          application/json:
  *
  *            {
- *                       "message": "Unauthorized request",
+ *                       "error": "Unauthorized request",
  *            }
  *     parameters:
  *       - name: album_id
@@ -165,7 +173,7 @@ router.post('/album',auth, albumController.createAlbum)
  *           format: int32
  */
 
-router.delete('/', (req, res) => { })
+router.delete('/album/:id',auth,albumController.deleteAlbum);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -176,15 +184,19 @@ router.delete('/', (req, res) => { })
  * @swagger
  * /album/{album_id}:
  *   get:
- *     tags: [album]
+ *     tags: [Album]
  *     description: Return album by ID.
+ *     parameters:
+ *       - name: album_id
+ *         in: url
+ *         required: true
+ *         description: album id
+ *         schema:
  *     responses:
  *       200:
  *         description: Success
  *         schema:
- *           type: array
- *           items:
- *             $ref: '#/responses/image'
+ *             $ref: "#/definitions/getAlbumByID"
  *
  *       404:
  *         description: Not found
@@ -192,7 +204,7 @@ router.delete('/', (req, res) => { })
  *          application/json:
  *
  *            {
- *                       "message": "Album not found",
+ *                       "error": "Album not found",
  *            }
  *       500:
  *         description: No value passed
@@ -200,23 +212,59 @@ router.delete('/', (req, res) => { })
  *          application/json:
  *
  *            {
- *                       "message": "Album id not sent",
+ *                       "error": "Album id not sent",
  *            }
- *     parameters:
- *       - name: album_id
- *         in: path
- *         required: true
- *         description: album id
- *         schema:
- *           type: integer
- *           format: int32
  */
 
-router.get('/:album_id', (req, res) => { })
+router.get('/album/:id',auth,albumController.getAlbumbyId)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * @swagger
+ * /album:
+ *   get:
+ *     tags: [Album]
+ *     description: Return all the user albums
+ *     parameters:
+ *       - name: token
+ *         in: header
+ *         required: true
+ *         description: the user token
+ *         schema:
+ *     responses:
+ *       200:
+ *         description: Success
+ *         schema:
+ *            type: array
+ *            items:
+ *              $ref: "#/definitions/getAlbumByID"
+ *
+ *       404:
+ *         description: Not found
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                       "error": "Album not found",
+ *            }
+ *       500:
+ *         description: No value passed
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                       "error": "Album id not sent",
+ *            }
+ */
+
+ router.get('/album',auth,albumController.getUserAlbums);
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
 /**
  * @swagger
  *
@@ -237,7 +285,7 @@ router.get('/:album_id', (req, res) => { })
  *        type: string
  *      description:
  *        type: string
- *      primary_photo_id:
+ *      photos:
  *        type: array
  *        items:
  *          type: integer
@@ -252,6 +300,27 @@ router.get('/:album_id', (req, res) => { })
  *        type: string
  *      createdAt:
  *        type: string
+ *      photos:
+ *          type: array
+ *          items:
+ *             type: integer
+ *  getAlbumByID:
+ *    type: object
+ *    properties:
+ *      _id:
+ *        type: integer
+ *      title:
+ *        type: string
+ *      description:
+ *        type: string
+ *      createdAt:
+ *        type: string
+ *      updatedAt:
+ *        type: string
+ *      photos:
+ *          type: array
+ *          items:
+ *             type: integer
  *  EditAlbum:
  *    type: object
  *    properties:
