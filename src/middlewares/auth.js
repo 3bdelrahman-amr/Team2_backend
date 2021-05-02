@@ -1,0 +1,37 @@
+const jwt=require("jsonwebtoken");
+const configure=require("../../config/default.json")
+const secret=configure.JWT_KEY;
+/////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////
+module.exports.authentication=(req,res)=>{
+   
+    let token=jwt.sign({ id:res.locals.userid },secret,{expiresIn:'24 hours'});
+    res.status(200).send({token:token});
+
+
+}
+/////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+module.exports.authorization=(req,res,next)=>{
+
+
+    let token=req.headers['token'];
+    if(!token)
+      res.status(403).send({message:"no token"});
+
+    jwt.verify(token,secret,(err,decoded)=>{
+    
+    if(err)
+    res.status(500).send({message:"failed to authenticate"});
+
+    if(!decoded)
+    res.status(401).send("unauthorized request");
+    res.locals.userid=decoded;
+
+    next();
+ });
+
+
+}
+///////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////

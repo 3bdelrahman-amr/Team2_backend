@@ -13,13 +13,13 @@
  *            [
  *              {
  *                           "photo_id": 0,
- *                           "photo_url": "http://localhost:3000/images/image.png",
+ *                           "photo_url": "http://localhost:3000/photos/photo.png",
  *                           "tag": "$$$$",
  *                           "title": "Photo 1"
  *               },
  *               {
  *                           "photo_id": 1,
- *                           "photo_url": "http://localhost:3000/images/image2.png",
+ *                           "photo_url": "http://localhost:3000/photos/photo2.png",
  *                           "tag": "$$$$",
  *                           "title": "Photo 2"
  *               }
@@ -162,7 +162,7 @@ router.put('/', (req, res) => {})
  *         schema:
  *           type: array
  *           items:
- *             $ref: '#/responses/image'
+ *             $ref: '#/responses/photo'
  *
  *       404:
  *         description: Not found
@@ -229,6 +229,6 @@ router.get('/:album_id', (req, res) => {})
  *       Albums:
  *         type: array
  *         items:
- *           $ref: '#/responses/image'
+ *           $ref: '#/responses/photo'
  */
 module.exports = router
