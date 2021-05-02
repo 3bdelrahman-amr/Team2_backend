@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Photo = require("./photo.model");
 
 const albumSchema = new mongoose.Schema({
     title: {
@@ -15,16 +16,20 @@ const albumSchema = new mongoose.Schema({
         required: true,
         ref: 'User'
     },
+    photos:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Photo'
+    }]
 
 }, {
     timestamps: true
 });
 
-albumSchema.virtual('photos',{
-    ref: 'photo',
-    localField: '_id',
-    foreignField: 'owner_albums'
-})
+// albumSchema.virtual('photos',{
+//     ref: 'Photo',
+//     localField: '_id',
+//     foreignField: 'albums_ids'
+// })
 
 const Album = mongoose.model('Album', albumSchema);
 

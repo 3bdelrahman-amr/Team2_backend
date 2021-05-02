@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const userController = require('../../controllers/user.controller');
 //schemas
 
 /**
@@ -130,7 +131,7 @@ const router = express.Router()
  *         type: string
  *
  */
-export const setup = (router) => {
+
     /**
      * @swagger
      * /user:
@@ -268,9 +269,7 @@ export const setup = (router) => {
      *
      */
 
-    router.post('/user', (req, res) => {
-        console.log(req.body.name)
-    })
+    router.post('/user',userController.createUser);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -673,5 +672,4 @@ export const setup = (router) => {
      *       num_comments:
      *         type: integer
      */
-}
 module.exports = router
