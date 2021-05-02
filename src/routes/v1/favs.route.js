@@ -9,7 +9,7 @@
  */
 const express = require('express')
 const router = express.Router()
-const { favsController } = require('../../controllers')
+//const { favsController } = require('../../controllers')
 /**
  * @swagger
  * /favs:

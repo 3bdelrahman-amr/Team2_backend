@@ -1,5 +1,5 @@
 const jwt=require("jsonwebtoken");
-const configure=require("../../config/default.json")
+const configure=require("../config/default.json")
 const secret=configure.JWT_KEY;
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
@@ -26,7 +26,7 @@ module.exports.authorization=(req,res,next)=>{
 
     if(!decoded)
     res.status(401).send("unauthorized request");
-    res.locals.userid=decoded;
+    res.locals.userid=decoded.id;
 
     next();
  });

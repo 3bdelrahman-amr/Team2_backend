@@ -1,13 +1,7 @@
-<<<<<<< HEAD
 const express=require('express');
 const router=express.Router();
-=======
-const express = require('express')
-const router = express.Router()
->>>>>>> a5235e6969199774c1df0e0cc4fb69191f8cd710
 //schemas
 /**
-<<<<<<< HEAD
 * @swagger
 * definitions:
 *   Gallery:
@@ -20,19 +14,6 @@ const router = express.Router()
 *       
 */
  
-=======
- * @swagger
- * definitions:
- *   Gallery:
- *     type: object
- *     properties:
- *       title:
- *         type: string
- *       description:
- *         type: string
- *
- */
->>>>>>> a5235e6969199774c1df0e0cc4fb69191f8cd710
 /**
  * @swagger
  *  /galleries:
@@ -314,7 +295,6 @@ router.post('/removephoto', (req, res) => {})
 
  *        
  */
-<<<<<<< HEAD
 
 
 
@@ -326,6 +306,3 @@ router.post('/removephoto', (req, res) => {})
 
 
 module.exports=router;
-=======
-module.exports = router
->>>>>>> a5235e6969199774c1df0e0cc4fb69191f8cd710
