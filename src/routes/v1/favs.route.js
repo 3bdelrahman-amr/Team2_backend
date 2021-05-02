@@ -8,6 +8,7 @@
  *         type: integer
  */
 const express = require('express')
+
 const router = express.Router()
 const { favsController } = require('../../controllers')
 const { authorization } = require('../../middlewares/auth')
@@ -59,12 +60,8 @@ const { authorization } = require('../../middlewares/auth')
  *           $ref: '#/definitions/Fav'
  *
  */
-router.use(function (req, res, next) {
-    authorization(req, res, next)
-})
-router.post('/', (req, res) => {
-    favsController.add_fav(req, res)
-})
+router.use((req, res, next) => authorization(req, res, next))
+router.post('/', (req, res) => favsController.add_fav(req, res))
 /**
  * @swagger
  * /favs/{photo_id}:
@@ -114,8 +111,6 @@ router.post('/', (req, res) => {
  *
  */
 
-router.delete('/:photoid', (req, res) => {
-    favsController.remove_fav(req, res)
-})
+router.delete('/:photoid', (req, res) => favsController.remove_fav(req, res))
 
 module.exports = router

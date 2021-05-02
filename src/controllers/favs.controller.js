@@ -1,12 +1,10 @@
 const { Photo } = require('../models/photo.model')
 const { User } = require('../models/user.model')
-const mongoose = require('mongoose')
+
 exports.add_fav = async function (req, res) {
-    let user, photo, photoId, userId
-    photoId = req.body.photo_id
-    userId = res.locals.userid
-    photo = await Photo.findById(photoId).exec()
-    user = await User.findById(userId).exec()
+    const photoId = req.body.photo_id
+    const userId = res.locals.userid
+    const photo = await Photo.findById(photoId).exec()
     if (!photoId) {
         res.status(422).json({ message: 'Missing photo parameter' })
     } else if (!photo) {
@@ -35,10 +33,9 @@ exports.add_fav = async function (req, res) {
     }
 }
 exports.remove_fav = async function (req, res) {
-    let photo, photoId, userId
-    photoId = req.params.photoid
-    photo = await Photo.findById(photoId).exec()
-    userId = res.locals.userid
+    const photoId = req.params.photoid
+    const photo = await Photo.findById(photoId).exec()
+    const userId = res.locals.userid
     if (!photoId) {
         res.status(422).json({ message: 'Missing photo parameter' })
     } else if (!photo) {
