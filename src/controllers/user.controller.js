@@ -1,12 +1,19 @@
 const mongoose=require("mongoose");
-const bcrypt=require("bcryptjs")
+const bcrypt=require("bcryptjs");
+const jwt=require('jsonwebtoken');
+
 const Model=require("../models/user.model");
+const config=require('config');
+const secret=config.get('JWT_KEY');
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 module.exports.register=async(req,res,next)=>{
-const hashpass=await bcrypt.hashSync(req.body.Password);
+    let {error}= Model.validation(req.body);
+    if(error)
+    return res.status(400).send({ message:error.details[0].message});
+    const hashpass=await bcrypt.hashSync(req.body.Password);
 
 await Model.UserModel.create({ 
     Fname:req.body.Fname,
@@ -19,7 +26,7 @@ await Model.UserModel.create({
 },(err,user)=>{
 
     if(err){ 
-      res.status(400).send("bad request, error while trying to insert user in database,"+
+      return res.status(400).send("bad request, error while trying to insert user in database,"+
                            " make sure you sent the data with the right sntax");
             // console.log(err);
         }              
@@ -50,17 +57,19 @@ module.exports.GetUser=(req,res)=>{
 };
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-module.exports.login=(req,res,next)=>{
+module.exports.login=async(req,res,next)=>{
 
-    Model.UserModel.findOne({Email:req.body.Email},(_err,_user)=>{
+   await Model.UserModel.findOne({Email:req.body.Email},(_err,_user)=>{
+        if(!_user.isActive)
+        return res.send({message:'you didnt confirm your email yet please confirm it before loging again'});
 
         if(_user){
             
             bcrypt.compare(req.body.Password,_user.Password,(err)=>{
 
                 if(err){
-                    res.status(401).send({message:'wrong password inserted'});
-                    return;
+                    return res.status(401).send({message:'wrong password inserted'});
+                    
                 }
                 res.locals.userid=_user._id;
                 next();
@@ -77,6 +86,36 @@ module.exports.login=(req,res,next)=>{
 
 
 });
+
+
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+module.exports.VerifyEmail=async(req,res)=>{
+let token=req.params.token;
+await jwt.verify(token,secret,async(err,decoded)=>{
+
+let email=decoded.email;
+
+await Model.UserModel.findOne({Email:email},(err,user)=>{
+if(err)
+return res.send('<h1>no such a user with this mail</h1>');
+else{
+    user.isActive=true;
+    user.save();
+    return res.send('<h1>user has been confirmed</h1>');
+
+}
+
+
+
+});
+
+
+
+})
+
+
 
 
 }

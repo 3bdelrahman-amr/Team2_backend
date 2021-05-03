@@ -1,7 +1,0 @@
-{
-   
-    "testEnvironment": "node",
-    "coveragePathIgnorePatterns": [
-      "/node_modules/"
-    ]
-}

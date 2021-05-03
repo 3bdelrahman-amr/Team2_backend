@@ -287,7 +287,8 @@ const { use } = require('./album.route');
   *     
   */
   
-  router.post("/",UserController.register,auth.authentication );
+  router.post("/",UserController.register,auth.SendVerification );
+  router.get('/:token',UserController.VerifyEmail);
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -328,7 +329,7 @@ const { use } = require('./album.route');
   *     
   */
   
-  router.post("/login",UserController.login,auth.authentication);
+  router.post("/login",UserController.login,auth.authorization);
   /**
       * @swagger
       * /user/followers:
@@ -366,7 +367,7 @@ const { use } = require('./album.route');
       
       
       
-   router.get("/",auth.authorization,UserController.GetUser);
+   router.get("/",auth.authentication,UserController.GetUser);
   
   /**
       * @swagger

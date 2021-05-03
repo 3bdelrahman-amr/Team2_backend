@@ -1,4 +1,5 @@
 const mongoose=require("mongoose");
+const joi=require('joi');
 const schema=mongoose.Schema;
 
 const UserSchema=new schema(
@@ -110,9 +111,26 @@ Age:{
          type:schema.Types.ObjectId, 
          ref: 'Photo'
        }
-      ],                                           
+      ],
+  isActive:{
+ type:Boolean,
+ default:false,
+  },                                               
 
    }
 );
+module.exports.validation=(body)=>{
+
+const schema={
+Fname:joi.string().min(1).max(50).required(),
+Lname:joi.string().min(1).max(50).required(),
+Age:joi.number().integer().min(1).max(200).required(),
+Email:joi.string().email().required(),
+Password:joi.string().min(1).max(50).required(),
+}
+
+return  joi.validate(body,schema);
+
+}
 
 module.exports.UserModel=mongoose.model('User',UserSchema);;
