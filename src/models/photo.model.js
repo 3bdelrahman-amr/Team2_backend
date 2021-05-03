@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Joi =require('joi');
-
+Joi.objectId= require('joi-objectid')(Joi);
 
 
 const commentSchema = new mongoose.Schema({
@@ -10,7 +10,7 @@ const commentSchema = new mongoose.Schema({
         trim: true,
         maxlenght: 1024
     },
-    userId: {
+    user: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: 'User'

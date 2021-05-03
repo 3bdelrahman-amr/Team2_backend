@@ -1,5 +1,8 @@
 const express = require('express')
 const router = express.Router()
+const {Photo,Comment ,validatePhoto, validateComment,validatePhotoId,validateCommentId}=require('../../models/photo.model')
+const {authorization}= require('../../middlewares/auth')
+const photoController=require('../../controllers/photo.controller')
 //schemas
 /**
  * @swagger
@@ -58,6 +61,7 @@ const router = express.Router()
  */
 
 router.post('/uploadphoto/photo', (req, res) => {})
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -134,8 +138,11 @@ router.put('/tag', (req, res) => {})
  *              [
  *                  {
  *                     "comment": "comment title",
- *                     "id": "123456",
- *                     "userName": "John Smith",
+ *                     "_id": "123456",
+ *                     "user": {
+ *                                  "Fname":"John",
+ *                                  "Lname":"Smith"
+ *                             },
  *                     "createdAt":"2020-5-23",
  *                     "updatedAt":"2021-4-2"
  *                  }
@@ -163,8 +170,7 @@ router.put('/tag', (req, res) => {})
  *
  */
 
- router.get('/{photo/_id}/comments', (req, res) => {})
-
+ router.get('/:photoId/comments',authorization,photoController.getComments);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -260,7 +266,7 @@ router.delete('/delete/:photo_id', (req, res) => {})
  *
  */
 
-router.post('{photo_id}/comment', (req, res) => {})
+ router.post('/:photoId/comments',authorization,photoController.addComment);
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -327,7 +333,7 @@ router.post('{photo_id}/comment', (req, res) => {})
  *
  */
 
- router.post('{photo_id}/comment', (req, res) => {})
+ router.put('{photo_id}/comment', (req, res) => {})
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
