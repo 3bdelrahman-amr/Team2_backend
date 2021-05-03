@@ -10,7 +10,7 @@ const secret=config.get('JWT_KEY');
 
 
 module.exports.register=async(req,res,next)=>{
-    let {error}= Model.validation(req.body);
+    let {error}= Model.validateSignup(req.body);
     if(error)
     return res.status(400).send({ message:error.details[0].message});
     const hashpass=await bcrypt.hashSync(req.body.Password);
@@ -58,6 +58,9 @@ module.exports.GetUser=(req,res)=>{
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 module.exports.login=async(req,res,next)=>{
+    let {error}= Model.validateLogin(req.body);
+    if(error)
+    return res.status(400).send({ message:error.details[0].message});
 
    await Model.UserModel.findOne({Email:req.body.Email},(_err,_user)=>{
         if(!_user.isActive)

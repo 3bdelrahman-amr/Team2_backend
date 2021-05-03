@@ -1,6 +1,7 @@
 const jwt=require("jsonwebtoken");
 const configure=require("../config/default.json")
 const nodemailer=require('nodemailer');
+const emailExisyence=require('email-existence');
 const secret=configure.JWT_KEY;
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
@@ -38,6 +39,12 @@ module.exports.authentication=(req,res,next)=>{
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 module.exports.SendVerification=async(req,res)=>{
 
+await  emailExisyence.check(req.body.Email,(err,response)=>{
+  if(err)
+  return res.status(400).send({message:'invalid email , insert valid one'});
+})
+
+
   let transporter = nodemailer.createTransport({
     service:'gmail',
     auth: {
@@ -64,9 +71,9 @@ let token=jwt.sign({email:req.body.Email},secret,{expiresIn:'24 hours'});
   let info =  transporter.sendMail(option,(err,data)=>{
   
   if(err)
-  return res.send({message:'failed to sent verification mail please fill with a valid email'});
+  return res.status(400).send({message:'failed to sent verification mail please fill with a valid email'});
   else 
-  return res.send({message:'email verification has been sent to you'});
+  return res.status(200).send({message:'email verification has been sent to you'});
   
   });
 
