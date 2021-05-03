@@ -91,26 +91,15 @@ function validateComment(comment){
 
 }
 
-function validatePhotoId(id){
+function validateId(id){
     const schema = Joi.object({
-        photoId: Joi.objectId().required(),
+        id: Joi.objectId().required()
     });
     const result = schema.validate(id);
     return result;
 }
 
-function validateCommentId(id){
-    const schema = Joi.object({
-        commentId: Joi.objectId().required(),
-    });
-    const result = schema.validate(id);
-    return result;
-
-}
-
-exports.validatePhotoId = validatePhotoId;
-exports.validateCommentId = validateCommentId;
-
+exports.validateId = validateId;
 exports.validatePhoto = validatePhoto;
 exports.validateComment = validateComment;
 module.exports.Photo = Photo;
