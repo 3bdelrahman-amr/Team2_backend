@@ -1,9 +1,10 @@
 const express = require('express')
-const router = express.Router()
 const groupsController = require('../../controllers/group.controller')
-const { checkAuth } = require('../../middlewares/auth')
-router.use(function (req, res, next) {
-    checkAuth(req, res, next)
+const { authorization } = require('../../middlewares/auth')
+
+const router = express.Router()
+router.use((req, res, next) => {
+    authorization(req, res, next)
 })
 /**
  * @swagger
