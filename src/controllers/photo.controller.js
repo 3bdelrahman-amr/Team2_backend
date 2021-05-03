@@ -49,3 +49,35 @@ exports.addComment = async (req, res) => {
 
     };
 };
+
+
+exports.deleteComment= async (req, res) => {
+
+    const { error } = validateId({id:req.params.photoId});
+    if (error) return res.status(400).send(error.details[0].message);
+
+    const photo= await Photo.findById(req.params.photoId);
+    if (!photo) return res.status(404).send('photo not found');
+
+    if(photo.privacy==='private' && res.locals.userid.id!=photo.ownerId) 
+        return res.status(403).send('Access denied');
+
+    const result = validateId({id:req.params.photoId});
+    if (result.error) return res.status(400).send(result.error.details[0].message);
+
+    const comment= await photo.comments.id(req.params.commentId);
+    if (!comment) return res.status(404).send('Comment not found');
+
+    if(res.locals.userid.id!=comment.user._id && res.locals.userid.id!=photo.ownerId) 
+        return res.status(403).send('Access denied. User not authorized to delete comment');
+
+    try {
+        comment.remove();
+        photo.save();
+        res.status(201).send('comment deleted successfully');
+    }
+    catch (ex) {
+        console.log(ex.message);
+
+    };
+};

@@ -11,7 +11,7 @@ router.use('/album', albumRoute)
 router.use('/favs', favsRoute)
 router.use('/docs', docsRoute)
 router.use('/group', groupsRoute)
-router.use('/users', usersRoute)
-router.use('/photos', photosRoute)
+router.use('/user', usersRoute)
+router.use('/photo', photosRoute)
 
 module.exports = router

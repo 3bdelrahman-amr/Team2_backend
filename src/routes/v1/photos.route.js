@@ -431,7 +431,7 @@ router.put('/photo/{photo_id}', (req, res) => {})
 
 /**
  * @swagger
- * /photo/{photo_id}/comment/{comment_id}:
+ * /photo/{photo_id}/comments/{comment_id}:
  *   delete:
  *     description: delete comment from a photo
  *     tags: [photo]
@@ -483,7 +483,7 @@ router.put('/photo/{photo_id}', (req, res) => {})
  *
  */
 
-router.delete('/{photo_id}/comment/{comment_id}', (req, res) => {})
+router.delete('/:photoId/comments/:commentId', authorization, photoController.deleteComment)
 
 /**
  * @swagger
