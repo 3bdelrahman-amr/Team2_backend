@@ -1,6 +1,5 @@
 const { Photo } = require('../models/photo.model')
-const  User  = require('../models/user.model')
-
+const { UserModel: User } = require('../models/user.model')
 exports.add_fav = async function (req, res) {
     const photoId = req.body.photo_id
     const userId = res.locals.userid
@@ -24,7 +23,7 @@ exports.add_fav = async function (req, res) {
         await Photo.findByIdAndUpdate(photoId, {
             $addToSet: { Fav: userId },
         })
-        await User.UserModel.findByIdAndUpdate(userId, {
+        await User.findByIdAndUpdate(userId, {
             $addToSet: { Fav: photoId },
         })
         res.status(200).json({
@@ -55,7 +54,7 @@ exports.remove_fav = async function (req, res) {
         await Photo.findByIdAndUpdate(photoId, {
             $pull: { Fav: userId },
         })
-        await User.UserModel.findByIdAndUpdate(userId, {
+        await User.findByIdAndUpdate(userId, {
             $pull: { Fav: photoId },
         })
         res.status(200).json({

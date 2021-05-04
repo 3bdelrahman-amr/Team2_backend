@@ -1,5 +1,6 @@
 const favController = require('../../../src/controllers/favs.controller')
-const { User, Photo } = require('../../../src/models')
+const { Photo } = require('../../../src/models')
+const { UserModel: User } = require('../../../src/models/user.model')
 const config = require('config')
 const mongoose = require('mongoose')
 describe('Favs Controller Add fav', () => {
@@ -31,13 +32,15 @@ describe('Favs Controller Add fav', () => {
         }
         user = new User({
             _id: '608834536de13632903701b7',
-            email: 'test@test.com',
+            Email: 'test@test.com',
+            UserName: 'test',
             Fname: 'test',
             Lname: 'test',
             username: 'test',
             about: 'test',
             date_joined: Date.now(),
-            age: 50,
+            Age: 50,
+            Password: '123456',
             Fav: [],
         })
         await user.save()
@@ -117,13 +120,15 @@ describe('Favs Controller Remove Fav', () => {
         }
         user = new User({
             _id: '608834536de13632903701b7',
-            email: 'test@test.com',
+            Email: 'test@test.com',
+            UserName: 'test',
             Fname: 'test',
             Lname: 'test',
             username: 'test',
             about: 'test',
             date_joined: Date.now(),
-            age: 50,
+            Age: 50,
+            Password: '123456',
             Fav: ['608834536de13632903701b7'],
         })
         await user.save()
