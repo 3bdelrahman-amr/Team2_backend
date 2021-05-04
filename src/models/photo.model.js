@@ -26,13 +26,13 @@ const photoSchema = new mongoose.Schema({
     title: {
         type: String,
         trim: true,
-        required: true,
+        required: false,
         default: "photo title",
         maxlength: 255
     },
     description: {
         type: String,
-        required: true,
+        required: false,
         default: "photo",
         maxlength: 1024
     },
@@ -42,7 +42,7 @@ const photoSchema = new mongoose.Schema({
     },
     privacy: {
         type: String,
-        required: true,
+        required: false,
         default: 'private',
         trim: true,
         enum: ['private', 'public']
@@ -69,11 +69,11 @@ const Photo = mongoose.model('Photo', photoSchema);
 
 function validatePhoto(photo){
     const schema = Joi.object({
-        title: Joi.string().max(255),
-        description:Joi.string().max(1024),
-        photoUrl:Joi.string().required(),
-        privacy:Joi.string().validate('private','public'),
-        tags:Joi.array().items(Joi.string().max(50))
+        title: Joi.string().max(255).allow(null, ''),
+        description:Joi.string().max(1024).allow(null, ''),
+        privacy:Joi.string().valid('private','public'),
+        tags:Joi.array().items(Joi.string().max(50)),
+        comments: Joi.array().items(Joi.string().max(1024))
 
     });
     const result = schema.validate(photo);

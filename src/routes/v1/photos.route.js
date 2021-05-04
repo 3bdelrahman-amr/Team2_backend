@@ -15,6 +15,9 @@ const photoController=require('../../controllers/photo.controller')
  *       description:
  *         type: string
  *         required: false
+ *       privacy:
+ *          type: string
+ *          required: false
  *       file:
  *         type: string
  *         format: base64
@@ -27,40 +30,60 @@ const photoController=require('../../controllers/photo.controller')
  *     description: Add photo
  *     tags: [photo]
  *     parameters:
- *       - name: body
+ *       - name: title
+ *         in: body
+ *         required: false
+ *         description: photo's title
+ *         schema:
+ *       - name: description
+ *         in: body
+ *         required: false
+ *         description: photo's description
+ *         schema:
+ *       - name: privacy
+ *         in: body
+ *         required: false
+ *         description: photo's privacy
+ *         schema: 
+ *       - name: file
  *         in: body
  *         required: true
- *         description: photo's data
+ *         description: photo's file
  *         schema:
- *           $ref: '#/definitions/photo'
+ *           $ref: "#/definitions/photo"
  *     responses:
- *       201:
- *         description: photo created successfully
- *         examples:
- *          application/json:
- *
- *            {
- *                     "photo_id": 0,
- *            }
+ *       200:
+ *         description: photo added successfully
+ *         schema:
+ *           $ref: "#responses/user_photo"
  *       401:
  *         description: Unauthorized
  *         examples:
  *          application/json:
  *
  *            {
- *                     "message": "Unauthorized request",
+ *                     "error": "Unauthorized request",
  *            }
- *       500:
- *         description: Bad file type
+ *       400:
+ *         description: Bad request or file type
  *         examples:
  *          application/json:
  *
  *            {
- *                     "message": "Bad file type",
+ *                     "error": "Bad request or file type",
+ *            }
+*       500:
+ *         description: internal server error
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                     "error": "Internal server error",
  *            }
  */
 
-router.post('/uploadphoto/photo', (req, res) => {})
+router.post('/photo',authorization,photoController.upload.single("photo"),photoController.AddPhoto)
+
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -674,21 +697,17 @@ router.get('/photo/:photo_id', (req, res) => {})
  *   user_photo:
  *     type: object
  *     properties:
- *       photo_id:
+ *       _id:
  *         type: integer
+ *       title:
+ *          type: string
+ *       description:
+ *          type: string
  *       photo_url:
  *         type: string
- *       photo_owner_id:
- *         type: integer
- *       num_favs:
- *         type: integer
- *       num_views:
- *         type: integer
- *       photo_owner_name:
+ *       privacy:
  *         type: string
- *
- *       description:
- *         type: string
+ *       
  *
  *
  *
