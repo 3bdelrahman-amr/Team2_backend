@@ -2,6 +2,7 @@ const jwt=require("jsonwebtoken");
 const configure=require("../config/default.json")
 const nodemailer=require('nodemailer');
 const emailExisyence=require('email-existence');
+const Model=require('../models/user.model')
 const secret=configure.JWT_KEY;
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
@@ -39,17 +40,21 @@ module.exports.authentication=(req,res,next)=>{
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 module.exports.SendVerification=async(req,res)=>{
 
-await  emailExisyence.check(req.body.Email,(err,response)=>{
-  if(err)
-  return res.status(400).send({message:'invalid email , insert valid one'});
-})
+   emailExisyence.check(req.body.email,async(err,response)=>{
+    if(err){
+      await Model.UserModel.deleteOne({Email:req.body.email}); 
+    return res.status(400).send({message:'invalid email , insert valid one'});
+    }
+   
+    ;});
+
 
 
   let transporter = nodemailer.createTransport({
     service:'gmail',
     auth: {
-      user: 'dropoidcompany@gmail.com', // generated ethereal user
-      pass: 'Dropoid123', // generated ethereal password
+      user: 'dropoidcompany@gmail.com',
+      pass: 'Dropoid123', 
     },
     tls:{
       rejectUnauthorized:false
@@ -62,13 +67,14 @@ let token=jwt.sign({email:req.body.Email},secret,{expiresIn:'24 hours'});
 
   let option={
     from: 'noreplay@example.com', // sender address
-    to: req.body.Email, // list of receivers
+    to: req.body.email, // list of receivers
     subject: "Mail confirmation", // Subject line
     text: "confirm please your mail", // plain text body
     html: '<a href="'+req.protocol+'://'+req.get('host')+req.originalUrl+'/'+token+'">link of confirmation</a>', // html body
   }
+
   
-  let info =  transporter.sendMail(option,(err,data)=>{
+  let info =  await transporter.sendMail(option,(err,data)=>{
   
   if(err)
   return res.status(400).send({message:'failed to sent verification mail please fill with a valid email'});
@@ -80,3 +86,5 @@ let token=jwt.sign({email:req.body.Email},secret,{expiresIn:'24 hours'});
 
 
 }
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////

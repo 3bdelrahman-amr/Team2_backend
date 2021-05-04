@@ -124,11 +124,11 @@ Age:{
 module.exports.validateSignup=(body)=>{
 
 const schema={
-Fname:joi.string().min(1).max(50).required(),
-Lname:joi.string().min(1).max(50).required(),
-Age:joi.number().integer().min(1).max(200).required(),
-Email:joi.string().email().required(),
-Password:joi.string().min(1).max(50).required(),
+firstName:joi.string().min(1).max(50).required(),
+lastName:joi.string().min(1).max(50).required(),
+age:joi.number().integer().min(1).max(200).required(),
+email:joi.string().email().required(),
+password:joi.string().min(1).max(50).required(),
 }
 
 return  joi.validate(body,schema);
@@ -139,8 +139,8 @@ return  joi.validate(body,schema);
 module.exports.validateLogin=(body)=>{
 
   const schema={
-  Email:joi.string().email().required(),
-  Password:joi.string().min(1).max(50).required(),
+  email:joi.string().email().required(),
+  password:joi.string().min(1).max(50).required(),
   }
   
   return  joi.validate(body,schema);
