@@ -27,7 +27,7 @@ exports.addComment = async (req, res) => {
     if (error) return res.status(400).send(error.details[0].message);
 
     const photo= await Photo.findById(req.params.photoId);
-    if (!photo) return res.status(400).send('Photo not found');
+    if (!photo) return res.status(404).send('Photo not found');
     
     if(photo.privacy==='private' && res.locals.userid.id!=photo.ownerId) 
         return res.status(403).send('Access denied');
