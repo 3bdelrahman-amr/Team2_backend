@@ -40,6 +40,13 @@ const photoSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    Fav: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+            unique: true,
+        },
+    ],
     privacy: {
         type: String,
         required: false,
