@@ -21,4 +21,6 @@ app.options('*', cors())
 // v1 api routes
 app.use('/api/v1', routes)
 
+app.use('/photos',express.static('photos')); // makes the photos folder available for everyone
+
 module.exports = app

@@ -104,7 +104,7 @@ const UserSchema = new schema(
       type: schema.Types.ObjectId,
       ref: 'Photo'
     }
-    ],
+    ]
 
   }
 );
