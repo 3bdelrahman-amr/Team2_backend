@@ -30,12 +30,41 @@ describe('Groups Controller create group', () => {
             },
         }
         group = new Group({
+            _id: '608834536de13632903701b7',
             name: 'test_group',
             description: 'test',
             privacy: 'public',
             visibility: 'public',
         })
         await group.save()
+    })
+    describe('Get a group with invalid id', () => {
+        it('Should Fail when invalid id used', async () => {
+            req.params.group_id = '10'
+            await groupController.get_group(req, res)
+            expect(res.statusCode).toBe(500)
+            expect(res.response.message).toBe('Invalid group ID')
+        })
+    })
+    describe('Get a group with no id', () => {
+        it('Should Fail when no group ID specified', async () => {
+            await groupController.create_group(req, res)
+            expect(res.statusCode).toBe(422)
+        })
+    })
+    describe('Get a group successfully', () => {
+        it('Should successfully fetch a group', async () => {
+            req.params.group_id = '608834536de13632903701b7'
+            await groupController.get_group(req, res)
+            expect(res.statusCode).toBe(200)
+        })
+    })
+    describe('Get a group with incorrect id', () => {
+        it('Should fail as id doesnt exist', async () => {
+            req.params.group_id = '608834536de13632903701b3'
+            await groupController.get_group(req, res)
+            expect(res.statusCode).toBe(404)
+        })
     })
     describe('Create a new group with no group name', () => {
         it('Should Fail when no group name is set', async () => {
