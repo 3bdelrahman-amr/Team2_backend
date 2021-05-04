@@ -1,7 +1,6 @@
 const express = require('express')
 const mongoSanitize = require('express-mongo-sanitize')
 const cors = require('cors')
-const httpStatus = require('http-status')
 const routes = require('./routes/v1')
 
 const app = express()

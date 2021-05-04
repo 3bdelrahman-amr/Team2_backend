@@ -1,3 +1,8 @@
-const { Group, groupSchema } = require('./groups.model');
-const{User,UserSchema}=require("./user.model")
-module.exports = {Group,User, groupSchema,UserSchema};
+//const { User, UserSchema } = require('./user.model')
+const { Photo, PhotoSchema } = require('./photo.model')
+
+module.exports = {
+   
+    Photo,
+    PhotoSchema,
+}
