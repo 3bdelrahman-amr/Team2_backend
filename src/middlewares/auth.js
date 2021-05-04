@@ -63,7 +63,7 @@ module.exports.SendVerification=async(req,res)=>{
 
 
 
-let token=jwt.sign({email:req.body.Email},secret,{expiresIn:'24 hours'});  
+let token=jwt.sign({email:req.body.email},secret,{expiresIn:'24 hours'});  
 
   let option={
     from: 'noreplay@example.com', // sender address
