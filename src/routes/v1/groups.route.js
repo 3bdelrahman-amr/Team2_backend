@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const groupsController = require('../../controllers/group.controller')
+//const groupsController = require('../../controllers/group.controller')
 const { checkAuth } = require('../../middlewares/auth')
 router.use(function (req, res, next) {
     checkAuth(req, res, next)

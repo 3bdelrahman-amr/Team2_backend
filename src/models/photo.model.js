@@ -24,7 +24,6 @@ const PhotoSchema = new Schema({
             unique: true,
         },
     ],
-<<<<<<< HEAD
     privacy:{
         type:String,
         enum:['Public','Private','Friends'],
@@ -35,8 +34,6 @@ const PhotoSchema = new Schema({
         ref:'User'
 
     }
-=======
->>>>>>> 5c7e5aa18b16b63b16718557283c80029a3a0eb3
 })
 Photo = mongoose.model('Photo', PhotoSchema)
 module.exports = { Photo, PhotoSchema }

@@ -11,7 +11,7 @@ const express = require('express')
 
 const router = express.Router()
 const { favsController } = require('../../controllers')
-const { authorization } = require('../../middlewares/auth')
+const { authorization, authentication } = require('../../middlewares/auth')
 /**
  * @swagger
  * /favs:
@@ -60,7 +60,7 @@ const { authorization } = require('../../middlewares/auth')
  *           $ref: '#/definitions/Fav'
  *
  */
-router.use((req, res, next) => authorization(req, res, next))
+router.use((req, res, next) => authentication(req, res, next))
 router.post('/', (req, res) => favsController.add_fav(req, res))
 /**
  * @swagger
