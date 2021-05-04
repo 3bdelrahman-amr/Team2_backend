@@ -2,9 +2,6 @@ const express = require('express');
 const router = express.Router();
 const UserController=require("../../controllers/user.controller");
 const auth=require("../../middlewares/auth");
-const { use } = require('./album.route');
-const express = require('express')
-const router = express.Router()
 //schemas
 /**
  * @swagger
@@ -288,7 +285,7 @@ const router = express.Router()
   *     
   */
   
-  router.post("/",UserController.register,auth.authentication );
+  router.post("/",auth.authentication,UserController.register );
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -26,13 +26,13 @@ const photoSchema = new mongoose.Schema({
     title: {
         type: String,
         trim: true,
-        required: true,
+        required: false,
         default: "photo title",
         maxlength: 255
     },
     description: {
         type: String,
-        required: true,
+        required: false,
         default: "photo",
         maxlength: 1024
     },
@@ -42,7 +42,7 @@ const photoSchema = new mongoose.Schema({
     },
     privacy: {
         type: String,
-        required: true,
+        required: false,
         default: 'private',
         trim: true,
         enum: ['private', 'public']
