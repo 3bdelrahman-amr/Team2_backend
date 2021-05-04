@@ -32,7 +32,7 @@ exports.AddPhoto = async (req, res) => {
         ownerId: _id,
         photoUrl: req.file.path
     })
-    const {error} = validatePhoto(req.body);
+    const { error } = validatePhoto(req.body);
     if (error) {
         console.log(error.details[0].message);
         return res.status(400).send({ error: "Bad request parameters" });
@@ -47,6 +47,19 @@ exports.AddPhoto = async (req, res) => {
 
 }
 
+
+
+exports.getComments = async (req, res) => {
+
+    const { error } = validateId({ id: req.params.photoId });
+    if (error) return res.status(400).send(error.details[0].message);
+
+    const photo = await Photo.findById(req.params.photoId)
+        .populate('comments.user', 'Fname Lname -_id');
+    if (!photo) return res.status(404).send('Photo not found');
+    if (photo.privacy === 'private' && res.locals.userid.id != photo.ownerId)
+        return res.status(403).send('Access denied');
+}
 
 
 exports.getComments = async (req, res) => {
