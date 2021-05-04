@@ -6,15 +6,12 @@ const groupsRoute = require('./groups.route')
 const usersRoute = require('./user.route')
 const photosRoute = require('./photos.route')
 
-const usersRoute = require('./user.route')
-const photosRoute = require('./photos.route')
 
 const router = express.Router()
 router.use('/album', albumRoute)
 router.use('/favs', favsRoute)
 router.use('/docs', docsRoute)
 router.use('/group', groupsRoute)
-router.use('/user', usersRoute)
 router.use('/photo', photosRoute)
 
 router.use('/user', usersRoute)
