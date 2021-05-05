@@ -171,8 +171,10 @@ describe('delete comments', async () => {
         res.locals.userid={
             id:'608f4985490a9381560f77e1'
         };
-        photoModel.Photo.findById=jest.fn();
+        photoModel.Photo.findById=jest.fn()
+            .mockReturnValue({id:req.params.photoId,comments:[{id:3242,comments:'hey'}]});
         photoModel.validateComment=jest.fn();
+        
         photoController.deleteComment(req, res);
         //expect(photoModel.validateComment).toHaveBeenCalled();
         expect(photoModel.Photo.findById).toHaveBeenCalled();

@@ -42,7 +42,7 @@ const photoSchema = new mongoose.Schema({
     },
     Fav: [
         {
-            type: Schema.Types.ObjectId,
+            type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
             unique: true,
         },
