@@ -57,7 +57,7 @@ router.get('/getgroups/:userid', (req, res) => {
  *         schema:
  *           type: array
  *           items:
- *             $ref: '#/responses/user_image'
+ *             $ref: '#/responses/user_photo'
  *       404:
  *         description: Not found
  *         examples:

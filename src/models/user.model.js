@@ -1,5 +1,5 @@
 const mongoose=require("mongoose");
-const joi=require('joi');
+const Joi=require('joi');
 const schema=mongoose.Schema;
 
 const UserSchema=new schema(
@@ -123,27 +123,27 @@ Age:{
 /////////////////////////////////////////////////////////////////////////////////////////////////
 module.exports.validateSignup=(body)=>{
 
-const schema={
-firstName:joi.string().min(1).max(50).required(),
-lastName:joi.string().min(1).max(50).required(),
-age:joi.number().integer().min(1).max(200).required(),
-email:joi.string().email().required(),
-password:joi.string().min(1).max(50).required(),
-}
+const schema=Joi.object({
+firstName:Joi.string().min(1).max(50).required(),
+lastName:Joi.string().min(1).max(50).required(),
+age:Joi.number().integer().min(1).max(200).required(),
+email:Joi.string().email().required(),
+password:Joi.string().min(1).max(50).required(),
+});
 
-return  joi.validate(body,schema);
+return  schema.validate(body);
 
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 module.exports.validateLogin=(body)=>{
 
-  const schema={
-  email:joi.string().email().required(),
-  password:joi.string().min(1).max(50).required(),
-  }
+  const schema=Joi.object( {
+  email:Joi.string().email().required(),
+  password:Joi.string().min(1).max(50).required(),
+  });
   
-  return  joi.validate(body,schema);
+  return  schema.validate(body);
   
   }
   
