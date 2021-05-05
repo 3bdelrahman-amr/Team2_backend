@@ -18,6 +18,10 @@ app.use(cors())
 app.options('*', cors())
 
 // v1 api routes
-app.use('/api/v1', routes)
+app.use('/api/v1',routes);
+// app.listen(3000,(err)=>{
+//     console.log("start list");
+    
+// });
 
 module.exports = app

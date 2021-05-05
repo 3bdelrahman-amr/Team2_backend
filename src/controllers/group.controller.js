@@ -66,3 +66,97 @@ exports.get_group = async function (req, res) {
         res.status(200).json(group)
     }
 }
+exports.join = async function (req, res) {
+    let token, tokenData, user, group, groupId, userId
+    token = req.headers.authorization.split(' ')[1]
+    tokenData = jwt.decode(token)
+    groupId = req.params.group_id
+    userId = tokenData.id
+    user = await User.findById(userId).exec()
+    try {
+        group = await Group.findById(groupId).lean().exec()
+    } catch (err) {
+        return res.status(500).json({ message: 'Invalid group ID' })
+    }
+    if (!groupId) {
+        res.status(422).json({ message: 'Missing group parameter' })
+    } else if (!group) {
+        res.status(404).json({ message: 'Group not found' })
+    } else {
+        const number = await Group.find({
+            _id: groupId,
+            Members: {
+                $elemMatch: { ref: userId },
+            },
+        }).exec()
+        if (number.length > 0) {
+            return res.status(500).json({
+                message: 'User is already a member of the group',
+            })
+        }
+        await Group.findByIdAndUpdate(groupId, {
+            $addToSet: {
+                Members: {
+                    ref: userId,
+                    role: 'member',
+                },
+            },
+        })
+        await User.findByIdAndUpdate(userId, {
+            $addToSet: {
+                Groups: {
+                    ref: groupId,
+                    role: 'member',
+                },
+            },
+        })
+        res.status(200).json({
+            message: 'User added to group successfully',
+        })
+    }
+}
+
+exports.leave = async function (req, res) {
+    let token, tokenData, user, group, groupId, userId
+    token = req.headers.authorization.split(' ')[1]
+    tokenData = jwt.decode(token)
+    groupId = req.params.group_id
+    userId = tokenData.id
+    user = await User.findById(userId).exec()
+    group = await Group.findById(groupId).exec()
+    if (!groupId) {
+        res.status(422).json({ message: 'Missing group parameter' })
+    } else if (!group) {
+        res.status(404).json({ message: 'Group not found' })
+    } else {
+        const number = await Group.find({
+            _id: groupId,
+            Members: {
+                $elemMatch: { ref: userId },
+            },
+        }).exec()
+        if (number.length === 0) {
+            return res.status(500).json({
+                message: 'User not a member in the group',
+            })
+        }
+        await Group.findByIdAndUpdate(groupId, {
+            $pull: {
+                Members: {
+                    ref: userId,
+                },
+            },
+        })
+        await User.findByIdAndUpdate(userId, {
+            $pull: {
+                Groups: {
+                    ref: groupId,
+                    role: 'member',
+                },
+            },
+        })
+        res.status(200).json({
+            message: 'User left group successfully',
+        })
+    }
+}

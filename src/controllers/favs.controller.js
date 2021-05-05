@@ -1,6 +1,5 @@
 const { Photo } = require('../models/photo.model')
-const { User } = require('../models/user.model')
-
+const { UserModel: User } = require('../models/user.model')
 exports.add_fav = async function (req, res) {
     const photoId = req.body.photo_id
     const userId = res.locals.userid

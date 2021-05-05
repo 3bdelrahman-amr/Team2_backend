@@ -1,19 +1,24 @@
-const express=require('express');
-const router=express.Router();
+const express = require('express')
+const auth=require('../../middlewares/auth');
+const _ = require('lodash');
+const galleryController = require('../../controllers/gallery.controller');
+const {Photo,PhotoSchema}=require('../../models/photo.model');
+const {validateGallery,Gallery,GallerySchema}=require('../../models/gallery.model');
+
+const router = express.Router()
 //schemas
 /**
-* @swagger
-* definitions:
-*   Gallery:
-*     type: object
-*     properties:
-*       title: 
-*         type: string
-*       description:
-*         type: string
-*       
-*/
- 
+ * @swagger
+ * definitions:
+ *   Gallery:
+ *     type: object
+ *     properties:
+ *       title:
+ *         type: string
+ *       description:
+ *         type: string
+ *
+ */
 /**
  * @swagger
  *  /galleries:
@@ -54,7 +59,7 @@ const router=express.Router();
  *             }
  */
 
-router.post('/create', (req, res) => {})
+ router.post('/',auth.authentication,galleryController.create);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,7 +71,13 @@ router.post('/create', (req, res) => {})
  *     description: Add a photo to a gallery owned by a user
  *     tags: [Gallery]
  *     parameters:
- *       - name: data
+ *       - name: gallery_id
+ *         in: body
+ *         required: true
+ *         description: Gallery id
+ *         schema:
+ *           type: integer
+ *       - name: Photo_id
  *         in: body
  *         required: true
  *         description: Photo's attributes
@@ -105,7 +116,7 @@ router.post('/create', (req, res) => {})
  *             }
  */
 
-router.post('/addPhoto', (req, res) => {})
+router.post('/photo',auth.authentication,galleryController.addphoto);
 
 ///////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
@@ -166,7 +177,14 @@ router.post('/addPhoto', (req, res) => {})
  *
  */
 
-router.get('/getInfo', (req, res) => {})
+router.get('/{gallery_id}:',auth.authorization,async(req, res) => {
+
+    const gallery= await Gallery.findById(req.params.gallery_id);
+    if(!gallery) return res.status(404).send({message:"Gallery not found"});
+    const index= req.params.page * req.params.per_page;
+    res.status(200).send(gallery.Photos.slice(index,index+req.url.per_page));
+
+});
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -221,7 +239,7 @@ router.get('/getInfo', (req, res) => {})
  *
  */
 
-router.post('/getphotos', (req, res) => {})
+router.post('/getphoto', (req, res) => {})
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -280,7 +298,7 @@ router.post('/getphotos', (req, res) => {})
  *            }
  */
 
-router.post('/removephoto', (req, res) => {})
+router.delete('/:gallery_id/photo/:photo_id',auth.authentication,galleryController.deletePhoto);
 
 /**
  * @swagger
@@ -295,14 +313,4 @@ router.post('/removephoto', (req, res) => {})
 
  *        
  */
-
-
-
-
-
-
-
-
-
-
-module.exports=router;
+module.exports = router
