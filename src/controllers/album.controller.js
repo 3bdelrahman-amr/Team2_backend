@@ -1,27 +1,43 @@
-const Album = require('../models/album.model');
+const { Album, validateAlbumId, validateCreateAlbum, validateUpdateAlbum } = require('../models/album.model');
 const Photo = require('../models/photo.model');
 const User = require('../models/user.model');
 
 const createAlbum = async (req, res) => {
-    const bodyParams = Object.keys(req.body);
-    const AllowedParams = ['title', 'description', 'photos'];
-    const isValidOperation = bodyParams.every((bodyParam) => AllowedParams.includes(bodyParam));
-    if (!isValidOperation || bodyParams.length == 0)
-        return res.status(400).send({ error: "Bad request" });
+
+    // Old validations commented for possible future need
+    // const bodyParams = Object.keys(req.body);
+    // const AllowedParams = ['title', 'description', 'photos', 'coverPhoto'];
+    // const isValidOperation = bodyParams.every((bodyParam) => AllowedParams.includes(bodyParam));
+
+    const { error } = validateCreateAlbum(req.body);
+
+    if (error)
+        return res.status(400).send(error.details[0].message);
     try {
-        if (req.body.photos) //If There are primary photos that the album was created with (The requester send it as part of the json and not empty)
-        {
-            if (req.body.photos.length != 0)
-                req.body.photos.forEach(async (photo_id) => await Photo.findById(photo_id));
+
+        if (req.body.photos.length != 0)
+            req.body.photos.forEach(async (photo_id) => await Photo.findById(photo_id));
+
+        if (req.body.coverPhoto) { // if the cover photo was passed
+            if (req.body.photos.length == 0 || !req.body.photos.includes(coverPhoto)) // and it is not included in the photos array or it is passed and the array of photos is empty
+                throw new Error("cover Photo must be a included in photos array");
+        } else { // if the cover photo was not passed
+            if (req.body.photos.length != 0) // and the photos array is not empty
+            {
+                req.body = {
+                    ...req.body,
+                    coverPhoto: req.body.photos[0] // the default cover photo is the first photo in the array
+                }
+            }
         }
         const album = new Album({
             ...req.body,
-            owner_id: res.locals.userid
+            ownerId: res.locals.userid
         });
-
         await album.save();
+        //The following lines to modify the properties in the response object to match the documentation
         const albumObject = album.toObject()
-        delete albumObject.owner_id;
+        delete albumObject.ownerId;
         delete albumObject.updatedAt;
         delete albumObject.__v;
         res.status(201).send(albumObject);
@@ -32,14 +48,24 @@ const createAlbum = async (req, res) => {
 
 const updateAlbum = async (req, res) => {
     const _id = req.params.id;
+
+    // Old validations commented for possible future need
     const updates = Object.keys(req.body);
-    const allowedUpdates = ['title', 'description'];
+    const allowedUpdates = ['title', 'description', 'coverPhoto'];
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
     if (!isValidOperation || updates.length == 0)
         return res.status(400).send({ error: "Invalid updates" });
-
+    console.log(req.body);
+    console.log(_id);
+    console.log(res.locals.userid)
+    const { error } = validateUpdateAlbum(req.body);
+    if (error)
+        return res.status(400).send(error.details[0].message);
+    const { error2 } = validateAlbumId({id:_id});
+    if (error2)
+        return res.status(400).send(error2.details[0].message);
     try {
-        const album = await Album.findOne({ _id, owner_id: res.locals.userid });
+        const album = await Album.findOne({ _id, ownerId: res.locals.userid });
         if (!album) {
             return res.status(404).send({ error: 'Album not found!' });
         }
@@ -56,36 +82,34 @@ const updateAlbum = async (req, res) => {
 const deleteAlbum = async (req, res) => {
     debugger;
     const _id = req.params.id;
+    const { error } = validateAlbumId({id:_id});
+    if (error)
+        return res.status(400).send(error.details[0].message);
     try {
-        const album = await Album.findOneAndDelete({ _id, owner_id: res.locals.userid });
+        const album = await Album.findOneAndDelete({ _id, ownerId: res.locals.userid });
         if (!album) {
             return res.status(404).send({ error: "Album not found" });
         }
-        // const photos = await album.populate('photos').execPopulate();
-
-        // Array.prototype.forEach.call(photos,(photo) => {
-        //     photo.albums_ids.filter((album) => {
-        //         return album != _id;
-        //     })// This function removes the album_id from the array of album_ids for all the photos that are in that album
-        // })
         res.status(200).send({ message: "Album successfully deleted" });
     }
     catch (error) {
         res.status(500).send({ error: "An error has occured" });
-        // res.status(500).send({ error: "An error has occured" });
     }
 
 };
 
 const getAlbumbyId = async (req, res) => {
     const _id = req.params.id;
+    const { error } = validateAlbumId({id:_id});
+    if (error)
+        return res.status(400).send(error.details[0].message);
     try {
-        const album = await Album.findById({ _id, owner_id: res.locals.userid });
+        const album = await Album.findById({ _id, ownerId: res.locals.userid });
         if (!album)
             return res.status(404).send({ error: "Album not found" });
         await album.populate('photos').execPopulate();
         const albumObject = album.toObject();
-        delete albumObject.owner_id;
+        delete albumObject.ownerId;
         delete albumObject.__v;
         res.status(200).send(albumObject);
     } catch (error) {
@@ -101,7 +125,7 @@ const getUserAlbums = async (req, res) => {
         var albumsObj = [];
         Array.prototype.forEach.call(albums, (album) => {
             const albumObj = album.toObject();
-            delete albumObj.owner_id
+            delete albumObj.ownerId
             delete albumObj.__v
             albumsObj.push(albumObj);
         })
@@ -124,7 +148,7 @@ const getAlbumbyUsername = async (req, res) => {
         var albumsObj = [];
         Array.prototype.forEach.call(albums, (album) => {
             const albumObj = album.toObject();
-            delete albumObj.owner_id
+            delete albumObj.ownerId
             delete albumObj.__v
             albumsObj.push(albumObj);
         })

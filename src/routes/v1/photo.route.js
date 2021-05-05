@@ -482,7 +482,7 @@ router.get('/photo/:photo_id', (req, res) => {})
  *         type: integer
  *       photo_url:
  *         type: string
- *       photo_owner_id:
+ *       photo_ownerId:
  *         type: integer
  *       tag:
  *         type: array
@@ -529,7 +529,7 @@ router.get('/photo/:photo_id', (req, res) => {})
  *         type: integer
  *       photo_url:
  *         type: string
- *       photo_owner_id:
+ *       photo_ownerId:
  *         type: integer
  *       num_favs:
  *         type: integer

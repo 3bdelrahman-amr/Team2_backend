@@ -18,18 +18,23 @@ const albumController = require('../../controllers/album.controller');
  *       schema:
  *     - name: description
  *       in: body
- *       required: true
+ *       required: false
  *       description: Album description
  *       type: string
  *       schema:
  *     - name: photos
  *       description: The photos that the album is created with
  *       in: body
- *       required: false
+ *       required: true
  *       type: array
  *       items:
  *          type: _id
- *       
+ *       schema:
+ *     - name: coverPhoto
+ *       in: body
+ *       required: false
+ *       description: Album cover photo
+ *       type: _id
  *       schema:
  *          $ref: "#/definitions/CreateAlbumRequest"
  *     responses:
@@ -96,6 +101,12 @@ router.post('/album',auth, albumController.createAlbum)
  *         required: false
  *         description: album description
  *         schema:
+ *       - name: coverPhoto
+ *         in: body
+ *         type: _id 
+ *         required: false
+ *         description: album cover photo
+ *         schema:
  *           $ref: '#/definitions/EditAlbum'
  *           photo_id:
  *               type: integer
@@ -155,6 +166,15 @@ router.post('/album',auth, albumController.createAlbum)
  *            {
  *                       "error": "Album not found",
  *            }
+ *       400:
+ *         description: invalid ID
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                       "error": Invalid album Id",
+ *            }
+ * 
  *       401:
  *         description: Unauthorized
  *         examples:
@@ -206,6 +226,16 @@ router.delete('/album/:id',auth,albumController.deleteAlbum);
  *            {
  *                       "error": "Album not found",
  *            }
+ * 
+ *       400:
+ *         description: invalid ID
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                       "error": Invalid album Id",
+ *            }
+ * 
  *       500:
  *         description: No value passed
  *         examples:
@@ -326,6 +356,8 @@ router.get('/album/:id',auth,albumController.getAlbumbyId)
  *        type: array
  *        items:
  *          type: integer
+ *      coverPhoto:
+ *        type: integer
  *  CreateAlbumResponse:
  *    type: object
  *    properties:
@@ -341,6 +373,8 @@ router.get('/album/:id',auth,albumController.getAlbumbyId)
  *          type: array
  *          items:
  *             type: integer
+ *      coverPhoto:
+ *        type: integer
  *  getAlbumByID:
  *    type: object
  *    properties:
@@ -358,6 +392,8 @@ router.get('/album/:id',auth,albumController.getAlbumbyId)
  *          type: array
  *          items:
  *             type: integer
+ *      coverPhoto:
+ *           type: _id
  *  EditAlbum:
  *    type: object
  *    properties:
@@ -365,6 +401,8 @@ router.get('/album/:id',auth,albumController.getAlbumbyId)
  *        type: string
  *      description:
  *        type: string
+ *      coverPhoto:
+ *        type: integer
  */
 /**
  * @swagger

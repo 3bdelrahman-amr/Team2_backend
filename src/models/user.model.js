@@ -71,13 +71,13 @@ const userSchema = new mongoose.Schema({
 userSchema.virtual('albums', {
     ref: 'Album',
     localField: '_id',
-    foreignField: 'owner_id'
+    foreignField: 'ownerId'
 })
 
 userSchema.virtual('photos', {
     ref: 'Photo',
     localField: '_id',
-    foreignField: 'owner_id'
+    foreignField: 'ownerId'
 })
 
 
