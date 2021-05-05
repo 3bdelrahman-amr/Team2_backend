@@ -8,9 +8,8 @@ const createAlbum = async (req, res) => {
     // const bodyParams = Object.keys(req.body);
     // const AllowedParams = ['title', 'description', 'photos', 'coverPhoto'];
     // const isValidOperation = bodyParams.every((bodyParam) => AllowedParams.includes(bodyParam));
-
     const { error } = validateCreateAlbum(req.body);
-
+    console.log(res.locals.userid);
     if (error)
         return res.status(400).send(error.details[0].message);
     try {
@@ -32,7 +31,7 @@ const createAlbum = async (req, res) => {
         }
         const album = new Album({
             ...req.body,
-            ownerId: res.locals.userid
+            ownerId: res.locals.userid.id
         });
         await album.save();
         //The following lines to modify the properties in the response object to match the documentation
@@ -42,6 +41,7 @@ const createAlbum = async (req, res) => {
         delete albumObject.__v;
         res.status(201).send(albumObject);
     } catch (error) {
+        console.log(error)
         res.status(500).send({ error: "An error has occured" })
     }
 };
@@ -55,17 +55,14 @@ const updateAlbum = async (req, res) => {
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
     if (!isValidOperation || updates.length == 0)
         return res.status(400).send({ error: "Invalid updates" });
-    console.log(req.body);
-    console.log(_id);
-    console.log(res.locals.userid)
     const { error } = validateUpdateAlbum(req.body);
     if (error)
         return res.status(400).send(error.details[0].message);
-    const { error2 } = validateAlbumId({id:_id});
+    const { error2 } = validateAlbumId({ id: _id });
     if (error2)
         return res.status(400).send(error2.details[0].message);
     try {
-        const album = await Album.findOne({ _id, ownerId: res.locals.userid });
+        const album = await Album.findOne({ _id, ownerId: res.locals.userid.id });
         if (!album) {
             return res.status(404).send({ error: 'Album not found!' });
         }
@@ -82,11 +79,11 @@ const updateAlbum = async (req, res) => {
 const deleteAlbum = async (req, res) => {
     debugger;
     const _id = req.params.id;
-    const { error } = validateAlbumId({id:_id});
+    const { error } = validateAlbumId({ id: _id });
     if (error)
         return res.status(400).send(error.details[0].message);
     try {
-        const album = await Album.findOneAndDelete({ _id, ownerId: res.locals.userid });
+        const album = await Album.findOneAndDelete({ _id, ownerId: res.locals.userid.id });
         if (!album) {
             return res.status(404).send({ error: "Album not found" });
         }
@@ -100,11 +97,11 @@ const deleteAlbum = async (req, res) => {
 
 const getAlbumbyId = async (req, res) => {
     const _id = req.params.id;
-    const { error } = validateAlbumId({id:_id});
+    const { error } = validateAlbumId({ id: _id });
     if (error)
         return res.status(400).send(error.details[0].message);
     try {
-        const album = await Album.findById({ _id, ownerId: res.locals.userid });
+        const album = await Album.findById({ _id, ownerId: res.locals.userid.id });
         if (!album)
             return res.status(404).send({ error: "Album not found" });
         await album.populate('photos').execPopulate();
@@ -118,7 +115,7 @@ const getAlbumbyId = async (req, res) => {
 };
 
 const getUserAlbums = async (req, res) => {
-    const user = await User.findById(res.locals.userid);
+    const user = await User.findById(res.locals.userid.id);
     try {
         await user.populate('albums').execPopulate();
         const albums = user.albums;

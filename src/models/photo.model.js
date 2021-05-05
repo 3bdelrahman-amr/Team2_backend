@@ -1,39 +1,128 @@
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
+const mongoose = require('mongoose');
+const Joi =require('joi');
+Joi.objectId= require('joi-objectid')(Joi);
 
-const PhotoSchema = new Schema({
+
+const commentSchema = new mongoose.Schema({
+    comment: {
+        type: String,
+        required: true,
+        trim: true,
+        maxlenght: 1024
+    },
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'User'
+    }
+}, {
+    timestamps: true
+});
+
+
+const Comment = mongoose.model('comment', commentSchema);
+
+const photoSchema = new mongoose.Schema({
     title: {
         type: String,
-        min: 1,
-        required: true,
+        trim: true,
+        required: false,
+        default: "photo title",
+        maxlength: 255
     },
     description: {
         type: String,
-        min: 1,
-        required: true,
+        required: false,
+        default: "photo",
+        maxlength: 1024
     },
-    url: {
+    photoUrl: {
         type: String,
-        min: 1,
-        required: true,
+        required: true
     },
     Fav: [
         {
-            type: Schema.Types.ObjectId,
+            type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
             unique: true,
         },
     ],
-    privacy:{
-        type:String,
-        enum:['Public','Private','Friends'],
-        default:'Public',
+    privacy: {
+        type: String,
+        required: false,
+        default: 'private',
+        trim: true,
+        enum: ['private', 'public']
     },
-    owner:{
-        type:Schema.Types.ObjectId,
-        ref:'User'
+    Fav: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            unique: true,
+        },
+    ],
+    ownerId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'User'
+    },
+    tags: [{
+        tag: {
+            type: String,
+            required: false,
+            trim: true,
+            maxlength: 50
+        }
+    }],
+    comments: [{type:commentSchema}]
+}, {
+    timestamps: true
+});
 
-    }
-})
-Photo = mongoose.model('Photo', PhotoSchema)
-module.exports = { Photo, PhotoSchema }
+const Photo = mongoose.model('Photo', photoSchema);
+
+function validatePhoto(photo){
+    const schema = Joi.object({
+        title: Joi.string().max(255).allow(null, ''),
+        description:Joi.string().max(1024).allow(null, ''),
+        privacy:Joi.string().valid('private','public'),
+        tags:Joi.array().items(Joi.string().max(50)),
+        comments: Joi.array().items(Joi.string().max(1024))
+
+    });
+    const result = schema.validate(photo);
+    return result;
+
+}
+
+
+function validateComment(comment){
+    const schema = Joi.object({
+        comment: Joi.string().required().max(1024)
+    });
+    const result = schema.validate(comment);
+    return result;
+
+}
+
+function validateId(id){
+    const schema = Joi.object({
+        id: Joi.objectId().required()
+    });
+    const result = schema.validate(id);
+    return result;
+}
+
+exports.validateId = validateId;
+exports.validatePhoto = validatePhoto;
+exports.validateComment = validateComment;
+module.exports.Photo = Photo;
+module.exports.Comment = Comment;
+
+
+
+
+
+
+
+
