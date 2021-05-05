@@ -1,145 +1,151 @@
-const mongoose = require('mongoose');
-const validator = require('validator');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const ALbum = require('../models/album.model')
+const mongoose=require("mongoose");
+const joi=require('joi');
+const schema=mongoose.Schema;
 
-
-
-
-
-const userSchema = new mongoose.Schema({
-    UserName: {
-        type: String,
-        min: 1
-        , required: true,
-        unique: true,
-        dropDups: true
-    }, name: {
-        type: String,
-        required: true,
-        trim: true
+const UserSchema=new schema(
+{ 
+Fname:{
+    type:String,
+    min: 1
+    ,required: true
+      },
+Lname:{
+    type:String,
+    min: 1
+    ,required: true
+      },
+UserName:{
+    type:String,
+    min: 1
+    ,required: true,
+    unique:true,
+    dropDups:true
+         },
+Email:{
+    type:String
+    , min: 1
+    ,required: true,
+    unique:true,
+    dropDups:true
+      },
+About:{
+       type:String
+        , min: 1,
+        default: "",        
+          },
+    
+Age:{
+    type:Number
+    , min: 1
+    ,required: true
     },
-    password: {
-        type: String,
-        required: true,
-        trim: true,
-        minLength: 7,
-        validate(value) {
-            if (value.toLowerCase().includes('password'))
-                throw new Error('Password cannot contain "password"')
-        }
+
+  Date_joined:  {
+    
+    type:Date,
+    required: true,
+     min: '2021-01-1'   ,
+     default: Date.now,  
+    
     },
-    email: {
-        type: String,
-        unique: true,
-        required: true,
-        trim: true,
-        lowercase: true,
-        validate(value) {
-            if (!validator.isEmail(value)) {
-                throw new Error('Email is not valid');
+    Password:{
+      type:String,
+      required:true,
+       min:1,
+      }
+
+   ,photos:[
+            { 
+             type:schema.Types.ObjectId, 
+             ref: 'Photo'
             }
-        }
-    },
-    age: {
-        type: Number,
-        default: 0,
-        validate(value) {
-            if (value < 0) {
-                throw new Error('Age must be a positive number')
+           ] ,
+
+  Num_tags:{ 
+            type: Number,
+            min: 0   
+          },
+
+  views:[{ 
+    type: schema.Types.ObjectId,
+    ref:'User'   
+       }
+      ],
+
+  Followers:[
+      {  
+      type: schema.Types.ObjectId,
+      ref: 'User'
+      }
+           ],
+
+  Following:[
+             {  
+               type: schema.Types.ObjectId,
+               ref: 'User'
+             }
+           ],         
+  Group:[
+            {  
+              type: schema.Types.ObjectId,
+              ref: 'Group'
             }
-        }
-    },
-    tokens: [{
-        token: {
-            type: String,
-            required: true
-        }
-    }],
-    avatar: {
-        type: Buffer
-    }
-},
+          ],     
+  Album:[
+            {  
+              type: schema.Types.ObjectId,
+              ref: 'Album'
+            }
+          ],
+  Gallery:[
+            {  
+              type: schema.Types.ObjectId,
+              ref: 'Gallery'
+            }
+          ],         
+  Avatar:{
+      type: schema.Types.ObjectId,
+      ref: 'Photo'
+        }, 
+  Fav:[  { 
+         type:schema.Types.ObjectId, 
+         ref: 'Photo'
+       }
+      ],
+  isActive:{
+ type:Boolean,
+ default:false,
+  },                                               
 
-    {
-        timestamps: true
-    })
+   }
+);
+////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+module.exports.validateSignup=(body)=>{
 
-
-
-userSchema.virtual('albums', {
-    ref: 'Album',
-    localField: '_id',
-    foreignField: 'ownerId'
-})
-
-userSchema.virtual('photos', {
-    ref: 'Photo',
-    localField: '_id',
-    foreignField: 'ownerId'
-})
-
-
-
-userSchema.methods.generateAuthToken = async function () {
-    const user = this
-    const token = jwt.sign({ _id: user._id.toString() }, 'thisismynewcourse')
-
-    user.tokens = user.tokens.concat({ token })
-    await user.save()
-
-    return token
+const schema={
+firstName:joi.string().min(1).max(50).required(),
+lastName:joi.string().min(1).max(50).required(),
+age:joi.number().integer().min(1).max(200).required(),
+email:joi.string().email().required(),
+password:joi.string().min(1).max(50).required(),
 }
 
+return  joi.validate(body,schema);
 
-
-
-
-userSchema.methods.toJSON = function () {
-    const user = this;
-    const userObject = user.toObject()
-    delete userObject.password
-    delete userObject.tokens
-    delete userObject.avatar
-    return userObject
 }
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+module.exports.validateLogin=(body)=>{
 
+  const schema={
+  email:joi.string().email().required(),
+  password:joi.string().min(1).max(50).required(),
+  }
+  
+  return  joi.validate(body,schema);
+  
+  }
+  
 
-userSchema.statics.findByCredentials = async (email, password) => {
-    const user = await User.findOne({ email });
-    if (!user) {
-        throw new Error('Unable to login')
-    }
-    const isMatch = await bcrypt.compare(password, user.password)
-    if (!isMatch) {
-        throw Error('Unable to login');
-    }
-    return user;
-}
-
-
-
-userSchema.pre('save', async function (next) {
-    const user = this;
-    if (user.isModified('password')) {
-        user.password = await bcrypt.hash(user.password, 8)
-    }
-
-    next();
-
-})
-
-
-userSchema.pre('remove', async function (next) {
-    const user = this;
-    await Task.deleteMany({ owner: user._id });
-    next()
-})
-
-const User = mongoose.model('User', userSchema)
-
-
-
-module.exports = User;
-
+module.exports.UserModel=mongoose.model('User',UserSchema);;

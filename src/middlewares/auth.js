@@ -1,23 +1,90 @@
-const jwt = require('jsonwebtoken')
-const User = require('../models/user.model')
+const jwt=require("jsonwebtoken");
+const configure=require("../config/default.json")
+const nodemailer=require('nodemailer');
+const emailExisyence=require('email-existence');
+const Model=require('../models/user.model')
+const secret=configure.JWT_KEY;
+/////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////
+module.exports.authorization=(req,res)=>{
+   
+    let token=jwt.sign({ id:res.locals.userid },secret,{expiresIn:'24 hours'});
+    res.status(200).send({token:token});
 
-const auth = async (req, res, next) => {
-    try {
-        const token = req.header('Authorization').replace('Bearer ', '')
-        const decoded = jwt.verify(token, 'thisismynewcourse')
-        const user = await User.findOne({ _id: decoded._id, 'tokens.token': token })
+
+}
+/////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+module.exports.authentication=(req,res,next)=>{
+
+
+    let token=req.headers['token'];
+    if(!token)
+      res.status(403).send({message:"no token"});
+
+    jwt.verify(token,secret,(err,decoded)=>{
     
-        if (!user) {
-            throw new Error()
-        }
+    if(err)
+    res.status(500).send({message:"error while trying to decode the token"});
 
-        req.token = token
-        res.locals.userid = user._id;
-        next()
+    if(!decoded)
+    res.status(401).send({message:"failed to authenticate"});
+    res.locals.userid=decoded.id;
 
-    } catch (error) {
-        res.status(401).send({ error: "User is not authorized to create album"})
+    next();
+ });
+
+
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+module.exports.SendVerification=async(req,res)=>{
+
+   emailExisyence.check(req.body.email,async(err,response)=>{
+    if(err){
+      await Model.UserModel.deleteOne({Email:req.body.email}); 
+    return res.status(400).send({message:'invalid email , insert valid one'});
     }
-};
+   
+    ;});
 
-module.exports = auth
+
+
+  let transporter = nodemailer.createTransport({
+    service:'gmail',
+    auth: {
+      user: 'dropoidcompany@gmail.com',
+      pass: 'Dropoid123', 
+    },
+    tls:{
+      rejectUnauthorized:false
+    },
+  });
+
+
+
+let token=jwt.sign({email:req.body.email},secret,{expiresIn:'24 hours'});  
+
+  let option={
+    from: 'noreplay@example.com', // sender address
+    to: req.body.email, // list of receivers
+    subject: "Mail confirmation", // Subject line
+    text: "confirm please your mail", // plain text body
+    html: '<a href="'+req.protocol+'://'+req.get('host')+req.originalUrl+'/'+token+'">link of confirmation</a>', // html body
+  }
+
+  
+  let info =  await transporter.sendMail(option,(err,data)=>{
+  
+  if(err)
+  return res.status(400).send({message:'failed to sent verification mail please fill with a valid email'});
+  else 
+  return res.status(200).send({message:'email verification has been sent to you'});
+  
+  });
+
+
+
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////

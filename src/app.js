@@ -1,7 +1,6 @@
 const express = require('express')
 const mongoSanitize = require('express-mongo-sanitize')
 const cors = require('cors')
-const httpStatus = require('http-status')
 const routes = require('./routes/v1')
 
 const app = express()
@@ -19,6 +18,10 @@ app.use(cors())
 app.options('*', cors())
 
 // v1 api routes
-app.use('/api/v1', routes)
+app.use('/api/v1',routes);
+// app.listen(3000,(err)=>{
+//     console.log("start list");
+    
+// });
 
 module.exports = app
