@@ -36,7 +36,15 @@ describe('Groups Controller create group', () => {
             privacy: 'public',
             visibility: 'public',
         })
+        privateGroup = new Group({
+            _id: '608834536de13632903701b6',
+            name: 'test_group',
+            description: 'test',
+            privacy: 'private',
+            visibility: 'invite',
+        })
         await group.save()
+        await privateGroup.save()
     })
     describe('Get a group with invalid id', () => {
         it('Should Fail when invalid id used', async () => {
@@ -62,6 +70,13 @@ describe('Groups Controller create group', () => {
     describe('Get a group with incorrect id', () => {
         it('Should fail as id doesnt exist', async () => {
             req.params.group_id = '608834536de13632903701b3'
+            await groupController.get_group(req, res)
+            expect(res.statusCode).toBe(404)
+        })
+    })
+    describe('Get a group which is private', () => {
+        it('Should fail as group is private and user is not a member', async () => {
+            req.params.group_id = '608834536de13632903701b6'
             await groupController.get_group(req, res)
             expect(res.statusCode).toBe(404)
         })

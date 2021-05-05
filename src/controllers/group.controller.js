@@ -31,7 +31,7 @@ exports.get_group = async function (req, res) {
     }
     if (!groupId) {
         res.status(422).json({ message: 'Missing group parameter' })
-    } else if (!group) {
+    } else if (!group || (group && group.privacy === 'private')) {
         res.status(404).json({ message: 'Group not found' })
     } else {
         const number = await Group.find({
