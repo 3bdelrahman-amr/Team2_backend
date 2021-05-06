@@ -44,11 +44,11 @@ const GallerySchema= new mongoose.Schema({
 
 const Gallery = mongoose.model('Gallery',GallerySchema);
 function validateGallery(gallery) {
-    const schema = {
+    const schema = Joi.object({
       title: Joi.string().min(5).max(50).required(),
       description: Joi.string().min(30).max(255).required()
-    };
-    return Joi.validate(gallery, schema);
+    });
+    return schema.validate(gallery);
 };
 
 module.exports.validateGallery=validateGallery;

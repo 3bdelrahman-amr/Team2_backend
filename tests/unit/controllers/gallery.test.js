@@ -24,6 +24,9 @@ await mongoose.connection.close();
 
     })
 
+
+
+describe('create new gallery',()=>{
     it('should test if the data passed is not corect',()=>{
         const req=httpmocks.createRequest();
         const res=httpmocks.createResponse();
@@ -45,6 +48,9 @@ await mongoose.connection.close();
         gallerymodel.create(req,res);
         expect(res._getStatusCode()).toBe(200);
     });
+});
+
+    
 
 
 
