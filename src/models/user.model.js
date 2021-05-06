@@ -116,13 +116,13 @@ const UserSchema = new schema(
 UserSchema.virtual('albums', {
   ref: 'Album',
   localField: '_id',
-  foreignField: 'owner_id'
+  foreignField: 'ownerId'
 })
 
 UserSchema.virtual('photos', {
   ref: 'Photo',
   localField: '_id',
-  foreignField: 'owner_id'
+  foreignField: 'ownerId'
 })
 ////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,6 +1,6 @@
 const { Album, validateAlbumId, validateCreateAlbum, validateUpdateAlbum } = require('../models/album.model');
 const Photo = require('../models/photo.model');
-const User = require('../models/user.model');
+const {UserModel} = require('../models/user.model');
 
 const createAlbum = async (req, res) => {
 
@@ -9,7 +9,6 @@ const createAlbum = async (req, res) => {
     // const AllowedParams = ['title', 'description', 'photos', 'coverPhoto'];
     // const isValidOperation = bodyParams.every((bodyParam) => AllowedParams.includes(bodyParam));
     const { error } = validateCreateAlbum(req.body);
-    console.log(res.locals.userid);
     if (error)
         return res.status(400).send(error.details[0].message);
     try {
@@ -31,7 +30,7 @@ const createAlbum = async (req, res) => {
         }
         const album = new Album({
             ...req.body,
-            ownerId: res.locals.userid.id
+            ownerId: res.locals.userid
         });
         await album.save();
         //The following lines to modify the properties in the response object to match the documentation
@@ -62,7 +61,7 @@ const updateAlbum = async (req, res) => {
     if (error2)
         return res.status(400).send(error2.details[0].message);
     try {
-        const album = await Album.findOne({ _id, ownerId: res.locals.userid.id });
+        const album = await Album.findOne({ _id, ownerId: res.locals.userid });
         if (!album) {
             return res.status(404).send({ error: 'Album not found!' });
         }
@@ -77,13 +76,12 @@ const updateAlbum = async (req, res) => {
 }
 
 const deleteAlbum = async (req, res) => {
-    debugger;
     const _id = req.params.id;
     const { error } = validateAlbumId({ id: _id });
     if (error)
         return res.status(400).send(error.details[0].message);
     try {
-        const album = await Album.findOneAndDelete({ _id, ownerId: res.locals.userid.id });
+        const album = await Album.findOneAndDelete({ _id, ownerId: res.locals.userid });
         if (!album) {
             return res.status(404).send({ error: "Album not found" });
         }
@@ -101,7 +99,7 @@ const getAlbumbyId = async (req, res) => {
     if (error)
         return res.status(400).send(error.details[0].message);
     try {
-        const album = await Album.findById({ _id, ownerId: res.locals.userid.id });
+        const album = await Album.findById({ _id, ownerId: res.locals.userid });
         if (!album)
             return res.status(404).send({ error: "Album not found" });
         await album.populate('photos').execPopulate();
@@ -115,10 +113,11 @@ const getAlbumbyId = async (req, res) => {
 };
 
 const getUserAlbums = async (req, res) => {
-    const user = await User.findById(res.locals.userid.id);
+    const user = await UserModel.findById(res.locals.userid);
     try {
         await user.populate('albums').execPopulate();
         const albums = user.albums;
+        console.log(albums);
         var albumsObj = [];
         Array.prototype.forEach.call(albums, (album) => {
             const albumObj = album.toObject();
@@ -136,7 +135,7 @@ const getUserAlbums = async (req, res) => {
 
 const getAlbumbyUsername = async (req, res) => {
     try {
-        const user = await User.findOne({ UserName: req.params.username });
+        const user = await UserModel.findOne({ UserName: req.params.username });
         if (!user)
             res.status(404).send({ error: "User is not found" });
 

@@ -25,7 +25,7 @@ exports.upload = multer({
 
 
 exports.AddPhoto = async (req, res) => {
-    const _id = res.locals.userid.id;
+    const _id = res.locals.userid;
     const photo = new Photo({
         ...req.body,
         ownerId: _id,

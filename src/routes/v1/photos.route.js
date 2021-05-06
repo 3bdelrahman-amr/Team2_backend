@@ -81,7 +81,7 @@ const photoController=require('../../controllers/photo.controller')
  *            }
  */
 
-router.post('/photo',authentication,photoController.upload.single("photo"),photoController.AddPhoto)
+router.post('/',authentication,photoController.upload.single("photo"),photoController.AddPhoto)
 
 
 
