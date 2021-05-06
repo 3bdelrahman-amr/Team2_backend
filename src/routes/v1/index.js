@@ -5,7 +5,7 @@ const favsRoute = require('./favs.route');
 const groupsRoute = require('./groups.route');
 const userRoute=require("./user.route");
 const galleryRoute=require("./galleries.route");
-const photoRoute = require("./photos.route")
+const photosRoute = require('./photos.route');
 
 
 const router = express.Router();
@@ -15,5 +15,5 @@ router.use('/docs', docsRoute);
 router.use('/group', groupsRoute);
 router.use('/user', userRoute);
 router.use('/galleries',galleryRoute);
-router.use('/photo',photoRoute);
+router.use('/photo', photosRoute);
 module.exports = router;

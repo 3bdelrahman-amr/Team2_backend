@@ -413,6 +413,6 @@ router.get('/user/:username', authentication, albumController.getAlbumbyUsername
  *       Albums:
  *         type: array
  *         items:
- *           $ref: '#/responses/image'
+ *           $ref: '#/responses/photo'
  */
 module.exports = router

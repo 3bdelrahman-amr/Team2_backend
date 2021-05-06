@@ -4,7 +4,6 @@ const UserController=require("../../controllers/user.controller");
 const auth=require("../../middlewares/auth");
 const { use } = require('./album.route');
 //schemas
-
 /**
  * @swagger
  * definitions:

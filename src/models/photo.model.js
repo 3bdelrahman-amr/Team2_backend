@@ -38,7 +38,7 @@ const photoSchema = new mongoose.Schema({
     },
     photoUrl: {
         type: String,
-        required: false
+        required: true
     },
     Fav: [
         {
@@ -54,13 +54,6 @@ const photoSchema = new mongoose.Schema({
         trim: true,
         enum: ['private', 'public']
     },
-    Fav: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User',
-            unique: true,
-        },
-    ],
     ownerId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
@@ -118,11 +111,3 @@ exports.validatePhoto = validatePhoto;
 exports.validateComment = validateComment;
 module.exports.Photo = Photo;
 module.exports.Comment = Comment;
-
-
-
-
-
-
-
-

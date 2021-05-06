@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const joi = require('joi');
+const Joi = require('joi');
 const schema = mongoose.Schema;
 
 const UserSchema = new schema(
@@ -54,6 +54,7 @@ const UserSchema = new schema(
       min: 1,
     },
 
+
     Num_tags: {
       type: Number,
       min: 0
@@ -82,12 +83,6 @@ const UserSchema = new schema(
       {
         type: schema.Types.ObjectId,
         ref: 'Group'
-      }
-    ],
-    Album: [
-      {
-        type: schema.Types.ObjectId,
-        ref: 'Album'
       }
     ],
     Gallery: [
@@ -128,27 +123,27 @@ UserSchema.virtual('photos', {
 /////////////////////////////////////////////////////////////////////////////////////////////////
 module.exports.validateSignup = (body) => {
 
-  const schema = joi.object({
-    firstName: joi.string().min(1).max(50).required(),
-    lastName: joi.string().min(1).max(50).required(),
-    age: joi.number().integer().min(1).max(200).required(),
-    email: joi.string().email().required(),
-    password: joi.string().min(1).max(50).required(),
-  })
-  return result = schema.validate(body);
-  // return  joi.validate(body,schema);
+  const schema = Joi.object({
+    firstName: Joi.string().min(1).max(50).required(),
+    lastName: Joi.string().min(1).max(50).required(),
+    age: Joi.number().integer().min(1).max(200).required(),
+    email: Joi.string().email().required(),
+    password: Joi.string().min(1).max(50).required(),
+  });
+
+  return schema.validate(body);
 
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 module.exports.validateLogin = (body) => {
 
-  const schema = joi.object({
-    email: joi.string().email().required(),
-    password: joi.string().min(1).max(50).required(),
-  })
-  return result = schema.validate(body);
-  // return  joi.validate(body,schema);
+  const schema = Joi.object({
+    email: Joi.string().email().required(),
+    password: Joi.string().min(1).max(50).required(),
+  });
+
+  return schema.validate(body);
 
 }
 

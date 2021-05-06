@@ -40,7 +40,6 @@ const createAlbum = async (req, res) => {
         delete albumObject.__v;
         res.status(201).send(albumObject);
     } catch (error) {
-        console.log(error)
         res.status(500).send({ error: "An error has occured" })
     }
 };
@@ -117,7 +116,6 @@ const getUserAlbums = async (req, res) => {
     try {
         await user.populate('albums').execPopulate();
         const albums = user.albums;
-        console.log(albums);
         var albumsObj = [];
         Array.prototype.forEach.call(albums, (album) => {
             const albumObj = album.toObject();
@@ -128,7 +126,6 @@ const getUserAlbums = async (req, res) => {
         res.status(200).send(albumsObj);
 
     } catch (error) {
-        console.log(error);
         res.status(500).send({ error: "Internal server Error" });
     }
 }
