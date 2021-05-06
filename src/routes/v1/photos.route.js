@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const {Photo,Comment ,validatePhoto, validateComment,validatePhotoId,validateCommentId}=require('../../models/photo.model')
-const {authorization}= require('../../middlewares/auth')
+const {authentication}= require('../../middlewares/auth')
 const photoController=require('../../controllers/photo.controller')
 //schemas
 /**
@@ -83,7 +83,7 @@ const photoController=require('../../controllers/photo.controller')
  *            }
  */
 
-router.post('/photo',authorization,photoController.upload.single("photo"),photoController.AddPhoto)
+router.post('/photo',authentication,photoController.upload.single("photo"),photoController.AddPhoto)
 
 
 
@@ -194,7 +194,7 @@ router.put('/tag', (req, res) => {})
  *
  */
 
- router.get('/:photoId/comments',authorization,photoController.getComments);
+ router.get('/:photoId/comments',authentication,photoController.getComments);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -290,7 +290,7 @@ router.delete('/delete/:photo_id', (req, res) => {})
  *
  */
 
- router.post('/:photoId/comments',authorization,photoController.addComment);
+ router.post('/:photoId/comments',authentication,photoController.addComment);
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -521,7 +521,7 @@ router.put('/photo/{photo_id}', (req, res) => {})
  *
  */
 
-router.delete('/:photoId/comments/:commentId', authorization, photoController.deleteComment)
+router.delete('/:photoId/comments/:commentId', authentication, photoController.deleteComment)
 
 /**
  * @swagger
