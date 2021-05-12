@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Joi = require('joi');
 const schema = mongoose.Schema;
 
 const UserSchema = new schema(
@@ -51,14 +52,8 @@ const UserSchema = new schema(
       type: String,
       required: true,
       min: 1,
-    }
+    },
 
-    , photos: [
-      {
-        type: schema.Types.ObjectId,
-        ref: 'Photo'
-      }
-    ],
 
     Num_tags: {
       type: Number,
@@ -104,9 +99,53 @@ const UserSchema = new schema(
       type: schema.Types.ObjectId,
       ref: 'Photo'
     }
-    ]
+    ],
+    isActive: {
+      type: Boolean,
+      default: false,
+    },
 
   }
 );
+
+UserSchema.virtual('albums', {
+  ref: 'Album',
+  localField: '_id',
+  foreignField: 'ownerId'
+})
+
+UserSchema.virtual('photos', {
+  ref: 'Photo',
+  localField: '_id',
+  foreignField: 'ownerId'
+})
+////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+module.exports.validateSignup = (body) => {
+
+  const schema = Joi.object({
+    firstName: Joi.string().min(1).max(50).required(),
+    lastName: Joi.string().min(1).max(50).required(),
+    age: Joi.number().integer().min(1).max(200).required(),
+    email: Joi.string().email().required(),
+    password: Joi.string().min(1).max(50).required(),
+  });
+
+  return schema.validate(body);
+
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+module.exports.validateLogin = (body) => {
+
+  const schema = Joi.object({
+    email: Joi.string().email().required(),
+    password: Joi.string().min(1).max(50).required(),
+  });
+
+  return schema.validate(body);
+
+}
+
 
 module.exports.UserModel = mongoose.model('User', UserSchema);;

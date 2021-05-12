@@ -1,4 +1,3 @@
-
 const { Photo, Comment, validatePhoto, validateComment, validateId } = require('../models/photo.model')
 const multer = require('multer');
 
@@ -26,7 +25,7 @@ exports.upload = multer({
 
 
 exports.AddPhoto = async (req, res) => {
-    const _id = res.locals.userid.id;
+    const _id = res.locals.userid;
     const photo = new Photo({
         ...req.body,
         ownerId: _id,
@@ -57,20 +56,7 @@ exports.getComments = async (req, res) => {
     const photo = await Photo.findById(req.params.photoId)
         .populate('comments.user', 'Fname Lname -_id');
     if (!photo) return res.status(404).send('Photo not found');
-    if (photo.privacy === 'private' && res.locals.userid.id != photo.ownerId)
-        return res.status(403).send('Access denied');
-}
-
-
-exports.getComments = async (req, res) => {
-
-    const { error } = validateId({ id: req.params.photoId });
-    if (error) return res.status(400).send(error.details[0].message);
-
-    const photo = await Photo.findById(req.params.photoId)
-        .populate('comments.user', 'Fname Lname -_id');
-    if (!photo) return res.status(404).send('Photo not found');
-    if (photo.privacy === 'private' && res.locals.userid.id != photo.ownerId)
+    if (photo.privacy === 'private' && res.locals.userid != photo.ownerId)
         return res.status(403).send('Access denied');
 
     try {
@@ -90,7 +76,7 @@ exports.addComment = async (req, res) => {
     const photo= await Photo.findById(req.params.photoId);
     if (!photo) return res.status(404).send('Photo not found');
     
-    if(photo.privacy==='private' && res.locals.userid.id!=photo.ownerId) 
+    if(photo.privacy==='private' && res.locals.userid!=photo.ownerId) 
         return res.status(403).send('Access denied');
 
     const result = validateComment(req.body);
@@ -98,7 +84,7 @@ exports.addComment = async (req, res) => {
 
     const comment = new Comment({
         comment: req.body.comment,
-        user: res.locals.userid.id
+        user: res.locals.userid
     });
     try {
         photo.comments.push(comment);
@@ -120,7 +106,7 @@ exports.deleteComment = async (req, res) => {
     const photo = await Photo.findById(req.params.photoId);
     if (!photo) return res.status(404).send('photo not found');
 
-    if (photo.privacy === 'private' && res.locals.userid.id != photo.ownerId)
+    if (photo.privacy === 'private' && res.locals.userid != photo.ownerId)
         return res.status(403).send('Access denied');
 
     const result = validateId({ id: req.params.photoId });
@@ -129,7 +115,7 @@ exports.deleteComment = async (req, res) => {
     const comment = await photo.comments.id(req.params.commentId);
     if (!comment) return res.status(404).send('Comment not found');
 
-    if (res.locals.userid.id != comment.user._id && res.locals.userid.id != photo.ownerId)
+    if (res.locals.userid != comment.user._id && res.locals.userid != photo.ownerId)
         return res.status(403).send('Access denied. User not authorized to delete comment');
 
     try {
@@ -139,6 +125,5 @@ exports.deleteComment = async (req, res) => {
     }
     catch (ex) {
         console.log(ex.message);
-
     };
 };
