@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-const Joi =require('joi');
-Joi.objectId= require('joi-objectid')(Joi);
+const Joi = require('joi');
+Joi.objectId = require('joi-objectid')(Joi);
 
 
 const commentSchema = new mongoose.Schema({
@@ -19,8 +19,25 @@ const commentSchema = new mongoose.Schema({
     timestamps: true
 });
 
+const tagSchema = new mongoose.Schema({
+    tagging: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'User'
+    },
+    tagged: [{
+        type: String,
+        unique: true,
+        required: true,
+        ref: 'User'
+    }]
+}, {
+    timestamps: true
+});
+
 
 const Comment = mongoose.model('comment', commentSchema);
+const Tag = mongoose.model('Tag',tagSchema);
 
 const photoSchema = new mongoose.Schema({
     title: {
@@ -67,20 +84,22 @@ const photoSchema = new mongoose.Schema({
             maxlength: 50
         }
     }],
-    comments: [{type:commentSchema}]
+    peopleTags: [{ type: tagSchema }],
+    comments: [{ type: commentSchema }]
 }, {
     timestamps: true
 });
 
 const Photo = mongoose.model('Photo', photoSchema);
 
-function validatePhoto(photo){
+function validatePhoto(photo) {
     const schema = Joi.object({
         title: Joi.string().max(255).allow(null, ''),
-        description:Joi.string().max(1024).allow(null, ''),
-        privacy:Joi.string().valid('private','public'),
-        tags:Joi.array().items(Joi.string().max(50)),
-        comments: Joi.array().items(Joi.string().max(1024))
+        description: Joi.string().max(1024).allow(null, ''),
+        privacy: Joi.string().valid('private', 'public'),
+        tags: Joi.array().items(Joi.string().max(50)),
+        comments: Joi.array().items(Joi.string().max(1024)),
+        tagged: Joi.array().items(Joi.string())
 
     });
     const result = schema.validate(photo);
@@ -89,7 +108,7 @@ function validatePhoto(photo){
 }
 
 
-function validateComment(comment){
+function validateComment(comment) {
     const schema = Joi.object({
         comment: Joi.string().required().max(1024)
     });
@@ -98,7 +117,7 @@ function validateComment(comment){
 
 }
 
-function validateId(id){
+function validateId(id) {
     const schema = Joi.object({
         id: Joi.objectId().required()
     });
@@ -111,3 +130,4 @@ exports.validatePhoto = validatePhoto;
 exports.validateComment = validateComment;
 module.exports.Photo = Photo;
 module.exports.Comment = Comment;
+module.exports.Tag = Tag;
