@@ -32,7 +32,6 @@ exports.addPhoto = async (req, res) => {
         ownerId: _id,
         photoUrl: req.file.path
     })
-    // Required validation on the array of tagged people that they really exist in user
     const { error } = validatePhoto(req.body);
     if (error) {
         return res.status(400).send({ error: error });
@@ -45,7 +44,6 @@ exports.addPhoto = async (req, res) => {
         this.tagPeople(req, res);
     }
     catch (error) {
-        console.log(error);
         res.status(500).send({ error: "Internal Server error" })
     }
 
@@ -53,6 +51,9 @@ exports.addPhoto = async (req, res) => {
 
 exports.tagPeople = async (req, res) => {
     const _id = req.params.id; // photo id
+    const {error} = validateId({id:_id});
+    if(error)
+    return res.status(400).send(error.details[0].message);
 
     try {
         var photo = await Photo.findById({ _id, ownerId: res.locals.userid });
@@ -60,15 +61,33 @@ exports.tagPeople = async (req, res) => {
             return res.status(400).send({ error: "photo not found" });
         //Validate the passed array of Usernames (if these usernames really do exist)
         if (!req.body.tagged)
-            return res.status(400).send("You must add tagged paramter");
+            return res.status(400).send("You must add tagged parameter");
         const taggedPeople = req.body.tagged; // array of usernames of tagged people
-        taggedPeople.forEach(async (person) => {
+
+        for (person of taggedPeople) {
             await UserModel.findOne({ UserName: person }); // if not found it will throw an error
-        });
-        const tag = new Tag({
-            tagging: res.locals.userid,
-            tagged: taggedPeople
-        })
+
+        }
+
+        const photoTags = photo.peopleTags; // array of all the people tags for this photo
+
+        var tag = photoTags.find((tag) => {
+            return tag.tagging == res.locals.userid
+        }) // this user already tagged other people in this photo
+
+        // if the user didn't tag anyone before in this photo
+        if (!tag) {
+            tag = new Tag({
+                tagging: res.locals.userid,
+                tagged: taggedPeople
+            })
+        }
+        else {
+            const index = photoTags.indexOf(tag);
+            photo.peopleTags.splice(index, 1); // remove the existing tag
+            tag.tagged = tag.tagged.concat(taggedPeople) // add on the existing one 
+            tag.tagged = [...(new Set(tag.tagged))]; // remove all duplicated of tagged people
+        }
         photo.peopleTags.push(tag);
         await photo.save();
         res.status(200).send(photo);
@@ -80,8 +99,50 @@ exports.tagPeople = async (req, res) => {
 
 }
 
-exports.getUserPhotos = async (req, res) => {
+exports.removeTagPeople = async (req, res) => {
 
+    const _id = req.params.id; // photo id
+
+    try {
+        var photo = await Photo.findById({ _id, ownerId: res.locals.userid });
+        if (!photo)
+            return res.status(400).send({ error: "photo not found" });
+        //Validate the passed array of Usernames (if these usernames really do exist)
+        if (!req.body.tagged)
+            return res.status(400).send("You must add tagged parameter");
+        const removeTaggedPeople = req.body.tagged; // array of usernames of people to remove
+        const photoTags = photo.peopleTags; // array of all the people tags for this photo
+        var tag = photoTags.find((tag) => {
+            return tag.tagging == res.locals.userid
+        }) // this user already tagged other people in this photo
+        if (!tag)
+            return res.status(400).send({ error: "tag not found" });
+
+        for (person of removeTaggedPeople) {
+            if (tag.tagged.includes(person)) // if the passed tagged person to remove is really tagged
+                tag.tagged = tag.tagged.filter((element) => element != person) // remove it
+        }
+
+
+
+        const index = photoTags.indexOf(tag);
+        photo.peopleTags.splice(index, 1); // remove the existing tag
+
+        if (tag.tagged.length != 0)
+            photo.peopleTags.push(tag);
+        await photo.save();
+        res.status(200).send(photo);
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({ error: "An error has occured whole finding photo, please check the photo id" });
+    }
+
+
+}
+
+//This one is implemeted as part of user model
+exports.getUserPhotos = async (req, res) => {
     const user = await UserModel.findById(res.locals.userid);
     try {
         await user.populate('photos').execPopulate();
@@ -91,8 +152,71 @@ exports.getUserPhotos = async (req, res) => {
     }
 }
 
-exports.getPhotosExplore = async (req,res) =>{
-    
+exports.getPhotosHome = async (req, res) => {
+    try {
+        const user = await UserModel.findById(res.locals.userid); // array of ids of the people that the authenticated user is following
+        const following = user.Following;
+        var homePhotos = [];
+        for (const person of following) {
+            const friend = await UserModel.findById(person);
+            await friend.populate('photos').execPopulate();
+            const photos = friend.photos;
+            homePhotos = homePhotos.concat(photos);
+
+        };
+        return res.status(200).send(homePhotos);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({ error: "Internal Server Error" });
+    }
+}
+
+exports.getPhotosExplore = async (req, res) => {
+    try {
+        const users = await UserModel.find(); // array of all users
+        var photos = [];
+        for (user of users) {
+            user.populate("photos").execPopulate();
+            for (photo of user.photos) {
+                if (photo.Fav.length > 20)
+                    photos.push(photo);
+            }
+        }
+        res.status(200).send(photos);
+    } catch (error) {
+        res.status(500).send({ error: "Internal Server Error" });
+    }
+}
+
+exports.addTag = async (req, res) => {
+    try {
+        for (element of req.body.photos) {
+            const photo = await Photo.findById({ _id: photo });
+            if (!photo)
+                return res.status(404).send({ error: "photo not found" });
+            if (!photo.tags.includes(req.body.tag)) {
+                photo.tags.push(tag);
+                await photo.save();
+            }
+        }
+        res.status(200).send({ message: "Tag added successfully" });
+
+    } catch (error) {
+        res.status(500).send({ error: "Internal Server Error" });
+    }
+}
+
+exports.removeTag = async (req, res) => {
+    try {
+        const photo = await Photo.findById({ _id: req.params.id });
+        if (!photo)
+            return res.status(404).send({ error: "Not found" });
+        photo.tags = photo.tags.filter((tag) => tag != req.body.tag);
+        await photo.save();
+        res.status(200).send({error:"Tag removed successfully"});
+    } catch (error) {
+        res.status(500).send({ error: "Internal server error" });
+    }
 }
 
 
