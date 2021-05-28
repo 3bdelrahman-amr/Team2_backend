@@ -24,6 +24,12 @@ app.use('/api/v1',routes);
     
 // });
 
+
+// simple route for testing api is working:
+app.get("/test", (req, res) => {
+    res.json({ message: "Welcome to dropoids backend application V99" });
+  });
+
 app.use('/photos',express.static('photos')); // makes the photos folder available for everyone
 
 module.exports = app
