@@ -23,7 +23,7 @@ const albumController = require('../../controllers/album.controller');
  *       type: string
  *       schema:
  *     - name: photos
- *       description: The photos that the album is created with
+ *       description: The ids of photos that the album is created with
  *       in: body
  *       required: true
  *       type: array
@@ -66,9 +66,8 @@ const albumController = require('../../controllers/album.controller');
  *          application/json:
  *
  *            {
- *                       "error": "An error has occured",
+ *                       "error": "Internal Server error",
  *            }
- *       $ref: "#/definitions/ApiResponse"
  */
 
 
@@ -77,9 +76,90 @@ router.post('/', authentication, albumController.createAlbum)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * @swagger
- * /album/{album:id}:
+ * /album/{album_id}:
+ *   post:
+ *     tags: [Album]
+ *     description: Add photos to album.
+ *     
+ *     parameters:
+ *     - name: Album_id
+ *       in: url
+ *       description: the album id that the photos will be added to
+ *       required: true
+ *       schema:
+ *     - name: photos'_id
+ *       in: body
+ *       required: true
+ *       type: integer
+ *       description: Array of photos ids to add to the album
+ *       schema:
+ *         type: object
+ *         properties:
+ *            photos:  
+ *              type: array
+ *              items:
+ *                  type: integer
+ *          
+ *     responses:
+ *       201:
+ *         description: returns array of photos ids of the album
+ *         schema:
+ *          type: object
+ *          properties:
+ *            photos:  
+ *              type: array
+ *              items:
+ *                  type: integer
+ *          
+ *          
+ *       401:
+ *         description: Unauthorized
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                       "error": "User is not authorized to create album",
+ *            }
+ *       400:
+ *         description: Invalid parameters
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                       "error": "Bad request",
+ *            }
+ *       404:
+ *         description: album not found
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                       "error": "Not found",
+ *            }
+ *       500:
+ *         description: Internal Server error
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                       "error": "Internal Server error",
+ *            }
+ *       $ref: "#/definitions/ApiResponse"
+ */
+
+
+ router.post('/:id', authentication, albumController.addPhotoToAlbum)
+
+ /////////////////////////////////////////////////////////////////////////////////////
+ /////////////////////////////////////////////////////////////////////////////////////
+ /////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @swagger
+ * /album/{album_id}:
  *   put:
  *     tags: [Album]
  *     description: Update album.
@@ -113,12 +193,8 @@ router.post('/', authentication, albumController.createAlbum)
  *     responses:
  *       200:
  *         description: Success
- *         examples:
- *          application/json:
- *
- *            {
- *                       "message": "Album updated successfully"
- *            }
+ *         schema:
+ *            $ref: "#/definitions/CreateAlbumResponse"
  *       404:
  *         description: Not found
  *         examples:
@@ -135,6 +211,15 @@ router.post('/', authentication, albumController.createAlbum)
  *            {
  *                       "error": "Invalid updates",
  *            }
+ *       500:
+ *         description: Internal Server error
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                       "error": "Internal Server error",
+ *            }
+ *                
  *
  */
 
@@ -149,6 +234,14 @@ router.put('/:id', authentication, albumController.updateAlbum);
  *   delete:
  *     tags: [Album]
  *     description: delete album by id.
+ *     parameters:
+ *       - name: album_id
+ *         in: url
+ *         required: true
+ *         description: Album id
+ *         schema:
+ *           type: integer
+ *           format: int32
  *     responses:
  *       200:
  *         description: Success
@@ -183,14 +276,15 @@ router.put('/:id', authentication, albumController.updateAlbum);
  *            {
  *                       "error": "Unauthorized request",
  *            }
- *     parameters:
- *       - name: album_id
- *         in: url
- *         required: true
- *         description: Album id
- *         schema:
- *           type: integer
- *           format: int32
+ *       500:
+ *         description: Internal Server error
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                       "error": "Internal Server error",
+ *            }
+ *                
  */
 
 router.delete('/:id', authentication, albumController.deleteAlbum);
@@ -200,6 +294,87 @@ router.delete('/:id', authentication, albumController.deleteAlbum);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @swagger
+ * /album/photos/{album_id}:
+ *   delete:
+ *     tags: [Album]
+ *     description: Remove photos from album.
+ *     
+ *     parameters:
+ *     - name: Album_id
+ *       in: url
+ *       description: the album id that the photos will be added to
+ *       required: true
+ *       schema:
+ *     - name: photos'_id
+ *       in: body
+ *       required: true
+ *       description: Array of photos ids to add to the album
+ *       schema:
+ *         type: object
+ *         properties:
+ *            photos:  
+ *              type: array
+ *              items:
+ *                  type: integer
+ *          
+ *     responses:
+ *       201:
+ *         description: returns array of photos ids of the album
+ *         schema:
+ *          type: object
+ *          properties:
+ *            photos:  
+ *              type: array
+ *              items:
+ *                  type: integer
+ *          
+ *          
+ *       401:
+ *         description: Unauthorized
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                       "error": "User is not authorized to create album",
+ *            }
+ *       400:
+ *         description: Invalid parameters
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                       "error": "Bad request",
+ *            }
+ *       404:
+ *         description: album not found
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                       "error": "Not found",
+ *            }
+ *       500:
+ *         description: Internal Server error
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                       "error": "An error has occured",
+ *            }
+ *       $ref: "#/definitions/ApiResponse"
+ */
+
+
+ router.delete('/photos/:id', authentication, albumController.removePhotoFromAlbum)
+
+ /////////////////////////////////////////////////////////////////////
+ /////////////////////////////////////////////////////////////////////
+ /////////////////////////////////////////////////////////////////////
+ /////////////////////////////////////////////////////////////////////
+ /////////////////////////////////////////////////////////////////////
 /**
  * @swagger
  * /album/{album_id}:
@@ -233,7 +408,7 @@ router.delete('/:id', authentication, albumController.deleteAlbum);
  *          application/json:
  *
  *            {
- *                       "error": Invalid album Id",
+ *                       "error": Invalid album Id,
  *            }
  * 
  *       500:
@@ -242,7 +417,7 @@ router.delete('/:id', authentication, albumController.deleteAlbum);
  *          application/json:
  *
  *            {
- *                       "error": "Album id not sent",
+ *                       "error": "Internal Server error",
  *            }
  */
 
@@ -257,12 +432,6 @@ router.get('/:id', authentication, albumController.getAlbumbyId)
  *   get:
  *     tags: [Album]
  *     description: Return all the user albums
- *     parameters:
- *       - name: token
- *         in: header
- *         required: true
- *         description: the user token
- *         schema:
  *     responses:
  *       200:
  *         description: Success
@@ -270,14 +439,21 @@ router.get('/:id', authentication, albumController.getAlbumbyId)
  *            type: array
  *            items:
  *              $ref: "#/definitions/getAlbumByID"
-
+ *       401:
+ *         description: Unauthorized
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                       "error": "User is not authorized to create album",
+ *            }
  *       500:
  *         description: No value passed
  *         examples:
  *          application/json:
  *
  *            {
- *                       "error": "Album id not sent",
+ *                       "error": "Internal Server error",
  *            }
  */
 
@@ -393,7 +569,7 @@ router.get('/user/:username', authentication, albumController.getAlbumbyUsername
  *          items:
  *             type: integer
  *      coverPhoto:
- *           type: _id
+ *           type: integer
  *  EditAlbum:
  *    type: object
  *    properties:
