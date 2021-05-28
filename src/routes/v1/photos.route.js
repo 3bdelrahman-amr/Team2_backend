@@ -256,8 +256,12 @@ router.delete('/delete/:photo_id', (req, res) => {})
  *         description: photo id to add comment to the corresponding photo
  *         schema:
  *           type: integer
- *
- *     properties:
+ *       - name: comment
+ *         in: body
+ *         required: true
+ *         description: comment added to the corresponding photo
+ *         type: object
+ *         properties:
  *           comment:
  *             type: string
  *     responses:
@@ -406,13 +410,18 @@ router.get('/photo/explore', (req, res) => {})
  *         description: photo_id to edit it
  *         schema:
  *           type: integer
- *       - name: privacy
+ *       - name: body
  *         in: body
  *         required: true
- *         description: mode of photo
- *         schema:
- *           type: string
- *
+ *         description: edit photo object
+ *         type: object
+ *         properties:
+ *           title:
+ *             type: string 
+ *           privacy:
+ *             type: string 
+ *           description:
+ *             type: string 
  *     responses:
  *       200:
  *         description: Success
