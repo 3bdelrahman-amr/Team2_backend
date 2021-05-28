@@ -1,10 +1,15 @@
 const { Photo, Comment, Tag, validatePhoto, validateComment, validateId } = require('../models/photo.model')
 const multer = require('multer');
 const { UserModel } = require('../models/user.model');
+const config = require('config');
 
+const port = "localhost:" + config.get('PORT') + "/";
+var mkdirp = require('mkdirp');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
+        var dest = './photos/';
+        mkdirp.sync(dest);
         cb(null, './photos/'); // This is the destination folder where the photos shall be stored
     },
     filename: function (req, file, cb) {
@@ -30,7 +35,7 @@ exports.addPhoto = async (req, res) => {
     const photo = new Photo({
         ...req.body,
         ownerId: _id,
-        photoUrl: req.file.path
+        photoUrl: port + req.file.path
     })
     const { error } = validatePhoto(req.body);
     if (error) {
@@ -51,9 +56,9 @@ exports.addPhoto = async (req, res) => {
 
 exports.tagPeople = async (req, res) => {
     const _id = req.params.id; // photo id
-    const {error} = validateId({id:_id});
-    if(error)
-    return res.status(400).send(error.details[0].message);
+    const { error } = validateId({ id: _id });
+    if (error)
+        return res.status(400).send(error.details[0].message);
 
     try {
         var photo = await Photo.findById({ _id, ownerId: res.locals.userid });
@@ -213,7 +218,7 @@ exports.removeTag = async (req, res) => {
             return res.status(404).send({ error: "Not found" });
         photo.tags = photo.tags.filter((tag) => tag != req.body.tag);
         await photo.save();
-        res.status(200).send({error:"Tag removed successfully"});
+        res.status(200).send({ error: "Tag removed successfully" });
     } catch (error) {
         res.status(500).send({ error: "Internal server error" });
     }
