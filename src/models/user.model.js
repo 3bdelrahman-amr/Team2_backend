@@ -91,10 +91,24 @@ const UserSchema = new schema(
         ref: 'Gallery'
       }
     ],
+    
+    
     Avatar: {
       type: schema.Types.ObjectId,
-      ref: 'Photo'
+      ref: 'Photo',
+      default:"60b0563bb7db47b60e439331"
+      
     },
+    BackGround: {
+      type: schema.Types.ObjectId,
+      ref: 'Photo',
+      default:"60b0563bb7db47b60e439331"
+      
+    },
+    PhotoStream:[{
+      type: schema.Types.ObjectId,
+      ref: 'Photo'
+    }],
     Fav: [{
       type: schema.Types.ObjectId,
       ref: 'Photo'

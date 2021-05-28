@@ -3,6 +3,7 @@ const app = require('./app');
 const config = require('config');
 
 
+
 let server;
 const db=config.get('db');
 const port=config.get('PORT');
@@ -14,7 +15,7 @@ mongoose.connect(db, {
   useUnifiedTopology: true
 }).then(() => {
   server = app.listen(port, () => {
-    console.log(`Listening to port ${port} `);
+    console.log(`Listening to port ${port}\n `);
     
   });
 }).catch(err => {
