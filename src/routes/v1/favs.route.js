@@ -8,8 +8,10 @@
  *         type: integer
  */
 const express = require('express')
+
 const router = express.Router()
-//const { favsController } = require('../../controllers')
+const { favsController } = require('../../controllers')
+const { authorization, authentication } = require('../../middlewares/auth')
 /**
  * @swagger
  * /favs:
@@ -58,10 +60,8 @@ const router = express.Router()
  *           $ref: '#/definitions/Fav'
  *
  */
-
-router.post('/:photoid', (req, res) => {
-    res.sendStatus(favsController.status)
-})
+router.use((req, res, next) => authentication(req, res, next))
+router.post('/', (req, res) => favsController.add_fav(req, res))
 /**
  * @swagger
  * /favs/{photo_id}:
@@ -93,7 +93,14 @@ router.post('/:photoid', (req, res) => {
  *            {
  *                       "message": "Missing photo parameter",
  *            }
+ *       500:
+ *         description: Photo not in favourites
+ *         examples:
+ *          application/json:
  *
+ *            {
+ *                       "message": "Photo not in favourites list",
+ *            }
  *     parameters:
  *       - name: photo_id
  *         in: path
@@ -104,8 +111,6 @@ router.post('/:photoid', (req, res) => {
  *
  */
 
-router.delete('/:photo_id', (req, res) => {
-    console.log(req.body.name)
-})
+router.delete('/:photoid', (req, res) => favsController.remove_fav(req, res))
 
 module.exports = router

@@ -43,6 +43,7 @@ await mongoose.connection.close();
 
      function my_next(){
          expect(res.locals).toHaveProperty('userid');
+         expect(response.statusCode).toBE(200);
          return;
 
      }

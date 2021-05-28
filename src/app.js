@@ -1,7 +1,6 @@
 const express = require('express')
 const mongoSanitize = require('express-mongo-sanitize')
 const cors = require('cors')
-const httpStatus = require('http-status')
 const routes = require('./routes/v1')
 
 const app = express()
@@ -18,11 +17,20 @@ app.use(mongoSanitize())
 app.use(cors())
 app.options('*', cors())
 
+// simple route for testing api is working:
+app.get("/test", (req, res) => {
+    res.json({ message: "Welcome to dropoids backend application V99" });
+  });
+
+
 // v1 api routes
-app.use('/api/v1',routes);
+app.use('/v1',routes);
 // app.listen(3000,(err)=>{
 //     console.log("start list");
     
 // });
+
+
+app.use('/photos',express.static('photos')); // makes the photos folder available for everyone
 
 module.exports = app
