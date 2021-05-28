@@ -387,7 +387,8 @@ router.get('/', authentication, photoController.getUserPhotos)
  *                     "_id": "123456",
  *                     "user": {
  *                                  "Fname":"John",
- *                                  "Lname":"Smith"
+ *                                  "Lname":"Smith",
+ *                                  "_id": "123456"
  *                             },
  *                     "createdAt":"2020-5-23",
  *                     "updatedAt":"2021-4-2"

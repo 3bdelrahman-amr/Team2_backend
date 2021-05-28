@@ -146,6 +146,15 @@ module.exports.validateLogin = (body) => {
   return schema.validate(body);
 
 }
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+function validateId(id) {
+  const schema = Joi.object({
+      id: Joi.objectId().required()
+  });
+  const result = schema.validate(id);
+  return result;
+}
 
-
+exports.validateId = validateId;
 module.exports.UserModel = mongoose.model('User', UserSchema);;
