@@ -17,18 +17,19 @@ app.use(mongoSanitize())
 app.use(cors())
 app.options('*', cors())
 
+// simple route for testing api is working:
+app.get("/test", (req, res) => {
+    res.json({ message: "Welcome to dropoids backend application V99" });
+  });
+
+
 // v1 api routes
-app.use('/api/v1',routes);
+app.use('/v1',routes);
 // app.listen(3000,(err)=>{
 //     console.log("start list");
     
 // });
 
-
-// simple route for testing api is working:
-app.get("/test", (req, res) => {
-    res.json({ message: "Welcome to dropoids backend application V99" });
-  });
 
 app.use('/photos',express.static('photos')); // makes the photos folder available for everyone
 
