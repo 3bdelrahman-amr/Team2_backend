@@ -7,11 +7,11 @@
  *       photo_id:
  *         type: integer
  */
-const express = require('express')
+const express = require('express');
 
-const router = express.Router()
-const { favsController } = require('../../controllers')
-const { authorization, authentication } = require('../../middlewares/auth')
+const router = express.Router();
+const { favsController } = require('../../controllers');
+const { authentication } = require('../../middlewares/auth');
 /**
  * @swagger
  * /favs:
@@ -60,8 +60,8 @@ const { authorization, authentication } = require('../../middlewares/auth')
  *           $ref: '#/definitions/Fav'
  *
  */
-router.use((req, res, next) => authentication(req, res, next))
-router.post('/', (req, res) => favsController.add_fav(req, res))
+router.use((req, res, next) => authentication(req, res, next));
+router.post('/', (req, res) => favsController.add_fav(req, res));
 /**
  * @swagger
  * /favs/{photo_id}:
@@ -111,6 +111,6 @@ router.post('/', (req, res) => favsController.add_fav(req, res))
  *
  */
 
-router.delete('/:photoid', (req, res) => favsController.remove_fav(req, res))
+router.delete('/:photoid', (req, res) => favsController.remove_fav(req, res));
 
-module.exports = router
+module.exports = router;
