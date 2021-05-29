@@ -251,4 +251,4 @@ router.post('user/fav', (req, res) => {
  *
  *
  */
-modules.exports = router
+module.exports = router

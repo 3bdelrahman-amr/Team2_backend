@@ -895,7 +895,7 @@ router.get('/:title',authentication,photoController.GetPhototitle)
 
 /**
  * @swagger
- *  Photo:
+ *Photo:
  *    type: object
  *    properties:
  *      _id:
@@ -931,7 +931,7 @@ router.get('/:title',authentication,photoController.GetPhototitle)
  *      updatedAt:
  *        example: "2021-05-29T11:17:57.326Z"
  * 
- *  peopleTag:
+ *peopleTag:
  *    type: object
  *    properties:
  *      tagging:
@@ -945,7 +945,7 @@ router.get('/:title',authentication,photoController.GetPhototitle)
  *      updatedAt:
  *        example: "2021-05-29T11:17:57.326Z"
  * 
- *  Comment:
+ *Comment:
  *    type: object
  *    properties:
  *      comment:
@@ -957,7 +957,7 @@ router.get('/:title',authentication,photoController.GetPhototitle)
  *      updatedAt:
  *        example: "2021-05-29T11:17:57.326Z"
  * 
- 
+ */
 
 /**
  * @swagger
