@@ -15,7 +15,9 @@ const createAlbum = async (req, res) => {
 
         if (req.body.photos.length != 0) {
             for (photo_id of req.body.photos) {
-                await Photo.findById({ _id: photo_id, ownerId: res.locals.userid });
+                const photo =  await Photo.findById({ _id: photo_id, ownerId: res.locals.userid });
+                if(!photo)
+                    return res.status(404).send({error: "Photo doesn't exist"});
             }
         }
         else {
@@ -94,7 +96,6 @@ const deleteAlbum = async (req, res) => {
     catch (error) {
         res.status(500).send({ error: "Internal Server Error" });
     }
-
 };
 
 const getAlbumbyId = async (req, res) => {
@@ -121,17 +122,16 @@ const getUserAlbums = async (req, res) => {
     const user = await UserModel.findById(res.locals.userid);
     try {
         await user.populate('albums').execPopulate();
+        console.log(user);
         const albums = user.albums;
-        var albumsObj = [];
-        Array.prototype.forEach.call(albums, (album) => {
-            const albumObj = album.toObject();
-            delete albumObj.ownerId
-            delete albumObj.__v
-            albumsObj.push(albumObj);
-        })
-        res.status(200).send(albumsObj);
+        for(album of albums)
+        {
+            await album.populate('photos').execPopulate();
+        }
+        res.status(200).send(albums);
 
     } catch (error) {
+        console.log(error);
         res.status(500).send({ error: "Internal server Error" });
     }
 }
@@ -160,6 +160,7 @@ const getAlbumbyUsername = async (req, res) => {
 const addPhotoToAlbum = async (req, res) => {
     try {
         const _id = req.params.id;
+        const { error } = validateAlbumId({ id: _id });
         if (error)
             return res.status(400).send(error.details[0].message);
         const { error2 } = validatePhotosIds({ photos: req.body.photos })
@@ -181,6 +182,7 @@ const addPhotoToAlbum = async (req, res) => {
         res.status(200).send(album.photos);
 
     } catch (error) {
+        console.log(error)
         res.status(500).send({ error: "Internal Server error" });
     }
 }

@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 
-
 const commentSchema = new mongoose.Schema({
     comment: {
         type: String,
@@ -34,9 +33,8 @@ const tagSchema = new mongoose.Schema({
     timestamps: true
 });
 
-
 const Comment = mongoose.model('comment', commentSchema);
-const Tag = mongoose.model('Tag',tagSchema);
+const Tag = mongoose.model('Tag', tagSchema);
 
 const photoSchema = new mongoose.Schema({
     title: {
@@ -75,13 +73,12 @@ const photoSchema = new mongoose.Schema({
         ref: 'User'
     },
     tags: [{
-        tag: {
-            type: String,
-            required: false,
-            trim: true,
-            maxlength: 50
-        }
-    }],
+        type: String,
+        required: false,
+        trim: true,
+        maxlength: 50
+    }
+    ],
     peopleTags: [{ type: tagSchema }],
     comments: [{ type: commentSchema }]
 }, {

@@ -1,10 +1,17 @@
 const { Photo, Comment, Tag, validatePhoto, validateComment, validateId } = require('../models/photo.model')
 const multer = require('multer');
 const { UserModel } = require('../models/user.model');
+const config = require('config');
+const Joi = require('joi');
+Joi.objectId = require('joi-objectid')(Joi);
 
+const port = "localhost:" + config.get('PORT') + "/";
+var mkdirp = require('mkdirp');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
+        var dest = './photos/';
+        mkdirp.sync(dest);
         cb(null, './photos/'); // This is the destination folder where the photos shall be stored
     },
     filename: function (req, file, cb) {
@@ -30,7 +37,7 @@ exports.addPhoto = async (req, res) => {
     const photo = new Photo({
         ...req.body,
         ownerId: _id,
-        photoUrl: req.file.path
+        photoUrl: port + req.file.path
     })
     const { error } = validatePhoto(req.body);
     if (error) {
@@ -52,9 +59,9 @@ exports.addPhoto = async (req, res) => {
 
 exports.tagPeople = async (req, res) => {
     const _id = req.params.id; // photo id
-    const {error} = validateId({id:_id});
-    if(error)
-    return res.status(400).send(error.details[0].message);
+    const { error } = validateId({ id: _id });
+    if (error)
+        return res.status(400).send(error.details[0].message);
 
     try {
         var photo = await Photo.findById({ _id, ownerId: res.locals.userid });
@@ -147,8 +154,11 @@ exports.getUserPhotos = async (req, res) => {
     const user = await UserModel.findById(res.locals.userid);
     try {
         await user.populate('photos').execPopulate();
+        console.log(user);
+        console.log(user.photos);
         res.status(200).send(user.photos);
     } catch (error) {
+        consolelog(error);
         res.status(500).send({ error: "Internal Server Error" });
     }
 }
@@ -158,7 +168,7 @@ exports.getPhotosHome = async (req, res) => {
         const user = await UserModel.findById(res.locals.userid); // array of ids of the people that the authenticated user is following
         const following = user.Following;
         var homePhotos = [];
-        for (const person of following) {
+        for ( person of following) {
             const friend = await UserModel.findById(person);
             await friend.populate('photos').execPopulate();
             const photos = friend.photos;
@@ -192,17 +202,19 @@ exports.getPhotosExplore = async (req, res) => {
 exports.addTag = async (req, res) => {
     try {
         for (element of req.body.photos) {
-            const photo = await Photo.findById({ _id: photo });
+            const photo = await Photo.findById({ _id: element });
             if (!photo)
                 return res.status(404).send({ error: "photo not found" });
             if (!photo.tags.includes(req.body.tag)) {
-                photo.tags.push(tag);
+                console.log(photo.tags)
+                photo.tags.push(req.body.tag);
                 await photo.save();
             }
         }
         res.status(200).send({ message: "Tag added successfully" });
 
     } catch (error) {
+        console.log(error);
         res.status(500).send({ error: "Internal Server Error" });
     }
 }
@@ -214,7 +226,7 @@ exports.removeTag = async (req, res) => {
             return res.status(404).send({ error: "Not found" });
         photo.tags = photo.tags.filter((tag) => tag != req.body.tag);
         await photo.save();
-        res.status(200).send({error:"Tag removed successfully"});
+        res.status(200).send({ error: "Tag removed successfully" });
     } catch (error) {
         res.status(500).send({ error: "Internal server error" });
     }
@@ -370,5 +382,33 @@ module.exports.GetPhototitle = async(req,res)=>{
     } catch (error) {
         res.status(500).send({message:"internal server error"});   
     }
+}
     
-};
+module.exports.GetPhototitle = async (req, res) => {
+    const schema = Joi.object({
+        title: Joi.string().min(1).max(255).required()
+    });
+
+    const { error } = schema.validate(req.params);
+    if (error) return res.status(400).send({ message: error.details[0].message });
+
+    const photos = await Photo.find({ title: req.params.title, privacy: 'public' })
+        .select({ title: 1, description: 1, photoUrl: 1 });
+
+    const allPhotos = await Photo.find({});
+    console.log(req.params.title);
+
+    for (photo of allPhotos) {
+        console.log(photo.tags);
+        if (photo.tags.includes(req.params.title) && !photos.includes(photo))
+            photos.push(photo)
+    }
+    try {
+        if (photos.length == 0) {
+            return res.status(404).send({ message: "Image not found" });
+        }
+        res.status(200).send(photos);
+    } catch (error) {
+        res.status(500).send({ message: "internal server error" });
+    }
+}
