@@ -641,7 +641,7 @@ router.put('{photo_id}/comment', (req, res) => { })
  *
  */
 
-router.put('/photo/{photo_id}', (req, res) => { })
+router.put('/{photo_id}', (req, res) => { })
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -760,7 +760,7 @@ router.delete('/:photoId/comments/:commentId', authentication, photoController.d
  *            }
  */
 
-router.delete('/photo//tag/:id', authentication, photoController.removeTag)
+router.delete('/tag/:id', authentication, photoController.removeTag)
 
 ///////////////////////////////////////////////////////////////////////////
 /**
@@ -824,7 +824,7 @@ router.delete('/photo//tag/:id', authentication, photoController.removeTag)
  *            }
  */
 
- router.post('/photo//tag/',authentication, photoController.addTag)
+ router.post('/tag/',authentication, photoController.addTag)
 
  //////////////////////////////////////////////////////////////////////////////////
 
@@ -869,7 +869,7 @@ router.delete('/photo//tag/:id', authentication, photoController.removeTag)
  *
  */
 
-router.get('/photo/:photo_id', (req, res) => { })
+router.get('/:title',authentication,photoController.GetPhototitle)
 
 /**
  * @swagger
@@ -910,7 +910,6 @@ router.get('/photo/:photo_id', (req, res) => { })
  *
  */
 
-router.get('/photo/:photo_id', (req, res) => { })
 
 /**
  * @swagger

@@ -36,15 +36,15 @@ const albumController = require('../../controllers/album.controller');
  *       description: Album cover photo
  *       type: _id
  *       schema:
- *          $ref: "#/definitions/CreateAlbumRequest"
+ *          $ref: "#/responses/CreateAlbumRequest"
  *     responses:
  *       201:
  *         description: Created successfully
  *         schema:
- *            $ref: "#/definitions/CreateAlbumResponse"
+ *            $ref: "#/responses/CreateAlbumResponse"
  *          
  *          
- *       401:
+ *       403:
  *         description: Unauthorized
  *         examples:
  *          application/json:
@@ -101,7 +101,7 @@ router.post('/', authentication, albumController.createAlbum)
  *            photos:  
  *              type: array
  *              items:
- *                  type: integer
+ *                  example: "60b222e537838723b02201fd"
  *          
  *     responses:
  *       201:
@@ -112,7 +112,7 @@ router.post('/', authentication, albumController.createAlbum)
  *            photos:  
  *              type: array
  *              items:
- *                  type: integer
+ *                  example: "60b222e537838723b02201fd"
  *          
  *          
  *       401:
@@ -187,14 +187,14 @@ router.post('/', authentication, albumController.createAlbum)
  *         required: false
  *         description: album cover photo
  *         schema:
- *           $ref: '#/definitions/EditAlbum'
+ *           $ref: '#/responses/EditAlbum'
  *           photo_id:
  *               type: integer
  *     responses:
  *       200:
  *         description: Success
  *         schema:
- *            $ref: "#/definitions/CreateAlbumResponse"
+ *            $ref: "#/responses/CreateAlbumResponse"
  *       404:
  *         description: Not found
  *         examples:
@@ -318,7 +318,7 @@ router.delete('/:id', authentication, albumController.deleteAlbum);
  *            photos:  
  *              type: array
  *              items:
- *                  type: integer
+ *                  example: "60b222e537838723b02201fd"
  *          
  *     responses:
  *       201:
@@ -329,7 +329,7 @@ router.delete('/:id', authentication, albumController.deleteAlbum);
  *            photos:  
  *              type: array
  *              items:
- *                  type: integer
+ *                  example: "60b222e537838723b02201fd"
  *          
  *          
  *       401:
@@ -391,7 +391,7 @@ router.delete('/:id', authentication, albumController.deleteAlbum);
  *       200:
  *         description: Success
  *         schema:
- *             $ref: "#/definitions/getAlbumByID"
+ *             $ref: "#/responses/getAlbumByID"
  *
  *       404:
  *         description: Not found
@@ -438,7 +438,7 @@ router.get('/:id', authentication, albumController.getAlbumbyId)
  *         schema:
  *            type: array
  *            items:
- *              $ref: "#/definitions/getAlbumByID"
+ *              $ref: "#/responses/getAlbumByID"
  *       401:
  *         description: Unauthorized
  *         examples:
@@ -482,7 +482,7 @@ router.get('/', authentication, albumController.getUserAlbums);
  *         schema:
  *            type: array
  *            items:
- *              $ref: "#/definitions/getAlbumByID"
+ *              $ref: "#/responses/getAlbumByID"
  * 
  *       404:
  *         description: User not found
@@ -515,80 +515,135 @@ router.get('/user/:username', authentication, albumController.getAlbumbyUsername
  *  Album:
  *    type: object
  *    properties:
- *      album_id:
- *        type: integer
+ *      _id:
+ *        example: "60b222e537838723b02201fd"
  *      title:
- *        type: string
+ *        example: "Album1"
  *      description:
- *        type: string
- *  CreateAlbumRequest:
- *    type: object
- *    properties:
- *      title:
- *        type: string
- *      description:
- *        type: string
+ *        example: "my album"
+ *      ownerId:
+ *        example: "60b222e537838723b02201fd"
  *      photos:
  *        type: array
  *        items:
- *          type: integer
+ *          $ref: '#/definitions/Photo'
  *      coverPhoto:
- *        type: integer
+ *        $ref: '#/definitions/Photo'
+ *      createdAt: 
+ *        example: "2021-05-29T11:17:57.326Z"
+ *      updatedAt:
+ *        example: "2021-05-29T11:17:57.326Z"
+ *  Photo:
+ *    type: object
+ *    properties:
+ *      _id:
+ *        example: "60b222e537838723b02201fd"
+ *      title:
+ *        example: "photo1"
+ *      description:
+ *        example: "my photo"
+ *      photoUrl:
+ *        example: "localhost:3000/photos\\2021-05-29T11-17-57.298ZFCFS.PNG"
+ *      Fav:
+ *        type: array
+ *        items:
+ *          example: "60b222e537838723b02201fd"
+ *      privacy:
+ *        example: "private"
+ *      ownerId:
+ *        example: "60b222e537838723b02201fd"
+ *      tags:
+ *        type: array
+ *        items:
+ *          example: "Nature"
+ *      peopleTags:
+ *        type: array
+ *        items:
+ *          $ref: '#/definitions/peopleTag'
+ *      comments:
+ *        type: array
+ *        items:
+ *          $ref: '#/definitions/Comment'
+ *      createdAt: 
+ *        example: "2021-05-29T11:17:57.326Z"
+ *      updatedAt:
+ *        example: "2021-05-29T11:17:57.326Z"
+ * 
+ *  peopleTag:
+ *    type: object
+ *    properties:
+ *      tagging:
+ *        example: integer
+ *      tagged:
+ *        type: array
+ *        items:
+ *          example: "60b222e537838723b02201fd"  
+ *      createdAt: 
+ *        example: "2021-05-29T11:17:57.326Z"
+ *      updatedAt:
+ *        example: "2021-05-29T11:17:57.326Z"
+ * 
+ *  Comment:
+ *    type: object
+ *    properties:
+ *      comment:
+ *        example: "this is a comment"
+ *      user:
+ *        example: "60b222e537838723b02201fd"
+ *      createdAt: 
+ *        example: "2021-05-29T11:17:57.326Z"
+ *      updatedAt:
+ *        example: "2021-05-29T11:17:57.326Z"
+ * 
+ *      
+ */
+/**
+ * @swagger
+ *responses:
  *  CreateAlbumResponse:
  *    type: object
  *    properties:
  *      _id:
- *        type: integer
+ *        example: "60b222e537838723b02201fd"
  *      title:
- *        type: string
+ *        example: "Album1"
  *      description:
- *        type: string
+ *        example: "this is my album"
+ *      ownerId:
+ *        example: "60b222e537838723b02201fd"
  *      createdAt:
- *        type: string
+ *        example: "2021-05-29T11:17:57.326Z"
+ *      updatedAt:
+ *        example: "2021-05-29T11:17:57.326Z"
  *      photos:
- *          type: array
- *          items:
- *             type: integer
+ *        type: array
+ *        items:
+ *          example: "60b222e537838723b02201fd"
  *      coverPhoto:
- *        type: integer
- *  getAlbumByID:
+ *        example: "60b222e537838723b02201fd"
+ *  getAlbumByID: 
+ *      $ref: '#/definitions/Album'
+ *  CreateAlbumRequest:
  *    type: object
  *    properties:
- *      _id:
- *        type: integer
  *      title:
- *        type: string
+ *        example: "Album1"
  *      description:
- *        type: string
- *      createdAt:
- *        type: string
- *      updatedAt:
- *        type: string
+ *        example: "this is my album"
  *      photos:
- *          type: array
- *          items:
- *             type: integer
+ *        type: array
+ *        items:
+ *          example: "60b222e537838723b02201fd"
  *      coverPhoto:
- *           type: integer
+ *        example: "60b222e537838723b02201fd"
  *  EditAlbum:
  *    type: object
  *    properties:
  *      title:
- *        type: string
+ *        example: "Album1"
  *      description:
- *        type: string
+ *        example: "This is my album"
  *      coverPhoto:
- *        type: integer
- */
-/**
- * @swagger
- * responses:
- *   Album:
- *     type: object
- *     properties:
- *       Albums:
- *         type: array
- *         items:
- *           $ref: '#/responses/photo'
+ *        example: 60b222e537838723b02201fd
  */
 module.exports = router
