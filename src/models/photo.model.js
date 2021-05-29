@@ -27,7 +27,6 @@ const tagSchema = new mongoose.Schema({
     },
     tagged: [{
         type: String,
-        unique: true,
         required: true,
         ref: 'User'
     }]

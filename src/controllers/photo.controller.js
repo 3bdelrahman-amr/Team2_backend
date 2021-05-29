@@ -44,6 +44,7 @@ exports.addPhoto = async (req, res) => {
         this.tagPeople(req, res);
     }
     catch (error) {
+        console.log(error);
         res.status(500).send({ error: "Internal Server error" })
     }
 
@@ -282,7 +283,7 @@ exports.deleteComment = async (req, res) => {
     if (photo.privacy === 'private' && res.locals.userid != photo.ownerId)
         return res.status(403).send('Access denied');
 
-    const result = validateId({ id: req.params.photoId });
+    const result = validateId({ id: req.params.commentId });
     if (result.error) return res.status(400).send(result.error.details[0].message);
 
     const comment = await photo.comments.id(req.params.commentId);
@@ -299,4 +300,75 @@ exports.deleteComment = async (req, res) => {
     catch (ex) {
         console.log(ex.message);
     };
+};
+
+exports.deletePhoto = async (req, res) => {
+
+
+    
+    const photodeleted = await Photo.findById(req.body.photos[0]);
+        if (!photodeleted)
+            return res.status(404).send({ error: "photo not found" });
+        if (res.locals.userid != photodeleted.ownerId)
+        return res.status(403).send('Access denied');
+      
+    try {
+        req.body.photos.forEach(async function (photo){
+            await Photo.findByIdAndRemove(photo);
+        })
+        res.status(201).send('photo deleted successfully');
+    }
+    catch (ex) {
+        console.log(ex.message);
+    };
+};
+
+exports.updatePhoto=async (req,res)=>{
+    let photoUpdated = await Photo.findById(req.body.photos[0]);
+        if (!photoUpdated) return res.status(404).send({ error: "photo not found" });
+        if (res.locals.userid != photoUpdated.ownerId)
+            return res.status(403).send('Access denied');
+
+        const { error }= validatePhoto({title:req.body.title,description:req.body.description,privacy:req.body.privacy});
+        if (error) return res.status(400).send(error.details[0].message);
+    try {
+        req.body.photos.forEach(async function (photo){
+            photoUpdated= await Photo.findById(photo);
+            if (!photoUpdated)
+            return res.status(404).send({ error: "photo not found" });
+            photoUpdated.set({
+                title: req.body.title,
+                description:req.body.description,
+                privacy:req.body.privacy
+            });
+            await photoUpdated.save();
+        })
+        res.status(201).send('photo updated successfully');
+    }
+    catch (ex) {
+        console.log(ex.message);
+    };
+};
+
+module.exports.GetPhototitle = async(req,res)=>{
+    const schema = Joi.object({
+        title: Joi.string().min(1).max(255).required()
+    });
+
+    const { error } = schema.validate(req.params); 
+    if (error) return res.status(400).send({message:error.details[0].message});
+
+    const photos = await Photo.find({title:req.params.title,tag:req.params.title,privacy:'public'})
+        .select({title:1,description:1,photoUrl:1});
+
+    try {
+        if(photos.length==0)
+        {
+            return res.status(404).send({message:"Image not found"});
+        }
+        res.status(200).send(photos);    
+    } catch (error) {
+        res.status(500).send({message:"internal server error"});   
+    }
+    
 };

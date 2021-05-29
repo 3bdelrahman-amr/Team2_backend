@@ -423,17 +423,19 @@ router.get('/:photoId/comments', authentication, photoController.getComments);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * @swagger
- *  /photo/{photo_id}:
+ *  /photo/:
  *   delete:
  *     description: Delete a photo
  *     tags: [Photo]
  *     parameters:
- *       - name: photo_id
- *         in: path
+ *       - name: body
+ *         in: body
  *         required: true
- *         description: photo id to add tag to the corresponding photo
- *         schema:
- *           type: integer
+ *         description: array of photo ids to delete corresponding photo 
+ *         type: object
+ *         properties:
+ *           photos:
+ *             type: integer  
  * 
  *     responses:
  *       200:
@@ -462,7 +464,7 @@ router.get('/:photoId/comments', authentication, photoController.getComments);
  *            }
  */
 
-router.delete('/delete/:photo_id', (req, res) => { })
+router.delete('/',authentication ,photoController.deletePhoto);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -596,17 +598,11 @@ router.put('{photo_id}/comment', (req, res) => { })
 
 /**
  * @swagger
- * /photo/{photo_id}:
+ * /photo/:
  *   put:
- *     description: change photo mode between { private public friends}
+ *     description: change photo mode between { private public}
  *     tags: [Photo]
  *     parameters:
- *       - name: photo_id
- *         in: path
- *         required: true
- *         description: photo_id to edit it
- *         schema:
- *           type: integer
  *       - name: body
  *         in: body
  *         required: true
@@ -619,6 +615,8 @@ router.put('{photo_id}/comment', (req, res) => { })
  *             type: string 
  *           description:
  *             type: string 
+ *           photos:
+ *             type: integer  
  *     responses:
  *       200:
  *         description: Success
@@ -651,7 +649,7 @@ router.put('{photo_id}/comment', (req, res) => { })
  *
  */
 
-router.put('/photo/{photo_id}', (req, res) => { })
+router.put('/', authentication, photoController.updatePhoto)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -834,7 +832,7 @@ router.delete('/photo//tag/:id', authentication, photoController.removeTag)
  *            }
  */
 
- router.post('/photo//tag/',authentication, photoController.addTag)
+ router.post('/photo/tag/',authentication, photoController.addTag)
 
  //////////////////////////////////////////////////////////////////////////////////
 
