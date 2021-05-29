@@ -115,7 +115,7 @@ router.post('/', authentication, albumController.createAlbum)
  *                  example: "60b222e537838723b02201fd"
  *          
  *          
- *       401:
+ *       403:
  *         description: Unauthorized
  *         examples:
  *          application/json:
@@ -268,7 +268,7 @@ router.put('/:id', authentication, albumController.updateAlbum);
  *                       "error": Invalid album Id",
  *            }
  * 
- *       401:
+ *       403:
  *         description: Unauthorized
  *         examples:
  *          application/json:
@@ -332,7 +332,7 @@ router.delete('/:id', authentication, albumController.deleteAlbum);
  *                  example: "60b222e537838723b02201fd"
  *          
  *          
- *       401:
+ *       403:
  *         description: Unauthorized
  *         examples:
  *          application/json:
@@ -439,7 +439,7 @@ router.get('/:id', authentication, albumController.getAlbumbyId)
  *            type: array
  *            items:
  *              $ref: "#/responses/getAlbumByID"
- *       401:
+ *       403:
  *         description: Unauthorized
  *         examples:
  *          application/json:
