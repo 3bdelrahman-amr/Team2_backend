@@ -264,12 +264,11 @@ router.get('/', authentication, photoController.getUserPhotos)
  *          application/json: 
  *            {
  *                     "error": "Unauthorized request",
+ *            }
  *       404:
  *         description: Not found
- *
  *         examples:
  *          application/json:
- *
  *            {
  *                     "error": "photos not found",
  *            }
@@ -307,9 +306,9 @@ router.get('/', authentication, photoController.getUserPhotos)
  *         description: Unauthorized
  *         examples:
  *          application/json:
-
  *            {
  *                     "error": "Unauthorized request",
+ *            }
  *       404:
  *         description: Not found
  *
