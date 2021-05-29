@@ -466,10 +466,38 @@ await Model.UserModel.findById({_id:res.locals.userid},queryProjection).then(use
 
         
     })
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+module.exports.Unfollow=async(req,res)=>{
+    await Model.UserModel.findById({_id:res.locals.userid}).then(async user=>{
+        if(!req.params.peopleid)
+        return res.status(403).send({message:'syntax error people id is missed'});
+        
+        await Model.UserModel.findById({_id:req.params.peopleid}).then(async people=>{
+
+             var valid=await user.Following.includes(people._id);
+            if(valid){
+                await user.Following.pull(people._id)
+                await people.Followers.pull(user._id)
+              await  user.save();
+               await people.save();
+                return res.status(200).send({message:'removed from following list successful'})   
+            }
+            else
+            return res.status(404).send({message:'not found in the following list'});
+        })
+        .catch(err=>{
+            return   res.status(404).send({message:'user(people) not found '});
+        })
 
 
 
 
 
-    }
+    })
+    .catch(err=>{
+        return   res.status(404).send({message:'user not found '});
 
+    })
+}

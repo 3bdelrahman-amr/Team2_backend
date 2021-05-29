@@ -368,6 +368,9 @@ const { use } = require('./album.route');
    //post new follower to the user
 
    router.post("/follow",auth.authentication,UserController.PostFollower);
+   //post new follower to the user
+
+   router.delete("/unfollow/:peopleid",auth.authentication,UserController.Unfollow);
 
    // return list of followers
    router.get("/followers",auth.authentication,UserController.GetFollowers)
