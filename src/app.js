@@ -24,7 +24,7 @@ app.get("/test", (req, res) => {
 
 
 // v1 api routes
-app.use('/v1',routes);
+app.use('/api/v1',routes);
 // app.listen(3000,(err)=>{
 //     console.log("start list");
     

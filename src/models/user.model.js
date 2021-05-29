@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Joi = require('joi');
 const schema = mongoose.Schema;
+Joi.objectId= require('joi-objectid')(Joi);
 
 const UserSchema = new schema(
   {
@@ -29,9 +30,22 @@ const UserSchema = new schema(
       dropDups: true
     },
     About: {
-      type: String
-      , min: 1,
-      default: "",
+        Description:{ 
+        type: String
+        , min: 1,
+        default: "",},
+        Occupation:{ 
+          type: String
+          , min: 1,
+          default: "",},
+          CurrentCity:{ 
+            type: String
+            , min: 1,
+            default: "",},
+            Hometown:{ 
+              type: String
+              , min: 1,
+              default: "",},    
     },
 
     Age: {
@@ -105,10 +119,6 @@ const UserSchema = new schema(
       default:"60b0563bb7db47b60e439331"
       
     },
-    PhotoStream:[{
-      type: schema.Types.ObjectId,
-      ref: 'Photo'
-    }],
     Fav: [{
       type: schema.Types.ObjectId,
       ref: 'Photo'
@@ -160,6 +170,16 @@ module.exports.validateLogin = (body) => {
   return schema.validate(body);
 
 }
+////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+module.exports.validateId=(id)=>{
+  const schema = Joi.object({
+      id: Joi.objectId().required()
+  });
+  const result = schema.validate(id);
+  return result;
+}
+///////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////
 module.exports.UserModel = mongoose.model('User', UserSchema);;

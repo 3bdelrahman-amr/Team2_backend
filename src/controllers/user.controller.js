@@ -8,6 +8,7 @@ const config=require('config');
 const { cache } = require("joi");
 const { use } = require("../routes/v1");
 const secret=config.get('JWT_KEY');
+const PhotoModel=require("../models/photo.model");
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -57,13 +58,14 @@ await Model.UserModel.create({
 module.exports.GetUser=async(req,res)=>{
    
    try { 
-        const user=await Model.UserModel.findById({_id:res.locals.userid},{Password:0})
+        const user=await Model.UserModel.findById({_id:res.locals.userid},{Password:0,_V:0})
      
         if(!user)
         return res.status(404).send({message:'user not found'});
 
-       
-        return res.status(200).send(user);
+       const UsrWithPhotos =await user.populate('photos').execPopulate()
+
+        return res.status(200).send(UsrWithPhotos);
 
 
 
@@ -213,19 +215,21 @@ module.exports.GetFollowers=async(req,res)=>{
         const followers=[]
         const users=await Model.UserModel.find({_id:user.Followers},queryProjection);
         
-        users.forEach(usr=>{
-            usr.populate('photos').execPopulate();
-            const follow=usr.toObject();
+        for(var i=0;i<users.length;i++)        
+         {
+             var user=await users[i].populate('photos').execPopulate();
+           
+            const follow=user.toObject();
+           const avatar= await PhotoModel.Photo.findById( follow.Avatar);
+           follow.Avatar=avatar.photoUrl;
             follow.Followers=follow.Followers.length;
             follow.Following=follow.Following.length;
-            if(follow.Photo)
-            follow.Photo=follow.Photo.length;
+            if(user.photos.length)
+            follow.Photo=user.photos.length;
             else
             follow.Photo=0;
             followers.push(follow);
-           
-           
-        });
+            };
       
       return  res.status(200).send({FollowersList:followers});
     })
@@ -265,19 +269,21 @@ module.exports.GetFollowing=async(req,res)=>{
         const followers=[]
         const users=await Model.UserModel.find({_id:user.Following},queryProjection);
         
-        users.forEach(usr=>{
-            usr.populate('photos').execPopulate();
-            const follow=usr.toObject();
+           for(var i=0;i<users.length;i++)        
+         {
+             var user=await users[i].populate('photos').execPopulate();
+           
+            const follow=user.toObject();
+           const avatar= await PhotoModel.Photo.findById( follow.Avatar);
+           follow.Avatar=avatar.photoUrl;
             follow.Followers=follow.Followers.length;
             follow.Following=follow.Following.length;
-            if(follow.Photo)
-            follow.Photo=follow.Photo.length;
+            if(user.photos.length)
+            follow.Photo=user.photos.length;
             else
             follow.Photo=0;
             followers.push(follow);
-           
-           
-        });
+            };
       
       return  res.status(200).send({FollowingList:followers});
     })
@@ -296,27 +302,174 @@ module.exports.UpdateUser=async(req,res)=>{
     if(Object.keys(req.body)==0)
     return res.status(400).send({message:'the body is empty'});
   
-    var updates=["Fname","Lname","Password","Avatar","BackGround","Email" ];
-  var willBeUpdate=Object.keys(req.body);
-  const isvalid=willBeUpdate.every(upd=>updates.includes(upd));
+    var updates=["Fname","Lname","Password","Avatar","BackGround","Email","About" ];
+    var about=["Description",'Hometown','Occupation','CurrentCity']
+    var willBeUpdate=Object.keys(req.body);
+    var isvalid=0
+    willBeUpdate.forEach(upd=>
+        {
+            if(updates.includes(upd))
+            isvalid++;
+    
+    });
+    var  keys=Object.keys(req.body.About);
+    var msg="";
+    if(req.body.Avatar&&!Model.validateId(req.body.Avatar)){
+        delete req.body.Avatar;
+        msg+='invalid Avatar id \n'
+        isvalid--;
+    }
+    else if(req.body.Avatar){
+        const photo=await PhotoModel.Photo.findById({_id:req.body.Avatar});
+        if(!photo)
+         {
+             delete req.body.Avatar
+             isvalid--;
+             msg+='no photo(Avatar)with this id'
+         }
+    }
 
-  if(isvalid){ 
-  await Model.UserModel.findOneAndUpdate({_id:res.locals.userid},req.body)
-  .then(user=>{
+    if(req.body.BackGround&&!Model.validateId(req.body.BackGround)){
+        delete req.body.Avatar;
+        msg+='invalid BackGround id \\n'
+        isvalid--;
+    }
+    else if(req.body.BackGround){
+        const photo=await PhotoModel.Photo.findById({_id:req.body.BackGround});
+        if(!photo)
+         {
+            delete req.body.BackGround;
+             isvalid--;
+             msg+='no photo(Avatar)with this id'
+         }
+    }
 
-  
-  
-   return res.status(200).send({message:'updated correctly'});
-  })
-  .catch(err=>{
+    
+    if( keys.length!=0){
+       
+        if(!keys.every(ab=>about.includes(ab))){
+           delete req.body.About;
+           isvalid--;
+           msg+=' invalid About Data \\n';
+        }
 
-    return res.status(404).send({message:'user not found'});
+        else{
+            const user=await Model.UserModel.findById({_id:res.locals.userid});
+            var userabout=user.About.toObject();
+            keys.forEach(key => {
+                userabout[key]=req.body.About[key]
 
-  })
-  }
-  else return res.status(403).send({message:'invalid format'});
+            });
+            
+            req.body.About=userabout;
+
+        }
+    }
 
 
+    if(req.body.Password){
+       req.body.Password= bcrypt.hashSync(req.body.Password);
+    }
+
+
+
+    if(isvalid){ 
+        await Model.UserModel.findOneAndUpdate({_id:res.locals.userid},req.body)
+         .then(user=>{
+             return res.status(200).send({message:'updated correctly'});
+         })
+         .catch(err=>{
+
+             return res.status(404).send({message:'user not found'});
+
+        })
+         }
+
+
+  else 
+        return res.status(403).send({message:'invalid format \\n'+msg});
 
 
 }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+module.exports.UserPhotos=async(req,res)=>{
+
+    await Model.UserModel.findById({_id:res.locals.userid}).then(async user=>{ 
+     
+        var  photos=[];
+        await user.populate("photos").execPopulate().then(async UserWithPhoto=>{
+
+            for(var i=0;i<UserWithPhoto.photos.length;i++){
+                var photo=await PhotoModel.Photo.findById(UserWithPhoto.photos[i]);
+                photos.push(photo);
+            }
+            res.status(200).send({PhotoList:photos});
+
+
+        })
+        .catch(err=>{
+            res.status(404).send({message:"can't find photo(s) for the given user"});
+        });
+    
+    })
+    .catch(err=>{
+
+        res.status(404).send({message:"can't find the given user"});
+    });
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+module.exports.About=async(req,res)=>{
+
+
+    const queryProjection={
+        Password:0,
+        Group:0,
+        Gallery:0,
+        __v:0,
+        isActive:0,
+        
+        views:0,
+        PhotoStream:0,
+        Date_joined:0,
+        Age:0,
+        Fav:0,
+        BackGround:0,
+        albums:0,
+        photos:0,
+        Avatar:0,
+        Fname:0,
+        Lname:0,
+        Email:0,
+        UserName:0,
+        Followers:0,
+        Following:0,
+        _id:0
+       
+    };
+
+
+await Model.UserModel.findById({_id:res.locals.userid},queryProjection).then(user=>{
+
+
+    if(!user)
+    return res.status(404).send({message:'user not found'});
+
+    return res.status(200).send(user);
+
+    })
+
+    .catch(err=>{
+             return  res.status(40).send({message:'invalid format caused an error'});
+
+
+        
+    })
+
+
+
+
+
+    }
+

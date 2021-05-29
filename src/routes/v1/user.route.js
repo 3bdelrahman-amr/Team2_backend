@@ -373,6 +373,8 @@ const { use } = require('./album.route');
    router.get("/followers",auth.authentication,UserController.GetFollowers)
    // return list of following
    router.get("/following",auth.authentication,UserController.GetFollowing)
+   // return list of user photos
+   router.get("/photos",auth.authentication,UserController.UserPhotos);
 
    
   
@@ -551,11 +553,7 @@ const { use } = require('./album.route');
       
       
       
-   router.put("/user/avatar",(req,res)=>{
-      
-      
-      
-  });
+   router.put("/user/avatar",auth.authentication,UserController.About);
    /**
       * @swagger
       * /user/about:
@@ -588,11 +586,7 @@ const { use } = require('./album.route');
       
       
       
-   router.get("/user",(req,res)=>{
-      
-      
-      
-  });
+   router.get("/about",auth.authentication,UserController.About);
   
   
   /**
