@@ -472,6 +472,7 @@ await Model.UserModel.findById({_id:res.locals.userid},queryProjection).then(use
 module.exports.Unfollow=async(req,res)=>{
     await Model.UserModel.findById({_id:res.locals.userid}).then(async user=>{
         if(!req.params.peopleid)
+        
         return res.status(403).send({message:'syntax error people id is missed'});
         
         await Model.UserModel.findById({_id:req.params.peopleid}).then(async people=>{
