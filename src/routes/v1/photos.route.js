@@ -361,7 +361,8 @@ router.get('/', authentication, photoController.getUserPhotos)
  *                     "_id": "123456",
  *                     "user": {
  *                                  "Fname":"John",
- *                                  "Lname":"Smith"
+ *                                  "Lname":"Smith",
+ *                                  "_id": "123456"
  *                             },
  *                     "createdAt":"2020-5-23",
  *                     "updatedAt":"2021-4-2"
@@ -396,17 +397,19 @@ router.get('/:photoId/comments', authentication, photoController.getComments);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * @swagger
- *  /photo/{photo_id}:
+ *  /photo/:
  *   delete:
  *     description: Delete a photo
  *     tags: [Photo]
  *     parameters:
- *       - name: photo_id
- *         in: path
+ *       - name: body
+ *         in: body
  *         required: true
- *         description: photo id to add tag to the corresponding photo
- *         schema:
- *           type: integer
+ *         description: array of photo ids to delete corresponding photo 
+ *         type: object
+ *         properties:
+ *           photos:
+ *             type: integer  
  * 
  *     responses:
  *       200:
@@ -435,7 +438,7 @@ router.get('/:photoId/comments', authentication, photoController.getComments);
  *            }
  */
 
-router.delete('/delete/:photo_id', (req, res) => { })
+router.delete('/',authentication ,photoController.deletePhoto);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -454,8 +457,12 @@ router.delete('/delete/:photo_id', (req, res) => { })
  *         description: photo id to add comment to the corresponding photo
  *         schema:
  *           type: integer
- *
- *     properties:
+ *       - name: comment
+ *         in: body
+ *         required: true
+ *         description: comment added to the corresponding photo
+ *         type: object
+ *         properties:
  *           comment:
  *             type: string
  *     responses:
@@ -565,24 +572,25 @@ router.put('{photo_id}/comment', (req, res) => { })
 
 /**
  * @swagger
- * /photo/{photo_id}:
+ * /photo/:
  *   put:
- *     description: change photo mode between { private public friends}
+ *     description: change photo mode between { private public}
  *     tags: [Photo]
  *     parameters:
- *       - name: photo_id
- *         in: path
- *         required: true
- *         description: photo_id to edit it
- *         schema:
- *           type: integer
- *       - name: privacy
+ *       - name: body
  *         in: body
  *         required: true
- *         description: mode of photo
- *         schema:
- *           type: string
- *
+ *         description: edit photo object
+ *         type: object
+ *         properties:
+ *           title:
+ *             type: string 
+ *           privacy:
+ *             type: string 
+ *           description:
+ *             type: string 
+ *           photos:
+ *             type: integer  
  *     responses:
  *       200:
  *         description: Success
@@ -615,7 +623,7 @@ router.put('{photo_id}/comment', (req, res) => { })
  *
  */
 
-router.put('/{photo_id}', (req, res) => { })
+router.put('/', authentication, photoController.updatePhoto)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
