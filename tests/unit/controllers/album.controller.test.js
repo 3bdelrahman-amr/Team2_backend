@@ -29,23 +29,23 @@ afterAll(async () => {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 describe('Create new album', async () => {
-    // it('Should return 201, successfully created, when the passed parameters are satisfactory', async () => {
-    //     // create fake response and request 
-    //     const req = httpmocks.createRequest();
-    //     const res = httpmocks.createResponse();
-    //     // set title and description and photos data in the req body
-    //     req.body = {
-    //         title: 'Album1',
-    //         description: 'my first album',
-    //         photos: [
-    //             '6093528c112f9f5bec107920', '6093528c112f9f5bec107921'
-    //         ],
-    //         coverPhoto: '6093528c112f9f5bec107920'
-    //     };
+    it('Should return 201, successfully created, when the passed parameters are satisfactory', async () => {
+        // create fake response and request 
+        const req = httpmocks.createRequest();
+        const res = httpmocks.createResponse();
+        // set title and description and photos data in the req body
+        req.body = {
+            title: 'Album1',
+            description: 'my first album',
+            photos: [
+                '6093528c112f9f5bec107920', '6093528c112f9f5bec107921'
+            ],
+            coverPhoto: '6093528c112f9f5bec107920'
+        };
 
-    //     albumController.createAlbum(req, res);
-    //     expect(res._getStatusCode()).toBe(201);
-    // })
+        albumController.createAlbum(req, res);
+        expect(res._getStatusCode()).toBe(200);
+    })
     it('Should return 400 if parameters are not valid', async () => {
         // create fake response and request 
         const req = httpmocks.createRequest();
