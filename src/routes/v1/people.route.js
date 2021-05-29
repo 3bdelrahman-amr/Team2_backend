@@ -1,5 +1,9 @@
 const express = require('express')
 const router = express.Router()
+const { authentication } = require('../../middlewares/auth');
+const peopleController = require('../../controllers/people.controller')
+const { UserModel, validateId } = require('../../models/user.model');
+
 /**
  * @swagger
  * /people/groups/{userid}:
@@ -154,7 +158,7 @@ router.get('/people', (req, res) => {
  *         schema:
  *           type: array
  *           items:
- *             $ref:  '#/responses/peopleinfo'
+ *             $ref:  '#/responses/Followinginfo'
  *
  *       404:
  *         description: Not found
@@ -173,8 +177,27 @@ router.get('/people', (req, res) => {
  *
  */
 
-router.get('/findByUsername/:username', (req, res) => {
-    console.log(req.body.name)
+router.get('/following/:userId', authentication, peopleController.getFollowing)
+
+router.post('/following/:userId', authentication, async (req, res) => {
+    // const { error } = validateId(req.params.userId);
+    // if (error) return res.status(400).send(error.details[0].message);
+
+    const user = await UserModel.findById(res.locals.userid);
+
+    if (!user) return res.status(404).send('no user');
+    //const following= UserModel.findById(req.params.userId);
+
+
+    try {
+        user.Following.push(req.params.userId)
+        user.save();
+        res.status(200).send('following');
+    }
+    catch (ex) {
+        console.log(ex.message);
+
+    };
 })
 
 /**
@@ -193,7 +216,7 @@ router.get('/findByUsername/:username', (req, res) => {
  *         schema:
  *           type: array
  *           items:
- *             $ref: '#/responses/photo'
+ *             $ref: '#/responses/favesinfo'
  *
  *       404:
  *         description: Not found
@@ -216,9 +239,7 @@ router.get('/findByUsername/:username', (req, res) => {
  *
  */
 
-router.post('user/fav', (req, res) => {
-    console.log(req.body.name)
-})
+router.get('/fav/:username', authentication,peopleController.getfaves )
 
 /**
  *@swagger
@@ -232,7 +253,7 @@ router.post('user/fav', (req, res) => {
  *       type: string
  *     username:
  *       type: string
- *     id:
+ *     _id:
  *       type: integer
  *       format: int32
  *     email:
@@ -247,8 +268,38 @@ router.post('user/fav', (req, res) => {
  *       type: integer
  *       format: int32
  *
+ *  Followinginfo:
+ *    type: object
+ *    properties:
+ *     Fname:
+ *       type: string
+ *     Lname:
+ *       type: string
+ *     UserName:
+ *       type: string
+ *     id:
+ *       type: integer
+ *       format: int32
+ *     numberOfPublicPhotos:
+ *       type: integer
+ *       format: int32
  *
+ *  favesinfo:
+ *    type: object
+ *    properties:
+ *     userName:
+ *       type: string
+ *     _id:
+ *       type: integer
+ *       format: int32
+ *     title:
+ *       type: string
+ *     photoUrl:
+ *       type: string
+ *     numberOfComments:
+ *       type: integer
+ *       format: int32
  *
  *
  */
-modules.exports = router
+module.exports = router
