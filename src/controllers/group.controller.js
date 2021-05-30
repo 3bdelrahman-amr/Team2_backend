@@ -263,48 +263,22 @@ exports.searchGroup = async function (req, res) {
   const userId = res.locals.userid;
   if (!searchKeyword) {
     res.status(404).json({ message: 'Group not found' });
-  } else {
-    const groups = await Group.find({
-      name: { $regex: searchKeyword, $options: 'i' },
-    }).exec();
-    let finalArray = [];
-    groups.forEach(async function (group) {
-      let gp = JSON.parse(JSON.stringify(group));
-      gp.num_photos = group.Photos.length;
-      gp.num_members = group.Members.length;
-      delete gp.Photos;
-      delete gp.Members;
-      const number = await Group.find({
-        _id: gp.id,
-        Members: {
-          $elemMatch: { ref: userId },
-        },
-      }).exec();
-      if (number.length > 0) {
-        const memberRole = await Group.aggregate([
-          {
-            $match: { _id: { $eq: mongoose.Types.ObjectId(gp._id) } },
-          },
-          {
-            $unwind: '$Members',
-          },
-          {
-            $match: {
-              'Members.ref': { $eq: mongoose.Types.ObjectId(userId) },
-            },
-          },
-          {
-            $project: {
-              ref: '$Members.ref',
-              role: '$Members.role',
-            },
-          },
-        ]).exec();
-        gp.role = memberRole[0].role;
-      }
-      console.log(gp);
-      finalArray.push(gp);
-    });
-    res.status(200).json(finalArray);
   }
+  const groups = await Group.find({
+    name: { $regex: searchKeyword, $options: 'i' },
+  }).exec();
+  let finalArray = [];
+  groups.forEach(async function (group) {
+    let gp = JSON.parse(JSON.stringify(group));
+    gp.num_photos = group.Photos.length;
+    gp.num_members = group.Members.length;
+    delete gp.Photos;
+    gp.Members.find(function (member) {
+      if (member.ref == userId) gp.role = member.role;
+      return;
+    });
+    delete gp.Members;
+    finalArray.push(gp);
+  });
+  res.status(200).json(finalArray);
 };

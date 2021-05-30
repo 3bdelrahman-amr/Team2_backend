@@ -307,7 +307,46 @@ router.get('/:group_id/join', (req, res) => groupsController.join(req, res));
 router.delete('/:group_id/leave', (req, res) => {
   groupsController.leave(req, res);
 });
-
+/**
+ * @swagger
+ * /group/{keyword}/search:
+ *   get:
+ *     description: Search groups
+ *     tags: [Group]
+ *     parameters:
+ *       - name: keyword
+ *         in: path
+ *         required: true
+ *         description: search keyword
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Success
+ *         examples:
+ *           application/json:
+ *              {
+ *                description: null,
+ *                privacy: 'public',
+ *                visibility: 'public',
+ *                id: '608c80ce54e3d74b34d9bb5a',
+ *               name: 'ABC',
+ *                num_photos: 0,
+ *                num_members: 1,
+ *               role: 'member'
+ *              }
+ *
+ *
+ *       404:
+ *         description: Not found
+ *         examples:
+ *           application/json:
+ *
+ *             {
+ *                     "message": "Group not found",
+ *             }
+ *
+ */
 router.get('/:keyword/search', (req, res) => {
   groupsController.searchGroup(req, res);
 });
