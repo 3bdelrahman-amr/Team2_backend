@@ -326,6 +326,7 @@ router.delete('/:group_id/leave', (req, res) => {
  *         description: Success
  *         examples:
  *           application/json:
+ *            [
  *              {
  *                description: null,
  *                privacy: 'public',
@@ -336,7 +337,7 @@ router.delete('/:group_id/leave', (req, res) => {
  *                num_members: 1,
  *               role: 'member'
  *              }
- *
+ *            ]
  *
  *       404:
  *         description: Not found
