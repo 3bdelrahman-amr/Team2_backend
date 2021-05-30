@@ -61,7 +61,7 @@ router.get('/getgroups/:userid', (req, res) => {
  *         schema:
  *           type: array
  *           items:
- *             $ref: '#/responses/user_photo'
+ *             $ref: '#/responses/photoInfo'
  *       404:
  *         description: Not found
  *         examples:
@@ -78,12 +78,7 @@ router.get('/getgroups/:userid', (req, res) => {
  *
  */
 
-router.get('/getgroups/:userid', (req, res) => {
-    console.log(req.params.id)
-    res.send({
-        id: 'route',
-    })
-})
+router.get('/photos/:userId', authentication,peopleController.getPhotos);
 /**
  * @swagger
  * /people/{username|email|id}:
@@ -112,7 +107,7 @@ router.get('/getgroups/:userid', (req, res) => {
  *
  */
 
-router.get('/findByUsername/:username', (req, res) => {
+router.get('/findByUsername/:username', authentication,async (req, res) => {
     console.log(req.body.name)
 })
 /**
@@ -146,6 +141,37 @@ router.get('/findByUsername/:username', (req, res) => {
 router.get('/people', (req, res) => {
     console.log(req.body.name)
 })
+
+/**
+ * @swagger
+ * /people/search/{username|email|fName|Lname}:
+ *   get:
+ *     tags: [People]
+ *     description: search for user using name,username or email.
+ *     responses:
+ *       200:
+ *         description: Success
+ *         schema:
+ *           $ref: '#/responses/peopleinfo'
+ *       404:
+ *         description: Not found
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                       "message": "User not found",
+ *            }
+ *     parameters:
+ *       - name: identifier
+ *         in: path
+ *         required: true
+ *         description: user identifier (username/email/name) to search on it
+ *
+ *
+ */
+
+ router.get('/search/:string',authentication, peopleController.searchUsers)
+
 /**
  * @swagger
  * /people/following/{user_id}:
@@ -179,26 +205,7 @@ router.get('/people', (req, res) => {
 
 router.get('/following/:userId', authentication, peopleController.getFollowing)
 
-router.post('/following/:userId', authentication, async (req, res) => {
-    // const { error } = validateId(req.params.userId);
-    // if (error) return res.status(400).send(error.details[0].message);
 
-    const user = await UserModel.findById(res.locals.userid);
-
-    if (!user) return res.status(404).send('no user');
-    //const following= UserModel.findById(req.params.userId);
-
-
-    try {
-        user.Following.push(req.params.userId)
-        user.save();
-        res.status(200).send('following');
-    }
-    catch (ex) {
-        console.log(ex.message);
-
-    };
-})
 
 /**
  * @swagger
@@ -239,7 +246,7 @@ router.post('/following/:userId', authentication, async (req, res) => {
  *
  */
 
-router.get('/fav/:username', authentication,peopleController.getfaves )
+router.get('/fav/:username', authentication,peopleController.getfaves );
 
 /**
  *@swagger
@@ -251,23 +258,59 @@ router.get('/fav/:username', authentication,peopleController.getfaves )
  *       type: string
  *     Lname:
  *       type: string
- *     username:
+ *     UserName:
  *       type: string
  *     _id:
  *       type: integer
  *       format: int32
- *     email:
- *       type: string
- *     date_joined:
+ *     Date_joined:
  *       type: string
  *       format: date
- *     num_photos:
+ *     numberOfPublicPhotos:
  *       type: integer
  *       format: int32
- *     num_following:
+ *     numberOfFollowers:
  *       type: integer
  *       format: int32
+ *     avatarUrl:
+ *       type: string
  *
+ *  photoInfo:
+ *    type: object
+ *    properties:
+ *     userName:
+ *       type: string
+ *     tags:
+ *       type: string
+ *     title:
+ *       type: string
+ *     description:
+ *       type: string
+ *     photoUrl:
+ *       type: string
+ *     peopleTags:
+ *       type: string
+ *     _id:
+ *       type: integer
+ *       format: int32
+ *     ownerId:
+ *       type: integer
+ *       format: int32
+ *     privacy:
+ *       type: string
+ *     createdAt:
+ *       type: string
+ *       format: date
+ *     updatedAt:
+ *       type: string
+ *       format: date
+ *     numberOfFavs:
+ *       type: integer
+ *       format: int32
+ *     numberOfComments:
+ *       type: integer
+ *       format: int32
+ * 
  *  Followinginfo:
  *    type: object
  *    properties:
