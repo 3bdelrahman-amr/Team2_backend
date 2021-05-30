@@ -388,9 +388,12 @@ module.exports.GetPhototitle = async (req, res) => {
     for(var ii = 0 ; ii < photos.length ; ii++)
     {
         photoindex = photos[ii];
+        const user = await UserModel.findById(photos[ii].ownerId);
+
         var image = photoindex.toObject();
         image.no_comments = photoindex.comments.length;
         image.no_fav = photoindex.Fav.length;
+        image.UserName = user.UserName;
          all_photos.push(image);
     }
 
