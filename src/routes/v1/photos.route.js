@@ -301,7 +301,7 @@ router.get('/', authentication, photoController.getUserPhotos)
  *         schema:
  *            type: array
  *            items:
- *             $ref: "#defintions/Photo"
+ *             $ref: "#definitions/Photo"
  *       403:
  *         description: Unauthorized
  *         examples:
