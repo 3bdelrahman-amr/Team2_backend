@@ -5,7 +5,9 @@ const config=require('config');
 const emailExisyence = require('email-existence');
 const Model = require('../models/user.model')
 const secret = config.get('JWT_KEY');
-const host=config.get("HOST_ADDR")+':'+config.get("PORT");
+const host=config.get("HOST_ADDR");
+if(config.get('NODE_ENV')=='development')
+host+=':'+config.get("PORT");
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 module.exports.authorization = (req, res) => {
