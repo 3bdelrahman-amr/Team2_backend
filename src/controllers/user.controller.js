@@ -63,9 +63,14 @@ module.exports.GetUser=async(req,res)=>{
         if(!user)
         return res.status(404).send({message:'user not found'});
 
-       const UsrWithPhotos =await user.populate('photos').execPopulate()
+       const UsrWithPhotos =await user.populate('photos').execPopulate();
+       var avatar=await PhotoModel.Photo.findById({_id:UsrWithPhotos.Avatar});  
+       var background=await PhotoModel.Photo.findById({_id:UsrWithPhotos.BackGround});   
+       var userjs=UsrWithPhotos.toObject();
+       userjs.Avatar=avatar.photoUrl;
+       userjs.BackGround=background.photoUrl;    
 
-        return res.status(200).send(UsrWithPhotos);
+        return res.status(200).send(userjs);
 
 
 
@@ -404,7 +409,7 @@ module.exports.UserPhotos=async(req,res)=>{
                 var photo=await PhotoModel.Photo.findById(UserWithPhoto.photos[i]);
                 photos.push(photo);
             }
-            res.status(200).send({PhotoList:photos});
+            res.status(200).send({photos});
 
 
         })
@@ -472,7 +477,7 @@ await Model.UserModel.findById({_id:res.locals.userid},queryProjection).then(use
 module.exports.Unfollow=async(req,res)=>{
     await Model.UserModel.findById({_id:res.locals.userid}).then(async user=>{
         if(!req.params.peopleid)
-        
+
         return res.status(403).send({message:'syntax error people id is missed'});
         
         await Model.UserModel.findById({_id:req.params.peopleid}).then(async people=>{
