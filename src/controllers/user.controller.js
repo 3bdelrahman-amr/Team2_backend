@@ -354,7 +354,7 @@ module.exports.UpdateUser=async(req,res)=>{
     }
 
     
-    if( req.body.about&& keys.length!=0){
+    if( req.body.About&& keys.length!=0){
        
         if(!keys.every(ab=>about.includes(ab))){
            delete req.body.About;
