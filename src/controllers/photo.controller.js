@@ -1,4 +1,3 @@
-
 const { Photo, Comment, validatePhoto, validateComment, validateId } = require('../models/photo.model')
 const multer = require('multer');
 

@@ -1,8 +1,8 @@
 const httpmocks=require('node-mocks-http');
 const mongoose=require('mongoose');
 const gallerymodel=require('../../../src/controllers/gallery.controller');
-const { describe } = require('joi/lib/types/lazy');
-const { items } = require('joi/lib/types/array');
+//const { describe } = require('joi/lib/types/lazy');
+//const { items } = require('joi/lib/types/array');
 const {validateGallery,Gallery,GallerySchema} = require('../../../src/models/gallery.model');
 beforeAll(async()=>{
     const url="mongodb://127.0.0.1:27017/jestuser";

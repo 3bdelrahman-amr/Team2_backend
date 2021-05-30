@@ -1,6 +1,5 @@
 const express = require('express')
 const router = express.Router()
-const {Photo,Comment ,validatePhoto, validateComment,validatePhotoId,validateCommentId}=require('../../models/photo.model')
 const {authentication}= require('../../middlewares/auth')
 const photoController=require('../../controllers/photo.controller')
 //schemas
@@ -21,7 +20,6 @@ const photoController=require('../../controllers/photo.controller')
  *       file:
  *         type: string
  *         format: base64
- *
  *
  */
 /**
@@ -83,7 +81,7 @@ const photoController=require('../../controllers/photo.controller')
  *            }
  */
 
-router.post('/photo',authentication,photoController.upload.single("photo"),photoController.AddPhoto)
+router.post('/',authentication,photoController.upload.single("photo"),photoController.AddPhoto)
 
 
 
@@ -411,23 +409,9 @@ router.get('/photo/explore', (req, res) => {})
  *       - name: privacy
  *         in: body
  *         required: true
- *         description: Image id to add tag to the corresponding image
- *         type: object
- *         properties:
- *           title:
- *             type: string
- *           description:
- *             type: string
- *           privacy:
- *             type: string
- *             enum:
- *               -public
- *               -private
- *           visibility:
- *             type: string
- *             enum:
- *                -public
- *               -Invites
+ *         description: mode of photo
+ *         schema:
+ *           type: string
  *
  *     responses:
  *       200:
@@ -585,8 +569,12 @@ router.put('/photo/:photo_id/tag/{tag_id}', (req, res) => {})
  *     responses:
  *       200:
  *         description: Success
- *         schema:
- *            $ref: '#/definitions/Image'
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                     "message": "Success",
+ *            }
  *       404:
  *         description: Not found
  *         examples:
@@ -655,8 +643,6 @@ router.get('/photo/:photo_id', (req, res) => {})
  *   photo:
  *     type: object
  *     properties:
- *       title:
- *         type: string
  *       photo_id:
  *         type: integer
  *       photo_url:
@@ -673,8 +659,6 @@ router.get('/photo/:photo_id', (req, res) => {})
  *           $ref: '#/responses/comment'
  *       description:
  *         type: string
- *       favs:
- *         type: object
  *
  */
 /**

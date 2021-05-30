@@ -1,151 +1,185 @@
-const mongoose=require("mongoose");
-const Joi=require('joi');
-const schema=mongoose.Schema;
+const mongoose = require("mongoose");
+const Joi = require('joi');
+const schema = mongoose.Schema;
+Joi.objectId= require('joi-objectid')(Joi);
 
-const UserSchema=new schema(
-{ 
-Fname:{
-    type:String,
-    min: 1
-    ,required: true
-      },
-Lname:{
-    type:String,
-    min: 1
-    ,required: true
-      },
-UserName:{
-    type:String,
-    min: 1
-    ,required: true,
-    unique:true,
-    dropDups:true
-         },
-Email:{
-    type:String
-    , min: 1
-    ,required: true,
-    unique:true,
-    dropDups:true
-      },
-About:{
-       type:String
+const UserSchema = new schema(
+  {
+    Fname: {
+      type: String,
+      min: 1
+      , required: true
+    },
+    Lname: {
+      type: String,
+      min: 1
+      , required: true
+    },
+    UserName: {
+      type: String,
+      min: 1
+      , required: true,
+      unique: true,
+      dropDups: true
+    },
+    Email: {
+      type: String
+      , min: 1
+      , required: true,
+      unique: true,
+      dropDups: true
+    },
+    About: {
+        Description:{ 
+        type: String
         , min: 1,
-        default: "",        
-          },
-    
-Age:{
-    type:Number
-    , min: 1
-    ,required: true
+        default: "",},
+        Occupation:{ 
+          type: String
+          , min: 1,
+          default: "",},
+          CurrentCity:{ 
+            type: String
+            , min: 1,
+            default: "",},
+            Hometown:{ 
+              type: String
+              , min: 1,
+              default: "",},    
     },
 
-  Date_joined:  {
-    
-    type:Date,
-    required: true,
-     min: '2021-01-1'   ,
-     default: Date.now,  
-    
+    Age: {
+      type: Number
+      , min: 1
+      , required: true
     },
-    Password:{
-      type:String,
-      required:true,
-       min:1,
-      }
 
-   ,photos:[
-            { 
-             type:schema.Types.ObjectId, 
-             ref: 'Photo'
-            }
-           ] ,
+    Date_joined: {
 
-  Num_tags:{ 
-            type: Number,
-            min: 0   
-          },
+      type: Date,
+      required: true,
+      min: '2021-01-1',
+      default: Date.now,
 
-  views:[{ 
-    type: schema.Types.ObjectId,
-    ref:'User'   
-       }
-      ],
+    },
+    Password: {
+      type: String,
+      required: true,
+      min: 1,
+    },
 
-  Followers:[
-      {  
+
+    Num_tags: {
+      type: Number,
+      min: 0
+    },
+
+    views: [{
       type: schema.Types.ObjectId,
       ref: 'User'
-      }
-           ],
+    }
+    ],
 
-  Following:[
-             {  
-               type: schema.Types.ObjectId,
-               ref: 'User'
-             }
-           ],         
-  Group:[
-            {  
-              type: schema.Types.ObjectId,
-              ref: 'Group'
-            }
-          ],     
-  Album:[
-            {  
-              type: schema.Types.ObjectId,
-              ref: 'Album'
-            }
-          ],
-  Gallery:[
-            {  
-              type: schema.Types.ObjectId,
-              ref: 'Gallery'
-            }
-          ],         
-  Avatar:{
+    Followers: [
+      {
+        type: schema.Types.ObjectId,
+        ref: 'User'
+      }
+    ],
+
+    Following: [
+      {
+        type: schema.Types.ObjectId,
+        ref: 'User'
+      }
+    ],
+    Group: [
+      {
+        type: schema.Types.ObjectId,
+        ref: 'Group'
+      }
+    ],
+    Gallery: [
+      {
+        type: schema.Types.ObjectId,
+        ref: 'Gallery'
+      }
+    ],
+    
+    
+    Avatar: {
+      type: schema.Types.ObjectId,
+      ref: 'Photo',
+      default:"60b0563bb7db47b60e439331"
+      
+    },
+    BackGround: {
+      type: schema.Types.ObjectId,
+      ref: 'Photo',
+      default:"60b0563bb7db47b60e439331"
+      
+    },
+    Fav: [{
       type: schema.Types.ObjectId,
       ref: 'Photo'
-        }, 
-  Fav:[  { 
-         type:schema.Types.ObjectId, 
-         ref: 'Photo'
-       }
-      ],
-  isActive:{
- type:Boolean,
- default:false,
-  },                                               
+    }
+    ],
+    isActive: {
+      type: Boolean,
+      default: false,
+    },
 
-   }
+  }
 );
+
+UserSchema.virtual('albums', {
+  ref: 'Album',
+  localField: '_id',
+  foreignField: 'ownerId'
+})
+
+UserSchema.virtual('photos', {
+  ref: 'Photo',
+  localField: '_id',
+  foreignField: 'ownerId'
+})
 ////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////
-module.exports.validateSignup=(body)=>{
+module.exports.validateSignup = (body) => {
 
-const schema=Joi.object({
-firstName:Joi.string().min(1).max(50).required(),
-lastName:Joi.string().min(1).max(50).required(),
-age:Joi.number().integer().min(1).max(200).required(),
-email:Joi.string().email().required(),
-password:Joi.string().min(1).max(50).required(),
-});
+  const schema = Joi.object({
+    firstName: Joi.string().min(1).max(50).required(),
+    lastName: Joi.string().min(1).max(50).required(),
+    age: Joi.number().integer().min(1).max(200).required(),
+    email: Joi.string().email().required(),
+    password: Joi.string().min(1).max(50).required(),
+  });
 
-return  schema.validate(body);
+  return schema.validate(body);
 
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-module.exports.validateLogin=(body)=>{
+module.exports.validateLogin = (body) => {
 
-  const schema=Joi.object( {
-  email:Joi.string().email().required(),
-  password:Joi.string().min(1).max(50).required(),
+  const schema = Joi.object({
+    email: Joi.string().email().required(),
+    password: Joi.string().min(1).max(50).required(),
   });
-  
-  return  schema.validate(body);
-  
-  }
-  
 
-module.exports.UserModel=mongoose.model('User',UserSchema);;
+  return schema.validate(body);
+
+}
+////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+module.exports.validateId=(id)=>{
+  const schema = Joi.object({
+      id: Joi.objectId().required()
+  });
+  const result = schema.validate(id);
+  return result;
+}
+///////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////
+module.exports.UserModel = mongoose.model('User', UserSchema);;
