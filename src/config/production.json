@@ -2,7 +2,7 @@
 {
     "JWT_KEY": "DROPOIDSECRETKEY##",
     "JWT_EXPIRES_IN": "2h",
-    "db": "mongodb+srv://dropoid:1234@cluster0.tqg0o.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
+    "db": "mongodb+srv://dropoid:1234@cluster0.tqg0o.mongodb.net/dropoid?retryWrites=true&w=majority",
     "PORT": "4000",
     "NODE_ENV": "production",
     "HOST_ADDR":"dropoids.me"
