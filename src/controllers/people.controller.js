@@ -1,5 +1,5 @@
 const { UserModel,validateId } = require('../models/user.model');
-
+const mongoose = require('mongoose');
 exports.getFollowing=async (req, res) => {
     const { error } = validateId({id:req.params.userId});
     if (error) return res.status(400).send(error.details[0].message);
@@ -69,3 +69,35 @@ exports.getfaves=async (req, res) => {
         }
     }
 }
+
+module.exports.GetPeopleByUserName_ID_Email= async(req,res)=>{
+    
+    if(!mongoose.Types.ObjectId.isValid(req.params.title))
+    {
+        let user = await UserModel.find({UserName:req.params.title});
+        
+        if(user.length==0)
+        {
+            user = await UserModel.find({Email:req.params.title});
+        }
+
+        if(!user) return res.status(404).send({message:'user not found'});
+
+        try {
+            res.status(200).send(user);
+        } catch (error) {
+            return res.status(500).send({message:'enternal server error'});
+        }
+    }
+    else
+    {
+        const userByid = await UserModel.findById(req.params.title);
+        if(!userByid) return res.status(404).send({message:'user not found'});
+
+        try {
+            res.status(200).send(userByid);
+        } catch (error) {
+            return res.status(500).send({message:'enternal server error'});
+        }
+    }
+};

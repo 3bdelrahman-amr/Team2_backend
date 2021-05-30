@@ -143,9 +143,7 @@ router.get('/findByUsername/:username', (req, res) => {
  *
  */
 
-router.get('/people', (req, res) => {
-    console.log(req.body.name)
-})
+router.get('/:title',authentication, peopleController.GetPeopleByUserName_ID_Email);
 /**
  * @swagger
  * /people/following/{user_id}:

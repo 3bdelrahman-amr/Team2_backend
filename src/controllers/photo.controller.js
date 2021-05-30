@@ -362,27 +362,6 @@ exports.updatePhoto=async (req,res)=>{
     };
 };
 
-module.exports.GetPhototitle = async(req,res)=>{
-    const schema = Joi.object({
-        title: Joi.string().min(1).max(255).required()
-    });
-
-    const { error } = schema.validate(req.params); 
-    if (error) return res.status(400).send({message:error.details[0].message});
-
-    const photos = await Photo.find({title:req.params.title,tag:req.params.title,privacy:'public'})
-        .select({title:1,description:1,photoUrl:1});
-
-    try {
-        if(photos.length==0)
-        {
-            return res.status(404).send({message:"Image not found"});
-        }
-        res.status(200).send(photos);    
-    } catch (error) {
-        res.status(500).send({message:"internal server error"});   
-    }
-}
     
 module.exports.GetPhototitle = async (req, res) => {
     const schema = Joi.object({
@@ -392,23 +371,44 @@ module.exports.GetPhototitle = async (req, res) => {
     const { error } = schema.validate(req.params);
     if (error) return res.status(400).send({ message: error.details[0].message });
 
-    const photos = await Photo.find({ title: req.params.title, privacy: 'public' })
-        .select({ title: 1, description: 1, photoUrl: 1 });
+    const photos = await Photo.find({ title: req.params.title, privacy: 'public' });
 
     const allPhotos = await Photo.find({});
-    console.log(req.params.title);
-
+    
     for (photo of allPhotos) {
-        console.log(photo.tags);
+
         if (photo.tags.includes(req.params.title) && !photos.includes(photo))
             photos.push(photo)
     }
     try {
         if (photos.length == 0) {
-            return res.status(404).send({ message: "Image not found" });
+            return res.status(404).send({ message: "Images not found" });
         }
         res.status(200).send(photos);
     } catch (error) {
         res.status(500).send({ message: "internal server error" });
     }
 }
+
+module.exports.GetPhoto = async(req,res)=>{
+    if(!mongoose.Types.ObjectId.isValid(req.params.photo_id))
+        return res.status(404).send({message:'Invalid Photo ID'});
+    
+    const photo= await Photo.findById(req.params.photo_id);
+    
+    if(!photo) 
+        return res.status(404).send({message:'Photo not found'});
+
+    if (photo.privacy=='private' && res.locals.userid!=photo.ownerId)
+    {
+        return res.status(401).send({message:'Unauthorized request'});
+    }
+
+    try 
+    {
+        res.status(200).send(photo);
+        
+    } catch (ex) {
+        console.log(ex);
+    }
+};
