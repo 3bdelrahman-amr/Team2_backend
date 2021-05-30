@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const { Group } = require('../models/groups.model');
+const { Photo } = require('../models/photo.model');
+const { UserModel: User } = require('../models/user.model');
 
 exports.createGroup = async function (req, res) {
   const userId = res.locals.userid;
@@ -60,10 +62,10 @@ exports.getGroup = async function (req, res) {
           },
         },
       ]).exec();
-      delete group.Members;
-      delete group.Photos;
       group.role = memberRole[0].role;
     }
+    delete group.Members;
+    delete group.Photos;
     res.status(200).json(group);
   }
 };
@@ -71,9 +73,9 @@ exports.getGroup = async function (req, res) {
 exports.join = async function (req, res) {
   const groupId = req.params.group_id;
   const userId = res.locals.userid;
-  const user = await User.findById(userId).exec();
+  let group;
   try {
-    const group = await Group.findById(groupId).lean().exec();
+    group = await Group.findById(groupId).lean().exec();
   } catch (err) {
     return res.status(500).json({ message: 'Invalid group ID' });
   }
@@ -103,10 +105,7 @@ exports.join = async function (req, res) {
     });
     await User.findByIdAndUpdate(userId, {
       $addToSet: {
-        Groups: {
-          ref: groupId,
-          role: 'member',
-        },
+        Group: groupId,
       },
     });
     res.status(200).json({
@@ -118,7 +117,6 @@ exports.join = async function (req, res) {
 exports.leave = async function (req, res) {
   const groupId = req.params.group_id;
   const userId = res.locals.userid;
-  const user = await User.findById(userId).exec();
   const group = await Group.findById(groupId).exec();
   if (!groupId) {
     res.status(422).json({ message: 'Missing group parameter' });
@@ -145,10 +143,7 @@ exports.leave = async function (req, res) {
     });
     await User.findByIdAndUpdate(userId, {
       $pull: {
-        Groups: {
-          ref: groupId,
-          role: 'member',
-        },
+        Group: groupId,
       },
     });
     res.status(200).json({
@@ -162,7 +157,7 @@ exports.getGroupPhotos = async function (req, res) {
   const groupId = req.params.id;
   let group;
   try {
-    group = await Group.findById(groupId).lean().exec();
+    group = await Group.findById(groupId).populate('Photos').lean().exec();
   } catch (err) {
     return res.status(500).json({ message: 'Invalid group ID' });
   }
@@ -200,16 +195,15 @@ exports.getGroupPhotos = async function (req, res) {
       delete group.Members;
       group.role = memberRole[0].role;
     }
-    res.status(200).json(group);
+    res.status(200).json(group.Photos);
   }
 };
 
 exports.getGroupMembers = async function (req, res) {
-  const userId = res.locals.userid;
   const groupId = req.params.id;
   let group;
   try {
-    group = await Group.findById(groupId).lean().exec();
+    group = await Group.findById(groupId).populate('Members.ref').lean().exec();
   } catch (err) {
     return res.status(500).json({ message: 'Invalid group ID' });
   }
@@ -218,35 +212,99 @@ exports.getGroupMembers = async function (req, res) {
   } else if (!group || (group && group.privacy === 'private')) {
     res.status(404).json({ message: 'Group not found' });
   } else {
+    const members = group.Members;
+    let finalArray = [];
+    members.forEach(function (member) {
+      member.ref.role = member.role;
+      member.ref.email = member.ref.Email;
+      delete member.ref.Email;
+      member.ref.num_photos = member.ref.Photos.length;
+      member.ref.num_following = member.ref.Followers.length;
+      delete member.ref.Photos;
+      delete member.ref.Followers;
+      finalArray.push(member.ref);
+    });
+    res.status(200).json(finalArray);
+  }
+};
+
+exports.addPhoto = async function (req, res) {
+  const groupId = req.body.group_id;
+  const photoId = req.body.photo_id;
+  const group = await Group.findById(groupId).exec();
+  const photo = await Photo.findByID(photoId).exec();
+  if (!groupId) {
+    res.status(422).json({ message: 'Missing group parameter' });
+  } else if (!group || !photo) {
+    res.status(404).json({ message: 'Group/Photo not found' });
+  } else {
     const number = await Group.find({
       _id: groupId,
-      Members: {
-        $elemMatch: { ref: userId },
+      Photos: {
+        $elemMatch: { $eq: photoId },
       },
     }).exec();
     if (number.length > 0) {
-      const memberRole = await Group.aggregate([
-        {
-          $match: { _id: { $eq: mongoose.Types.ObjectId(groupId) } },
-        },
-        {
-          $unwind: '$Members',
-        },
-        {
-          $match: {
-            'Members.ref': { $eq: mongoose.Types.ObjectId(userId) },
-          },
-        },
-        {
-          $project: {
-            ref: '$Members.ref',
-            role: '$Members.role',
-          },
-        },
-      ]).exec();
-      delete group.Photos;
-      group.role = memberRole[0].role;
+      return res.status(500).json({
+        message: 'Photo is already in Group',
+      });
     }
-    res.status(200).json(group);
+  }
+  await Group.findByIdAndUpdate(groupId, {
+    $addToSet: { Photos: photoId },
+  });
+  res.status(200).json({
+    group_id: groupId,
+  });
+};
+
+exports.searchGroup = async function (req, res) {
+  const searchKeyword = req.params.keyword;
+  const userId = res.locals.userid;
+  if (!searchKeyword) {
+    res.status(404).json({ message: 'Group not found' });
+  } else {
+    const groups = await Group.find({
+      name: { $regex: searchKeyword, $options: 'i' },
+    }).exec();
+    let finalArray = [];
+    groups.forEach(async function (group) {
+      let gp = JSON.parse(JSON.stringify(group));
+      gp.num_photos = group.Photos.length;
+      gp.num_members = group.Members.length;
+      delete gp.Photos;
+      delete gp.Members;
+      const number = await Group.find({
+        _id: gp.id,
+        Members: {
+          $elemMatch: { ref: userId },
+        },
+      }).exec();
+      if (number.length > 0) {
+        const memberRole = await Group.aggregate([
+          {
+            $match: { _id: { $eq: mongoose.Types.ObjectId(gp._id) } },
+          },
+          {
+            $unwind: '$Members',
+          },
+          {
+            $match: {
+              'Members.ref': { $eq: mongoose.Types.ObjectId(userId) },
+            },
+          },
+          {
+            $project: {
+              ref: '$Members.ref',
+              role: '$Members.role',
+            },
+          },
+        ]).exec();
+        gp.role = memberRole[0].role;
+      }
+      console.log(gp);
+      finalArray.push(gp);
+    });
+    res.status(200).json(finalArray);
   }
 };

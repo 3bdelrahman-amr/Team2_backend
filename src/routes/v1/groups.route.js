@@ -1,7 +1,7 @@
 const express = require('express');
 const groupsController = require('../../controllers/group.controller');
 const { authentication } = require('../../middlewares/auth');
-
+const { isMember } = require('../../middlewares/group');
 const router = express.Router();
 router.use((req, res, next) => {
   authentication(req, res, next);
@@ -130,7 +130,8 @@ router.get('/:group_id', (req, res) => {
  *             }
  *
  */
-router.post('/photo', (req, res) => {
+router.post('/photo', (req, res, next) => {
+  isMember(req, res, next);
   groupsController.addPhoto(req, res);
 });
 /**
@@ -305,6 +306,10 @@ router.get('/:group_id/join', (req, res) => groupsController.join(req, res));
  */
 router.delete('/:group_id/leave', (req, res) => {
   groupsController.leave(req, res);
+});
+
+router.get('/:keyword/search', (req, res) => {
+  groupsController.searchGroup(req, res);
 });
 
 /**
