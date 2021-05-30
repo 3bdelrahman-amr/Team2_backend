@@ -5,8 +5,8 @@ const emailExisyence=require('email-existence');
 
 const Model=require("../models/user.model");
 const config=require('config');
-const { cache } = require("joi");
-const { use } = require("../routes/v1");
+//const { cache } = require("joi");
+////const { use } = require("../routes/v1");
 const secret=config.get('JWT_KEY');
 const PhotoModel=require("../models/photo.model");
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -21,13 +21,7 @@ module.exports.register=async(req,res,next)=>{
     
   
   
-// else{ 
 
-//    await Model.UserModel.findOne({Email:req.body.email}).then((err,user)=>{
-//      if(user)
-//        res.status(422).send({message:'user already exist'});
-//       return;
-//     });
 
 await Model.UserModel.create({ 
     Fname:req.body.firstName,
@@ -322,12 +316,12 @@ module.exports.UpdateUser=async(req,res)=>{
     if(req.body.About)
       keys=Object.keys(req.body.About);
     var msg="";
-    if(req.body.Avatar&&!Model.validateId(req.body.Avatar)){
+    if(req.body.Avatar&&!mongoose.Types.ObjectId.isValid(req.body.Avatar)){
         delete req.body.Avatar;
         msg+='invalid Avatar id \n'
         isvalid--;
     }
-    else if(req.body.Avatar&&Model.validateId(req.body.Avatar)){
+    else if(req.body.Avatar&&mongoose.Types.ObjectId.isValid(req.body.Avatar)){
         const photo=await PhotoModel.Photo.findById({_id:req.body.Avatar});
         if(!photo)
          {
@@ -337,12 +331,12 @@ module.exports.UpdateUser=async(req,res)=>{
          }
     }
 
-    if(req.body.BackGround&&!Model.validateId(req.body.BackGround)){
+    if(req.body.BackGround&&!mongoose.Types.ObjectId.isValid(eq.body.BackGround)){
         delete req.body.Avatar;
         msg+='invalid BackGround id \\n'
         isvalid--;
     }
-    else if(req.body.BackGround&&Model.validateId(req.body.BackGround)){
+    else if(req.body.BackGround&&mongoose.Types.ObjectId.isValid(eq.body.BackGround)){
         const photo=await PhotoModel.Photo.findById({_id:req.body.BackGround});
         if(!photo)
          {
@@ -509,3 +503,26 @@ module.exports.Unfollow=async(req,res)=>{
 
     })
 }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+module.exports.GetFav = async(req,res)=>{
+
+    const LoginUser = await Model.UserModel.findById(res.locals.userid);
+
+    try {
+        var FavPhotos = new Array();
+        let Fav;
+        for(var i=0 ; i<LoginUser.Fav.length ;i++)
+        {
+            Fav = await PhotoModel.Photo.findById(LoginUser.Fav[i]);
+            if(Fav)
+            {
+                FavPhotos.push(Fav);
+            }
+        }
+        res.status(200).send(FavPhotos);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({message:"internal server error,please try again"});
+    }
+};
