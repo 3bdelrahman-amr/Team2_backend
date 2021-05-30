@@ -61,9 +61,13 @@ module.exports.GetUser=async(req,res)=>{
 
         const avatar= await PhotoModel.Photo.findById({_id:user.Avatar});
         const background= await PhotoModel.Photo.findById({_id:user.BackGround});
+        
         const usr=UsrWithPhotos.toObject();
         usr.Avatar=avatar.photoUrl;
         usr.BackGround=background.photoUrl;
+         if(!UsrWithPhotos.photos)
+         usr.Photo=0;
+        usr.Photo=UsrWithPhotos.photos.length;
 
         return res.status(200).send(usr);
 
