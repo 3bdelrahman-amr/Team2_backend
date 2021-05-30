@@ -3,8 +3,6 @@ node_modules
 coverage/
 deploy_key
 package-lock.json
-!.gitignore
-!src/photos
-!
+
 
 
