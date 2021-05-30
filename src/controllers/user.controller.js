@@ -318,14 +318,16 @@ module.exports.UpdateUser=async(req,res)=>{
             isvalid++;
     
     });
-    var  keys=Object.keys(req.body.About);
+    var keys;
+    if(req.body.About)
+      keys=Object.keys(req.body.About);
     var msg="";
     if(req.body.Avatar&&!Model.validateId(req.body.Avatar)){
         delete req.body.Avatar;
         msg+='invalid Avatar id \n'
         isvalid--;
     }
-    else if(req.body.Avatar){
+    else if(req.body.Avatar&&Model.validateId(req.body.Avatar)){
         const photo=await PhotoModel.Photo.findById({_id:req.body.Avatar});
         if(!photo)
          {
@@ -340,7 +342,7 @@ module.exports.UpdateUser=async(req,res)=>{
         msg+='invalid BackGround id \\n'
         isvalid--;
     }
-    else if(req.body.BackGround){
+    else if(req.body.BackGround&&Model.validateId(req.body.BackGround)){
         const photo=await PhotoModel.Photo.findById({_id:req.body.BackGround});
         if(!photo)
          {
@@ -351,7 +353,7 @@ module.exports.UpdateUser=async(req,res)=>{
     }
 
     
-    if( keys.length!=0){
+    if( req.body.about&& keys.length!=0){
        
         if(!keys.every(ab=>about.includes(ab))){
            delete req.body.About;

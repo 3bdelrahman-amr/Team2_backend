@@ -20,7 +20,7 @@ class PhotosSeeder extends Seeder {
       return count === 0;
     }
   
-    
+
     async run() {
       return PhotoModel.Photo.create(data);
     }
