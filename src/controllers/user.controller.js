@@ -63,9 +63,15 @@ module.exports.GetUser=async(req,res)=>{
         if(!user)
         return res.status(404).send({message:'user not found'});
 
-       const UsrWithPhotos =await user.populate('photos').execPopulate()
+       const UsrWithPhotos =await user.populate('photos').execPopulate();
 
-        return res.status(200).send(UsrWithPhotos);
+        const avatar= await PhotoModel.Photo.findById({_id:user.Avatar});
+        const background= await PhotoModel.Photo.findById({_id:user.BackGround});
+        const usr=UsrWithPhotos.toObject();
+        usr.Avatar=avatar.photoUrl;
+        usr.BackGround=background.photoUrl;
+
+        return res.status(200).send(usr);
 
 
 

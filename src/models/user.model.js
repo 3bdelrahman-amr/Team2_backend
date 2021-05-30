@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Joi = require('joi');
 const schema = mongoose.Schema;
 Joi.objectId= require('joi-objectid')(Joi);
+const id=mongoose.Types.ObjectId('608834536de13632903701b7');
 
 const UserSchema = new schema(
   {
@@ -110,13 +111,13 @@ const UserSchema = new schema(
     Avatar: {
       type: schema.Types.ObjectId,
       ref: 'Photo',
-      default:"60b0563bb7db47b60e439331"
+      default:id
       
     },
     BackGround: {
       type: schema.Types.ObjectId,
       ref: 'Photo',
-      default:"60b0563bb7db47b60e439331"
+      default:id
       
     },
     Fav: [{
