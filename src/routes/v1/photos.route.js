@@ -850,7 +850,7 @@ router.delete('/tag/:id', authentication, photoController.removeTag)
 router.get('/:photo_id',authentication,photoController.GetPhoto);
 /**
  * @swagger
- * /photo/{title}:
+ * /photo/getbytitle/{title}:
  *   get:
  *     description: get a photo by title
  *     tags: [Photo]

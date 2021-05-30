@@ -373,6 +373,8 @@ module.exports.GetPhototitle = async (req, res) => {
 
     const photos = await Photo.find({ title: req.params.title, privacy: 'public' });
 
+  
+
     const allPhotos = await Photo.find({});
     
     for (photo of allPhotos) {
@@ -380,11 +382,23 @@ module.exports.GetPhototitle = async (req, res) => {
         if (photo.tags.includes(req.params.title) && !photos.includes(photo))
             photos.push(photo)
     }
+
+    let photoindex;
+    const all_photos = new Array();
+    for(var ii = 0 ; ii < photos.length ; ii++)
+    {
+        photoindex = photos[ii];
+        var image = photoindex.toObject();
+        image.no_comments = photoindex.comments.length;
+        image.no_fav = photoindex.Fav.length;
+         all_photos.push(image);
+    }
+
     try {
-        if (photos.length == 0) {
+        if (all_photos.length == 0) {
             return res.status(404).send({ message: "Images not found" });
         }
-        res.status(200).send(photos);
+        res.status(200).send(all_photos);
     } catch (error) {
         res.status(500).send({ message: "internal server error" });
     }
