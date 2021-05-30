@@ -66,6 +66,7 @@ router.post('/', (req, res) => {
  *              {
  *                  "_id": "608c80ce54e3d74b34d9bb5a",
  *                  "Photos": [],
+ *                  "Members": [],
  *                  "privacy": "public",
  *                  "visibility": "public",
  *                  "name": "ABC",
