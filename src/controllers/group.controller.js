@@ -64,6 +64,8 @@ exports.getGroup = async function (req, res) {
       ]).exec();
       group.role = memberRole[0].role;
     }
+    group.count_members = group.Members.length;
+    group.count_photos = group.Photos.length;
     delete group.Members;
     delete group.Photos;
     res.status(200).json(group);
