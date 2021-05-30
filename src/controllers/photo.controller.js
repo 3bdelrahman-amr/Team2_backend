@@ -26,6 +26,7 @@ exports.upload = multer({
 
 exports.AddPhoto = async (req, res) => {
     const _id = res.locals.userid;
+   
     const photo = new Photo({
         ...req.body,
         ownerId: _id,
@@ -37,10 +38,13 @@ exports.AddPhoto = async (req, res) => {
         return res.status(400).send({ error: "Bad request parameters" });
     }
     try {
+        
         await photo.save()
-        res.status(200).send(photo);
+        return res.status(200).send(photo);
     }
     catch (error) {
+        console.log(error)
+        
         res.status(500).send({ error: "Internal Server error" })
     }
 

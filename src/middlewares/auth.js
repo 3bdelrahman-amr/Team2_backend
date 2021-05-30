@@ -85,7 +85,7 @@ module.exports.SendVerification = async (req, res) => {
       return res.status(400).send({ message: 'failed to sent verification mail please fill with a valid email' });
     }
     else
-      return res.status(200).send({ message: 'email verification has been sent to you' });
+      return res.status(201).send({ message: 'email verification has been sent to you' });
 
   });
 

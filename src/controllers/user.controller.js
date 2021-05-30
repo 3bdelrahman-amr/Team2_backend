@@ -95,29 +95,32 @@ module.exports.login=async(req,res,next)=>{
         if(!_user.isActive)
         return res.status(500).send({message:'you didnt confirm your email yet please confirm it before loging again'});
 
-        if(_user){
-            
-            bcrypt.compare(req.body.password,_user.Password,(err)=>{
 
-                if(err){
+        const hashpass= bcrypt.compare(req.body.password,_user.Password,(err,ismatch)=>{ 
+        
+            
+            
+
+                if(!ismatch){
                     return res.status(401).send({message:'wrong password inserted'});
                     
                 }
                 res.locals.userid=_user._id;
                 next();
-                return;
+               
 
-            })
-            return;
-        }
+            });
+            
+        
         if(_err){
             res.status(401).send({message:"wrong Email inserted,no user with this mail"});
         }
+    })
 
 
 
 
-});
+
 
 
 }
@@ -517,7 +520,14 @@ module.exports.GetFav = async(req,res)=>{
             Fav = await PhotoModel.Photo.findById(LoginUser.Fav[i]);
             if(Fav)
             {
-                FavPhotos.push(Fav);
+                var fa=Fav.toObject();
+                var Owner=await Model.UserModel.findById(Fav.ownerId);
+                fa.Username=Owner.UserName;
+                fa.comments=Fav.comments.length
+                fa.comments=Fav.Fav.length
+
+                fa.Name=Owner.Fname+" "+ Owner.Lname
+                FavPhotos.push(fa);
             }
         }
         res.status(200).send(FavPhotos);
@@ -526,3 +536,5 @@ module.exports.GetFav = async(req,res)=>{
         res.status(500).send({message:"internal server error,please try again"});
     }
 };
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
