@@ -152,7 +152,9 @@ router.get('/people', (req, res) => {
  *       200:
  *         description: Success
  *         schema:
- *           $ref: '#/responses/peopleinfo'
+ *           type: array
+ *           items:
+ *             $ref:  '#/responses/peopleinfo'
  *       404:
  *         description: Not found
  *         examples:
