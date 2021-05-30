@@ -5,6 +5,6 @@ deploy_key
 package-lock.json
 !.gitignore
 !src/photos
-!*/
+!
 
 
