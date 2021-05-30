@@ -54,7 +54,7 @@ module.exports.SendVerification = async (req, res) => {
     service: 'gmail',
     auth: {
       user: 'dropoidcompany@gmail.com',
-      pass: 'Dropoid123',
+      pass: 'Dropoid_123',
     },
     tls: {
       rejectUnauthorized: false

@@ -1,5 +1,7 @@
 const { UserModel,validateId } = require('../models/user.model');
+const photo =require('../models/photo.model');
 const mongoose = require('mongoose');
+const { use } = require('../routes/v1/people.route');
 exports.getFollowing=async (req, res) => {
     const { error } = validateId({id:req.params.userId});
     if (error) return res.status(400).send(error.details[0].message);
@@ -74,30 +76,40 @@ module.exports.GetPeopleByUserName_ID_Email= async(req,res)=>{
     
     if(!mongoose.Types.ObjectId.isValid(req.params.title))
     {
-        let user = await UserModel.find({UserName:req.params.title});
+        let user = await UserModel.find({UserName:req.params.title},{Password:0,isActive : 0});
         
         if(user.length==0)
         {
-            user = await UserModel.find({Email:req.params.title});
+            user = await UserModel.find({Email:req.params.title},{Password:0,isActive : 0});
         }
 
         if(!user) return res.status(404).send({message:'user not found'});
 
         try {
-            res.status(200).send(user);
+            const avatarurl = await photo.Photo.findById(user[0].Avatar);
+            const backgroundurl = await photo.Photo.findById(user[0].BackGround);
+            user[0].BackGround = backgroundurl.photoUrl;
+            user[0].Avatar = avatarurl.photoUrl;
+            res.status(200).send(user[0]);
         } catch (error) {
-            return res.status(500).send({message:'enternal server error'});
+            console.log(error);
+            return res.status(500).send({message:'internal server error'});
         }
     }
     else
     {
-        const userByid = await UserModel.findById(req.params.title);
+        const userByid = await UserModel.findById({_id:req.params.title},{Password:0,isActive : 0});
         if(!userByid) return res.status(404).send({message:'user not found'});
 
         try {
-            res.status(200).send(userByid);
+            const avatarurl = await photo.Photo.findById(userByid[0].Avatar);
+            const backgroundurl = await photo.Photo.findById(userByid[0].BackGround);
+            userByid[0].BackGround = backgroundurl.photoUrl;
+            userByid[0].Avatar = avatarurl.photoUrl;
+            res.status(200).send(userByid[0]);
         } catch (error) {
-            return res.status(500).send({message:'enternal server error'});
+            console.log(error);
+            return res.status(500).send({message:'internal server error'});
         }
     }
 };
