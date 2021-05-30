@@ -276,6 +276,9 @@ router.get('/fav/:username', authentication,peopleController.getfaves );
  *       format: int32
  *     avatarUrl:
  *       type: string
+ *     isFollowed:
+ *       type: boolean
+ *
  *
  *  photoInfo:
  *    type: object

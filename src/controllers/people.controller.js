@@ -104,14 +104,20 @@ exports.getPhotos = async (req, res) => {
 
 exports.searchUsers = async (req, res) => {
 
-    const users = await UserModel.find({_id:{$ne:res.locals.userid}})
+    const users = await UserModel.find({ _id: { $ne: res.locals.userid } })
         .or([{ UserName: { $regex: req.params.string, $options: "i" } }, { Fname: { $regex: req.params.string, $options: "i" } }, { Lname: { $regex: req.params.string, $options: "i" } }, { Email: { $regex: req.params.string, $options: "i" } }])
         .populate('Avatar', 'photoUrl -_id')
         .select('Avatar UserName Fname Lname Date_joined Followers');
     if (!users) return res.status(404).send('no users match the required input');
     else {
         let Users = [];
+        
         for (user of users) {
+            let followed = false;
+            index=user.Followers.indexOf(res.locals.userid);
+            console.log(index);
+            if (index != -1 ) 
+                followed = true;
             await user.populate('photos').execPopulate();
             const photos = user.photos;
             let count = 0;
@@ -121,6 +127,7 @@ exports.searchUsers = async (req, res) => {
             }
             countFollowers = user.Followers.length;
             user = {
+                isFollowed:followed,
                 numberOfFollowers: countFollowers,
                 numberOfPublicPhotos: count,
                 ...user._doc
