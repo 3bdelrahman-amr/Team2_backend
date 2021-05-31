@@ -15,7 +15,6 @@ mongoose.connect(db, {
   useUnifiedTopology: true
 }).then(() => {
   server = app.listen(port, () => {
-
     console.log(`Listening to port ${port}\n  `);
     console.log('NODE_ENV=',config.util.getEnv('NODE_ENV'));
     

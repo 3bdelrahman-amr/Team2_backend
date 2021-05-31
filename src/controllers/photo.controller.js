@@ -5,7 +5,13 @@ const config = require('config');
 const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 
-const port = "localhost:" + config.get('PORT') + "/";
+var port;
+if (config.util.getEnv('NODE_ENV') === 'development')
+    port = "localhost:" + config.get('PORT') + "/";
+else
+    port = "http://dropoids.me/";
+
+
 var mkdirp = require('mkdirp');
 
 const storage = multer.diskStorage({
@@ -34,6 +40,8 @@ exports.upload = multer({
 
 exports.addPhoto = async (req, res) => {
     const _id = res.locals.userid;
+    if (!req.file)
+        return res.status(400).send({ error: "You must add a file" });
     const photo = new Photo({
         ...req.body,
         ownerId: _id,
@@ -58,49 +66,58 @@ exports.addPhoto = async (req, res) => {
 }
 
 exports.tagPeople = async (req, res) => {
-    const _id = req.params.id; // photo id
-    const { error } = validateId({ id: _id });
-    if (error)
-        return res.status(400).send(error.details[0].message);
-
+    if (!req.body.photos || !req.body.tagged)
+        return res.status(400).send({ error: "Please send photos and tagged" })
+    var photos = [];
     try {
-        var photo = await Photo.findById({ _id, ownerId: res.locals.userid });
-        if (!photo)
-            return res.status(400).send({ error: "photo not found" });
-        //Validate the passed array of Usernames (if these usernames really do exist)
-        if (!req.body.tagged)
-            return res.status(400).send("You must add tagged parameter");
-        const taggedPeople = req.body.tagged; // array of usernames of tagged people
 
-        for (person of taggedPeople) {
-            await UserModel.findOne({ UserName: person }); // if not found it will throw an error
+        for (_id of req.body.photos) {
+            const { error } = validateId({ id: _id });
+            if (error)
+                return res.status(400).send(error.details[0].message);
 
+            const photo = await Photo.findById({ _id, ownerId: res.locals.userid });
+            if (!photo)
+                return res.status(400).send({ error: "photo not found" });
+            //Validate the passed array of Usernames (if these usernames really do exist)
+            if (!req.body.tagged)
+                return res.status(400).send("You must add tagged parameter");
+            const taggedPeople = req.body.tagged; // array of usernames of tagged people
+            const arr = [];
+
+            for (person of taggedPeople) {
+                const find = await UserModel.findOne({ UserName: person }); // if not found it will throw an error
+                if (find)
+                    arr.push(person)
+
+            }
+
+            const photoTags = photo.peopleTags; // array of all the people tags for this photo
+
+            var tag = photoTags.find((tag) => {
+                return tag.tagging == res.locals.userid
+            }) // this user already tagged other people in this photo
+
+            // if the user didn't tag anyone before in this photo
+            if (!tag) {
+                tag = new Tag({
+                    tagging: res.locals.userid,
+                    tagged: arr
+                })
+            }
+            else {
+                const index = photoTags.indexOf(tag);
+                photo.peopleTags.splice(index, 1); // remove the existing tag
+                tag.tagged = tag.tagged.concat(arr) // add on the existing one 
+                tag.tagged = [...(new Set(tag.tagged))]; // remove all duplicated of tagged people
+            }
+            photo.peopleTags.push(tag);
+            await photo.save();
+            photos.push(photo);
         }
-
-        const photoTags = photo.peopleTags; // array of all the people tags for this photo
-
-        var tag = photoTags.find((tag) => {
-            return tag.tagging == res.locals.userid
-        }) // this user already tagged other people in this photo
-
-        // if the user didn't tag anyone before in this photo
-        if (!tag) {
-            tag = new Tag({
-                tagging: res.locals.userid,
-                tagged: taggedPeople
-            })
-        }
-        else {
-            const index = photoTags.indexOf(tag);
-            photo.peopleTags.splice(index, 1); // remove the existing tag
-            tag.tagged = tag.tagged.concat(taggedPeople) // add on the existing one 
-            tag.tagged = [...(new Set(tag.tagged))]; // remove all duplicated of tagged people
-        }
-        photo.peopleTags.push(tag);
-        await photo.save();
-        res.status(200).send(photo);
-
+        res.status(200).send(photos);
     } catch (error) {
+        console.log(error);
         res.status(500).send({ error: "An error has occured whole finding photo, please check the photo id" });
     }
 
@@ -131,8 +148,6 @@ exports.removeTagPeople = async (req, res) => {
                 tag.tagged = tag.tagged.filter((element) => element != person) // remove it
         }
 
-
-
         const index = photoTags.indexOf(tag);
         photo.peopleTags.splice(index, 1); // remove the existing tag
 
@@ -154,7 +169,6 @@ exports.getUserPhotos = async (req, res) => {
     const user = await UserModel.findById(res.locals.userid);
     try {
         await user.populate('photos').execPopulate();
-        console.log(user);
         console.log(user.photos);
         res.status(200).send(user.photos);
     } catch (error) {
@@ -168,7 +182,7 @@ exports.getPhotosHome = async (req, res) => {
         const user = await UserModel.findById(res.locals.userid); // array of ids of the people that the authenticated user is following
         const following = user.Following;
         var homePhotos = [];
-        for ( person of following) {
+        for (person of following) {
             const friend = await UserModel.findById(person);
             await friend.populate('photos').execPopulate();
             const photos = friend.photos;
@@ -184,22 +198,63 @@ exports.getPhotosHome = async (req, res) => {
 
 exports.getPhotosExplore = async (req, res) => {
     try {
-        const users = await UserModel.find(); // array of all users
         var photos = [];
-        for (user of users) {
-            user.populate("photos").execPopulate();
-            for (photo of user.photos) {
-                if (photo.Fav.length > 20)
-                    photos.push(photo);
+        const allPhotos = await Photo.find();
+        for (photo of allPhotos) {
+            if (photo.Fav.length > 20 && photo.privacy === 'public') {
+                await photo.populate('ownerId comments.user Fav ownerId.Avatar').execPopulate();
+                var arrNumfollowing = [];
+                var arrNumPhotos = [];
+                var i = 0;
+                for (fav of photo.Fav) //fav is a user (populated)
+                {
+                    await fav.populate('photos Avatar').execPopulate();
+                    arrNumfollowing[i] = fav.Following.length;
+                    arrNumPhotos[i] = fav.photos.length;
+                    i++;
+                }
+                for (comment of photo.comments) {
+                    const user = comment.user;
+                    await user.populate("Avatar").execPopulate();
+                }
+                var result = photo.toObject();
+
+                //remove unwanted fields from ownerId
+                result.ownerId = (({ _id, Fname, Lname, UserName, Avatar, Email }) => ({ _id, Lname, Fname, UserName, Avatar, Email }))(result.ownerId);
+                result.ownerId.Avatar = result.ownerId.Avatar.photoUrl
+
+                //remove unwanted fields in comments user
+                for (comment of result.comments) {
+                    comment.user = (({ _id, Fname, Lname, UserName, Avatar, Email }) => ({ _id, Lname, Fname, UserName, Avatar, Email }))(comment.user);
+                    comment.user.Avatar = comment.user.Avatar.photoUrl
+                }
+
+                //remove people tags and __v from the result
+                delete result.peopleTags
+                delete result.__v
+                // add numPhotos and numFollowing to Fav
+                i = 0
+                for (fav of result.Fav) {
+                    fav = (({ Fname, Lname, UserName, Avatar }) => ({ Fname, Lname, UserName, Avatar }))(fav);
+                    fav.Avatar = fav.Avatar.photoUrl;
+                    fav.numPhotos = arrNumPhotos[i];
+                    fav.numFollowing = arrNumfollowing[i];
+                    result.Fav[i] = { ...fav }
+                    i++
+                }
+                photos.push(result);
             }
         }
         res.status(200).send(photos);
     } catch (error) {
+        console.log(error);
         res.status(500).send({ error: "Internal Server Error" });
     }
 }
 
 exports.addTag = async (req, res) => {
+    if(!req.body.photos)
+        return res.status(400).send({error: "Please enter photos"})
     try {
         for (element of req.body.photos) {
             const photo = await Photo.findById({ _id: element });
@@ -317,15 +372,15 @@ exports.deleteComment = async (req, res) => {
 exports.deletePhoto = async (req, res) => {
 
 
-    
+
     const photodeleted = await Photo.findById(req.body.photos[0]);
-        if (!photodeleted)
-            return res.status(404).send({ error: "photo not found" });
-        if (res.locals.userid != photodeleted.ownerId)
+    if (!photodeleted)
+        return res.status(404).send({ error: "photo not found" });
+    if (res.locals.userid != photodeleted.ownerId)
         return res.status(403).send('Access denied');
-      
+
     try {
-        req.body.photos.forEach(async function (photo){
+        req.body.photos.forEach(async function (photo) {
             await Photo.findByIdAndRemove(photo);
         })
         res.status(201).send('photo deleted successfully');
@@ -335,23 +390,23 @@ exports.deletePhoto = async (req, res) => {
     };
 };
 
-exports.updatePhoto=async (req,res)=>{
+exports.updatePhoto = async (req, res) => {
     let photoUpdated = await Photo.findById(req.body.photos[0]);
-        if (!photoUpdated) return res.status(404).send({ error: "photo not found" });
-        if (res.locals.userid != photoUpdated.ownerId)
-            return res.status(403).send('Access denied');
+    if (!photoUpdated) return res.status(404).send({ error: "photo not found" });
+    if (res.locals.userid != photoUpdated.ownerId)
+        return res.status(403).send('Access denied');
 
-        const { error }= validatePhoto({title:req.body.title,description:req.body.description,privacy:req.body.privacy});
-        if (error) return res.status(400).send(error.details[0].message);
+    const { error } = validatePhoto({ title: req.body.title, description: req.body.description, privacy: req.body.privacy });
+    if (error) return res.status(400).send(error.details[0].message);
     try {
-        req.body.photos.forEach(async function (photo){
-            photoUpdated= await Photo.findById(photo);
+        req.body.photos.forEach(async function (photo) {
+            photoUpdated = await Photo.findById(photo);
             if (!photoUpdated)
-            return res.status(404).send({ error: "photo not found" });
+                return res.status(404).send({ error: "photo not found" });
             photoUpdated.set({
                 title: req.body.title,
-                description:req.body.description,
-                privacy:req.body.privacy
+                description: req.body.description,
+                privacy: req.body.privacy
             });
             await photoUpdated.save();
         })
@@ -362,28 +417,7 @@ exports.updatePhoto=async (req,res)=>{
     };
 };
 
-module.exports.GetPhototitle = async(req,res)=>{
-    const schema = Joi.object({
-        title: Joi.string().min(1).max(255).required()
-    });
 
-    const { error } = schema.validate(req.params); 
-    if (error) return res.status(400).send({message:error.details[0].message});
-
-    const photos = await Photo.find({title:req.params.title,tag:req.params.title,privacy:'public'})
-        .select({title:1,description:1,photoUrl:1});
-
-    try {
-        if(photos.length==0)
-        {
-            return res.status(404).send({message:"Image not found"});
-        }
-        res.status(200).send(photos);    
-    } catch (error) {
-        res.status(500).send({message:"internal server error"});   
-    }
-}
-    
 module.exports.GetPhototitle = async (req, res) => {
     const schema = Joi.object({
         title: Joi.string().min(1).max(255).required()
@@ -393,7 +427,6 @@ module.exports.GetPhototitle = async (req, res) => {
     if (error) return res.status(400).send({ message: error.details[0].message });
 
     const photos = await Photo.find({ title: req.params.title, privacy: 'public' })
-        .select({ title: 1, description: 1, photoUrl: 1 });
 
     const allPhotos = await Photo.find({});
     console.log(req.params.title);
