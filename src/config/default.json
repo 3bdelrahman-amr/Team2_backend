@@ -1,4 +1,3 @@
-  
 {
     "JWT_KEY": "1234",
     "JWT_EXPIRES_IN": "30d",

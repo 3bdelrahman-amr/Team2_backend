@@ -1,6 +1,18 @@
 const { Photo } = require('../models/photo.model');
 const { UserModel: User } = require('../models/user.model');
-exports.add_fav = async function (req, res) {
+/**
+ * A function that lets the user add a photo to their favorites
+ *
+ * @function
+ * @author Mostafa Omar
+ * @summary Add photo to favorites
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @throws 404 Photo not found
+ * @throws 422 Missing photo parameter
+ * @throws 500 Photo is already in favorites
+ */
+exports.addFav = async function (req, res) {
   const photoId = req.body.photo_id;
   const userId = res.locals.userid;
   const photo = await Photo.findById(photoId).exec();
@@ -31,7 +43,19 @@ exports.add_fav = async function (req, res) {
     });
   }
 };
-exports.remove_fav = async function (req, res) {
+/**
+ * A function that lets the user remove a photo from their favorites
+ *
+ * @function
+ * @author Mostafa Omar
+ * @summary Remove photo from favorites
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @throws 404 Photo not found
+ * @throws 422 Missing photo parameter
+ * @throws 500 Photo not in favourites list
+ */
+exports.removeFav = async function (req, res) {
   const photoId = req.params.photoid;
   const photo = await Photo.findById(photoId).exec();
   const userId = res.locals.userid;

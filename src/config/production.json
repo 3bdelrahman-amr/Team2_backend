@@ -1,9 +1,8 @@
-  
 {
-    "JWT_KEY": "DROPOIDSECRETKEY##",
-    "JWT_EXPIRES_IN": "2h",
-    "db": "mongodb+srv://dropoid:1234@cluster0.tqg0o.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
-    "PORT": "3000",
-    "NODE_ENV": "production",
-    "HOST_ADDR":"192.168.1.2"
-  }
+  "JWT_KEY": "DROPOIDSECRETKEY##",
+  "JWT_EXPIRES_IN": "2h",
+  "db": "mongodb+srv://dropoid:1234@cluster0.tqg0o.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
+  "PORT": "3000",
+  "NODE_ENV": "production",
+  "HOST_ADDR":"192.168.1.2"
+}
