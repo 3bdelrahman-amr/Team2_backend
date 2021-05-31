@@ -26,6 +26,15 @@ exports.createGroup = async function (req, res) {
       name: groupName,
       Members: { ref: userId, role: 'admin' },
     });
+    groupInserted = await Group.findOne({
+      name: groupName,
+    }).exec();
+    groupId = groupInserted._id;
+    await User.findByIdAndUpdate(userId, {
+      $addToSet: {
+        Group: groupId,
+      },
+    });
     res.status(200).json({
       message: 'Group created successfully',
     });
