@@ -310,7 +310,7 @@ exports.addPhoto = async function (req, res) {
   const groupId = req.body.group_id;
   const photoId = req.body.photo_id;
   const group = await Group.findById(groupId).exec();
-  const photo = await Photo.findByID(photoId).exec();
+  const photo = await Photo.findById(photoId).exec();
   if (!groupId) {
     res.status(422).json({ message: 'Missing group parameter' });
   } else if (!group || !photo) {
