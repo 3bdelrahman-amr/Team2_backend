@@ -5,7 +5,13 @@ const config = require('config');
 const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 
-const port = "localhost:" + config.get('PORT') + "/";
+var port
+if (config.get('HOST_ADDR') === 'localhost')
+    port = "localhost:" + config.get('PORT') + "/";
+else
+    port = "http://dropoids.me/";
+
+
 var mkdirp = require('mkdirp');
 
 const storage = multer.diskStorage({
@@ -200,12 +206,11 @@ exports.getPhotosExplore = async (req, res) => {
                 var result = photo.toObject();
 
                 //remove unwanted fields from ownerId
-                result.ownerId = (({ _id,Fname, Lname, UserName, Avatar, Email }) => ({ _id, Lname,Fname, UserName, Avatar, Email }))(fav);
+                result.ownerId = (({ _id, Fname, Lname, UserName, Avatar, Email }) => ({ _id, Lname, Fname, UserName, Avatar, Email }))(fav);
 
                 //remove unwanted fields in comments user
-                for(comment of result.comments)
-                {
-                    comment.user = (({ _id,Fname, Lname, UserName, Avatar, Email }) => ({ _id, Lname,Fname, UserName, Avatar, Email }))(comment.user);
+                for (comment of result.comments) {
+                    comment.user = (({ _id, Fname, Lname, UserName, Avatar, Email }) => ({ _id, Lname, Fname, UserName, Avatar, Email }))(comment.user);
                 }
 
                 //remove people tags and __v from the result

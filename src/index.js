@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const app = require('./app');
 const config = require('config');
+const { util } = require('config');
+
 
 let server;
 const db = config.get('db');
@@ -13,8 +15,9 @@ mongoose.connect(db, {
   useUnifiedTopology: true
 }).then(() => {
   server = app.listen(port, () => {
-    console.log(`Listening to port ${port} `);
-
+    console.log(`Listening to port ${port}\n  `);
+    console.log('NODE_ENV=',config.util.getEnv('NODE_ENV'));
+    
   });
 }).catch(err => {
   console.log('Error: ', err);

@@ -187,11 +187,7 @@ const { use } = require('./album.route');
   
   
   
-  router.put("/UpdateUser",(req,res)=>{
-  
-  
-  
-  });
+  router.put("/",auth.authentication,UserController.UpdateUser);
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -287,7 +283,7 @@ const { use } = require('./album.route');
   */
   
   router.post("/",UserController.register,auth.SendVerification );
-  router.get('/:token',UserController.VerifyEmail);
+  router.get('/verify/:token',UserController.VerifyEmail);
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -367,6 +363,23 @@ const { use } = require('./album.route');
       
       
    router.get("/",auth.authentication,UserController.GetUser);
+
+
+   //post new follower to the user
+
+   router.post("/follow",auth.authentication,UserController.PostFollower);
+   //post new follower to the user
+
+   router.delete("/unfollow/:peopleid",auth.authentication,UserController.Unfollow);
+
+   // return list of followers
+   router.get("/followers",auth.authentication,UserController.GetFollowers)
+   // return list of following
+   router.get("/following",auth.authentication,UserController.GetFollowing)
+   // return list of user photos
+   router.get("/photos",auth.authentication,UserController.UserPhotos);
+
+   
   
   /**
       * @swagger
@@ -543,11 +556,7 @@ const { use } = require('./album.route');
       
       
       
-   router.put("/user/avatar",(req,res)=>{
-      
-      
-      
-  });
+   router.put("/user/avatar",auth.authentication,UserController.About);
    /**
       * @swagger
       * /user/about:
@@ -580,11 +589,7 @@ const { use } = require('./album.route');
       
       
       
-   router.get("/user",(req,res)=>{
-      
-      
-      
-  });
+   router.get("/about",auth.authentication,UserController.About);
   
   
   /**

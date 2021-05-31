@@ -1,0 +1,43 @@
+sudo: required
+language: generic
+services:
+- docker
+branches:
+  only:
+  - master
+addons:
+  ssh_known_hosts: 52.170.119.1
+#ssh travis with our server
+before_install:
+- pwd
+- openssl aes-256-cbc -K $encrypted_dfdcfd5172af_key -iv $encrypted_dfdcfd5172af_iv
+  -in deploy_key.enc -out ./deploy_key -d
+- eval "$(ssh-agent -s)"
+- chmod 600 ./deploy_key
+- echo -e "Host $SERVER_IP_ADDRESS\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+- ssh-add ./deploy_key
+# test ssh connection
+- ssh -i ./deploy_key Dev@52.170.119.1 pwd
+
+# Build Docker image for testing:
+- echo Build front and api docker images for testing..
+- docker build -t loaymoh99/api-test -f ./Dockerfile.dev .
+
+script:
+# Run tests with built Docker images:
+- echo Run api tests..
+#- docker run -e CI=true loaymoh99/api-test
+
+
+after_success:
+#Buildng and then pushing the new images to docker hub
+- echo Building the production Docker image..
+- docker build -t loaymoh99/dkr-dropoids-api .
+
+- echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+- echo Pushing the Docker images..
+- docker push loaymoh99/dkr-dropoids-api
+
+#deploying the new containers
+- echo Deploy here..
+- "./deploy.sh"
