@@ -371,97 +371,85 @@ exports.deleteComment = async (req, res) => {
     };
 };
 
-// exports.deletePhoto = async (req, res) => {
-//     const user = await UserModel.findById(res.locals.userid)
-//     .select('Group');
-//     await user.populate('albums').execPopulate();
-//     const albums=user.albums;
+exports.deletePhoto = async (req, res) => {
+    const user = await UserModel.findById(res.locals.userid)
+    .select('Group');
+    await user.populate('albums').execPopulate();
+    const albums=user.albums;
     
-//     let numErrors=0;
-//     let errormsg;
-//     req.body.photos.forEach(async function (photo) {
-//         const { error } = validateId({ id: photo });
-//         if (error) 
-//         {
-//             numErrors++;
-//             errormsg=error.details[0].message
-//         }
-//     })
-//     if (numErrors>0) return res.status(400).send(errormsg);
-//     let photodeleted = await Photo.findById(req.body.photos[0]);
-//     if (!photodeleted) return res.status(404).send({ error: "photo not found" });
-//     if (res.locals.userid != photodeleted.ownerId)
-//         return res.status(403).send('Access denied');
+    let numErrors=0;
+    let errormsg;
+    req.body.photos.forEach(async function (photo) {
+        const { error } = validateId({ id: photo });
+        if (error) 
+        {
+            numErrors++;
+            errormsg=error.details[0].message
+        }
+    })
+    if (numErrors>0) return res.status(400).send(errormsg);
+    let photodeleted = await Photo.findById(req.body.photos[0]);
+    if (!photodeleted) return res.status(404).send({ error: "photo not found" });
+    if (res.locals.userid != photodeleted.ownerId)
+        return res.status(403).send('Access denied');
 
-//     console.log(user.Group);
-//     if(user.Group)
-//     {
-//         user.Group.forEach(async function (group) {
-//             group = await Group.findById(group);
+    console.log(user.Group);
+    if(user.Group)
+    {
+        user.Group.forEach(async function (group) {
+            group = await Group.findById(group);
 
-//             req.body.photos.forEach(async function (photo) {
-//                 group.Photos.remove(photo);
-//             })
-//             await group.save();
-//         })
-//     }
+            req.body.photos.forEach(async function (photo) {
+                group.Photos.remove(photo);
+            })
+            await group.save();
+        })
+    }
 
-//     console.log(albums);    
-//     if(user.albums)
-//     {
-//         user.albums.forEach(async function (album) {
-//             album = await Album.findById(album);
-//             req.body.photos.forEach(async function (photo) {
-//                     album.photos.remove(photo);
-//             })
-//             await album.save();
-//         })
-//     }
+    console.log(albums);    
+    if(user.albums)
+    {
+        user.albums.forEach(async function (album) {
+            album = await Album.findById(album);
+            req.body.photos.forEach(async function (photo) {
+                    album.photos.remove(photo);
+            })
+            await album.save();
+        })
+    }
 
-
-//     await user.save();
+    await user.save();
     
    
-//     try {
-//         req.body.photos.forEach(async function (photo) {
-//             photodeleted = await Photo.findById(photo);
-//             if (!photodeleted) return
-//             else {
-//                 favespoeple = photodeleted.Fav;
+    try {
+        req.body.photos.forEach(async function (photo) {
+            photodeleted = await Photo.findById(photo);
+            if (!photodeleted) return
+            else {
+                favespoeple = photodeleted.Fav;
 
-//                 const users = await UserModel.find({ _id: { $in: favespoeple } })
-//                 .select('Fav');
-//                 if(users)
-//                 {
-//                     users.forEach(async function (user) {
-//                         if(user.Fav)
-//                         {
-//                             user.Fav.remove(photo);
-//                         await user.save();
-//                         }  
-//                     })
-//                 }
+                const users = await UserModel.find({ _id: { $in: favespoeple } })
+                .select('Fav');
+                if(users)
+                {
+                    users.forEach(async function (user) {
+                        if(user.Fav)
+                        {
+                            user.Fav.remove(photo);
+                        await user.save();
+                        }  
+                    })
+                }
                 
-//                 await Photo.findByIdAndRemove(photo);
-//             }
-
-
-//     const photodeleted = await Photo.findById(req.body.photos[0]);
-//     if (!photodeleted)
-//         return res.status(404).send({ error: "photo not found" });
-//     if (res.locals.userid != photodeleted.ownerId)
-//         return res.status(403).send('Access denied');
-
-//     try {
-//         req.body.photos.forEach(async function (photo) {
-//             await Photo.findByIdAndRemove(photo);
-//         })
-//         res.status(201).send('photo deleted successfully');
-//     }
-//     catch (ex) {
-//         console.log(ex.message);
-//     };
-// };
+                await Photo.findByIdAndRemove(photo);
+            }
+        })
+        res.status(201).send('photo deleted successfully');
+    }
+    catch (ex) {
+        console.log(ex.message);
+    };
+};
 
 exports.updatePhoto = async (req, res) => {
     let photoUpdated = await Photo.findById(req.body.photos[0]);
