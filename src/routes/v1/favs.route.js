@@ -61,7 +61,7 @@ const { authentication } = require('../../middlewares/auth');
  *
  */
 router.use((req, res, next) => authentication(req, res, next));
-router.post('/', (req, res) => favsController.add_fav(req, res));
+router.post('/', (req, res) => favsController.addFav(req, res));
 /**
  * @swagger
  * /favs/{photo_id}:
@@ -111,6 +111,6 @@ router.post('/', (req, res) => favsController.add_fav(req, res));
  *
  */
 
-router.delete('/:photoid', (req, res) => favsController.remove_fav(req, res));
+router.delete('/:photoid', (req, res) => favsController.removeFav(req, res));
 
 module.exports = router;

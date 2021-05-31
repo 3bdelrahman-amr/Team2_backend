@@ -42,7 +42,7 @@ router.use((req, res, next) => {
  */
 
 router.post('/', (req, res) => {
-  groupsController.create_group(req, res);
+  groupsController.createGroup(req, res);
 });
 
 /**
@@ -65,12 +65,13 @@ router.post('/', (req, res) => {
  *           application/json:
  *              {
  *                  "_id": "608c80ce54e3d74b34d9bb5a",
- *                  "Photos": [],
- *                  "Members": [],
  *                  "privacy": "public",
  *                  "visibility": "public",
  *                  "name": "ABC",
- *                  "role": "member"
+ *                  "createdAt": "2021-05-30T14:14:40.691Z",
+ *                  "role": "admin",
+ *                  "count_members": 1,
+ *                  "count_photos": 0
  *             }
  *       401:
  *         description: Unauthorized request
@@ -214,7 +215,7 @@ router.get('/photos/:id', (req, res) => {
 /**
  * @swagger
  * /group/{group_id}/join:
- *   get:
+ *   post:
  *     description: Join group
  *     tags: [Group]
  *     parameters:
@@ -253,7 +254,7 @@ router.get('/photos/:id', (req, res) => {
  *
  *
  */
-router.get('/:group_id/join', (req, res) => groupsController.join(req, res));
+router.post('/:group_id/join', (req, res) => groupsController.join(req, res));
 
 /**
  * @swagger
