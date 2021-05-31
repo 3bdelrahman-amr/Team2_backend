@@ -1,24 +1,25 @@
-const User=require('./seeders/User.seeder');
-const Photo=require('./seeders/photos.seeder');
-const mongoose=require('mongoose');
-const config=require('config');
-const db=config.get('db');
+const User = require("./seeders/User.seeder");
+const Photo = require("./seeders/photos.seeder");
+
+const mongoose = require("mongoose");
+const config = require("config");
+const db = config.get("db");
 /**
  * Seeders List
  * order is important
  * @type {Object}
  */
-module.exports.seedersList = {User,Photo};
+module.exports.seedersList = { User, Photo };
 /**
  * Connect to mongodb implementation
  * @return {Promise}
  */
 module.exports.connect = async () =>
-  await mongoose.connect(db,{  
+  await mongoose.connect(db, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useFindAndModify: false,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
   });
 /**
  * Drop/Clear the database implementation
