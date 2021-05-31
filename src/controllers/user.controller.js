@@ -500,7 +500,7 @@ module.exports.Explore = async (req, res) => {
       var comentowner = await Model.UserModel.findById({ _id: user });
       comentowner = comentowner.toObject();
       let commentjs = {};
-      commentjs.comment=photos[i].comments[j].comment;
+      commentjs.comment=photos[i].comments[j]
       commentjs.ownerusername = comentowner.UserName;
       var commentavatarowner = await PhotoModel.Photo.findById({
         _id: comentowner.Avatar,
