@@ -5,8 +5,8 @@ const config = require('config');
 const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 
-var port
-if (config.get('HOST_ADDR') === 'localhost')
+var port;
+if (config.util.getEnv('NODE_ENV') === 'development')
     port = "localhost:" + config.get('PORT') + "/";
 else
     port = "http://dropoids.me/";
@@ -40,6 +40,8 @@ exports.upload = multer({
 
 exports.addPhoto = async (req, res) => {
     const _id = res.locals.userid;
+    if (!req.file)
+        return res.status(400).send({ error: "You must add a file" });
     const photo = new Photo({
         ...req.body,
         ownerId: _id,
@@ -64,49 +66,58 @@ exports.addPhoto = async (req, res) => {
 }
 
 exports.tagPeople = async (req, res) => {
-    const _id = req.params.id; // photo id
-    const { error } = validateId({ id: _id });
-    if (error)
-        return res.status(400).send(error.details[0].message);
-
+    if (!req.body.photos || !req.body.tagged)
+        return res.status(400).send({ error: "Please send photos and tagged" })
+    var photos = [];
     try {
-        var photo = await Photo.findById({ _id, ownerId: res.locals.userid });
-        if (!photo)
-            return res.status(400).send({ error: "photo not found" });
-        //Validate the passed array of Usernames (if these usernames really do exist)
-        if (!req.body.tagged)
-            return res.status(400).send("You must add tagged parameter");
-        const taggedPeople = req.body.tagged; // array of usernames of tagged people
 
-        for (person of taggedPeople) {
-            await UserModel.findOne({ UserName: person }); // if not found it will throw an error
+        for (_id of req.body.photos) {
+            const { error } = validateId({ id: _id });
+            if (error)
+                return res.status(400).send(error.details[0].message);
 
+            const photo = await Photo.findById({ _id, ownerId: res.locals.userid });
+            if (!photo)
+                return res.status(400).send({ error: "photo not found" });
+            //Validate the passed array of Usernames (if these usernames really do exist)
+            if (!req.body.tagged)
+                return res.status(400).send("You must add tagged parameter");
+            const taggedPeople = req.body.tagged; // array of usernames of tagged people
+            const arr = [];
+
+            for (person of taggedPeople) {
+                const find = await UserModel.findOne({ UserName: person }); // if not found it will throw an error
+                if (find)
+                    arr.push(person)
+
+            }
+
+            const photoTags = photo.peopleTags; // array of all the people tags for this photo
+
+            var tag = photoTags.find((tag) => {
+                return tag.tagging == res.locals.userid
+            }) // this user already tagged other people in this photo
+
+            // if the user didn't tag anyone before in this photo
+            if (!tag) {
+                tag = new Tag({
+                    tagging: res.locals.userid,
+                    tagged: arr
+                })
+            }
+            else {
+                const index = photoTags.indexOf(tag);
+                photo.peopleTags.splice(index, 1); // remove the existing tag
+                tag.tagged = tag.tagged.concat(arr) // add on the existing one 
+                tag.tagged = [...(new Set(tag.tagged))]; // remove all duplicated of tagged people
+            }
+            photo.peopleTags.push(tag);
+            await photo.save();
+            photos.push(photo);
         }
-
-        const photoTags = photo.peopleTags; // array of all the people tags for this photo
-
-        var tag = photoTags.find((tag) => {
-            return tag.tagging == res.locals.userid
-        }) // this user already tagged other people in this photo
-
-        // if the user didn't tag anyone before in this photo
-        if (!tag) {
-            tag = new Tag({
-                tagging: res.locals.userid,
-                tagged: taggedPeople
-            })
-        }
-        else {
-            const index = photoTags.indexOf(tag);
-            photo.peopleTags.splice(index, 1); // remove the existing tag
-            tag.tagged = tag.tagged.concat(taggedPeople) // add on the existing one 
-            tag.tagged = [...(new Set(tag.tagged))]; // remove all duplicated of tagged people
-        }
-        photo.peopleTags.push(tag);
-        await photo.save();
-        res.status(200).send(photo);
-
+        res.status(200).send(photos);
     } catch (error) {
+        console.log(error);
         res.status(500).send({ error: "An error has occured whole finding photo, please check the photo id" });
     }
 
@@ -136,8 +147,6 @@ exports.removeTagPeople = async (req, res) => {
             if (tag.tagged.includes(person)) // if the passed tagged person to remove is really tagged
                 tag.tagged = tag.tagged.filter((element) => element != person) // remove it
         }
-
-
 
         const index = photoTags.indexOf(tag);
         photo.peopleTags.splice(index, 1); // remove the existing tag
@@ -192,35 +201,42 @@ exports.getPhotosExplore = async (req, res) => {
         var photos = [];
         const allPhotos = await Photo.find();
         for (photo of allPhotos) {
-            if (photo.Fav.length === 2 && photo.privacy === 'public') {
-                await photo.populate('ownerId comments.user Fav ownerId.Avatar comments.user.Avatar Fav.Avatar ').execPopulate();
+            if (photo.Fav.length > 20 && photo.privacy === 'public') {
+                await photo.populate('ownerId comments.user Fav ownerId.Avatar').execPopulate();
                 var arrNumfollowing = [];
                 var arrNumPhotos = [];
                 var i = 0;
-                for (fav of photo.Fav) {
-                    await fav.populate('photos').execPopulate();
+                for (fav of photo.Fav) //fav is a user (populated)
+                {
+                    await fav.populate('photos Avatar').execPopulate();
                     arrNumfollowing[i] = fav.Following.length;
                     arrNumPhotos[i] = fav.photos.length;
                     i++;
                 }
+                for (comment of photo.comments) {
+                    const user = comment.user;
+                    await user.populate("Avatar").execPopulate();
+                }
                 var result = photo.toObject();
 
                 //remove unwanted fields from ownerId
-                result.ownerId = (({ _id, Fname, Lname, UserName, Avatar, Email }) => ({ _id, Lname, Fname, UserName, Avatar, Email }))(fav);
+                result.ownerId = (({ _id, Fname, Lname, UserName, Avatar, Email }) => ({ _id, Lname, Fname, UserName, Avatar, Email }))(result.ownerId);
+                result.ownerId.Avatar = result.ownerId.Avatar.photoUrl
 
                 //remove unwanted fields in comments user
                 for (comment of result.comments) {
                     comment.user = (({ _id, Fname, Lname, UserName, Avatar, Email }) => ({ _id, Lname, Fname, UserName, Avatar, Email }))(comment.user);
+                    comment.user.Avatar = comment.user.Avatar.photoUrl
                 }
 
                 //remove people tags and __v from the result
                 delete result.peopleTags
                 delete result.__v
-
                 // add numPhotos and numFollowing to Fav
                 i = 0
                 for (fav of result.Fav) {
                     fav = (({ Fname, Lname, UserName, Avatar }) => ({ Fname, Lname, UserName, Avatar }))(fav);
+                    fav.Avatar = fav.Avatar.photoUrl;
                     fav.numPhotos = arrNumPhotos[i];
                     fav.numFollowing = arrNumfollowing[i];
                     result.Fav[i] = { ...fav }
@@ -237,6 +253,8 @@ exports.getPhotosExplore = async (req, res) => {
 }
 
 exports.addTag = async (req, res) => {
+    if(!req.body.photos)
+        return res.status(400).send({error: "Please enter photos"})
     try {
         for (element of req.body.photos) {
             const photo = await Photo.findById({ _id: element });

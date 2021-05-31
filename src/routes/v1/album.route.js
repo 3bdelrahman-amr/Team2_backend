@@ -551,7 +551,7 @@ router.get('/user/:username', authentication, albumController.getAlbumbyUsername
  *      privacy:
  *        example: "private"
  *      ownerId:
- *        $ref: '#/definitions/UserModelAlbum'
+ *          example: "60b222e537838723b02201fd"
  *      tags:
  *        type: array
  *        items:

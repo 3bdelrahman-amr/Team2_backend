@@ -72,7 +72,7 @@ const photoController = require('../../controllers/photo.controller')
  *            }
  */
 
-router.post('/', authentication, photoController.upload.single("photo"), photoController.addPhoto)
+router.post('/', authentication, photoController.upload.single("file"), photoController.addPhoto)
 
 
 
@@ -82,26 +82,30 @@ router.post('/', authentication, photoController.upload.single("photo"), photoCo
 
 /**
  * @swagger
- *  /photo/peopletag/{photo_id}:
+ *  /photo/peopletag:
  *   post:
  *     description: Tag other people in a photo
  *     tags: [Photo]
  *     parameters:
- *       - name: photo_id
- *         in: url
+ *       - name: photos
  *         required: true
- *         description: photo id
- *         type: id
+ *         description: Array of photos to be tagged in
+ *         in: body
+ *         type : string
  *         schema:
  *       - name: tagged
  *         required: true
- *         description: Array of the usernames people that are being tagged
+ *         description: Array of the usernames people that are being removed
  *         in: body
  *         type : string
  *         schema:
  *           type: object
  *           properties:
  *             tagged:
+ *               type: array
+ *               items:
+ *                 example: "60b222e537838723b02201fd" 
+ *             photos:
  *               type: array
  *               items:
  *                 example: "60b222e537838723b02201fd" 
@@ -136,7 +140,7 @@ router.post('/', authentication, photoController.upload.single("photo"), photoCo
  *                }
  */
 
-router.post('/peopletag/:id', authentication, photoController.tagPeople);
+router.post('/peopletag', authentication, photoController.tagPeople);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

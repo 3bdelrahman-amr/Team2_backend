@@ -15,9 +15,9 @@ const createAlbum = async (req, res) => {
 
         if (req.body.photos.length != 0) {
             for (photo_id of req.body.photos) {
-                const photo =  await Photo.findById({ _id: photo_id, ownerId: res.locals.userid });
-                if(!photo)
-                    return res.status(404).send({error: "Photo doesn't exist"});
+                const photo = await Photo.findById({ _id: photo_id, ownerId: res.locals.userid });
+                if (!photo)
+                    return res.status(404).send({ error: "Photo doesn't exist" });
             }
         }
         else {
@@ -25,12 +25,13 @@ const createAlbum = async (req, res) => {
         }
 
         if (req.body.coverPhoto) { // if the cover photo was passed
-            if (req.body.photos.length == 0 || !req.body.photos.includes(coverPhoto)) // and it is not included in the photos array or it is passed and the array of photos is empty
+            if (req.body.photos.length == 0 || !req.body.photos.includes(req.body.coverPhoto)) // and it is not included in the photos array or it is passed and the array of photos is empty
                 throw new Error("cover Photo must be a included in photos array");
         } else { // if the cover photo was not passed
-
+            const setOfPhotos = [...(new Set(req.body.photos))];
             req.body = {
                 ...req.body,
+                photos: setOfPhotos,
                 coverPhoto: req.body.photos[0] // the default cover photo is the first photo in the array
             }
 
@@ -40,7 +41,6 @@ const createAlbum = async (req, res) => {
             ownerId: res.locals.userid
         });
         await album.save();
-        
         res.status(201).send(album);
     } catch (error) {
         console.log(error);
@@ -69,11 +69,14 @@ const updateAlbum = async (req, res) => {
             return res.status(404).send({ error: 'Album not found!' });
         }
         updates.forEach((update) => {
+            if (update == 'coverPhoto' && !album.photos.includes(req.body[update]))
+                throw new Error("cover Photo must be a included in photos array");
             album[update] = req.body[update];
         })
         await album.save();
         res.status(200).send(album);
     } catch (error) {
+        console.log(error);
         res.status(500).send({ error: "An error occured" });
     }
 }
@@ -91,6 +94,7 @@ const deleteAlbum = async (req, res) => {
         res.status(200).send({ message: "Album successfully deleted" });
     }
     catch (error) {
+        console.log(error);
         res.status(500).send({ error: "Internal Server Error" });
     }
 };
@@ -116,8 +120,7 @@ const getUserAlbums = async (req, res) => {
     try {
         await user.populate('albums').execPopulate();
         const albums = user.albums;
-        for(album of albums)
-        {
+        for (album of albums) {
             await album.populate('photos coverPhoto ownerId').execPopulate();
         }
         res.status(200).send(albums);
@@ -134,9 +137,10 @@ const getAlbumbyUsername = async (req, res) => {
         if (!user)
             res.status(404).send({ error: "User is not found" });
 
-        res.locals.userid= user._id;
-        getUserAlbums(req,res);
+        res.locals.userid = user._id;
+        getUserAlbums(req, res);
     } catch (error) {
+        console.log(error);
         res.status(500).send({ error: "Username is not sent correctly" });
     }
 }
@@ -156,7 +160,9 @@ const addPhotoToAlbum = async (req, res) => {
         const photos = req.body.photos;
         for (photo of photos) // make sure that all hte passed photo really exists
         {
-            await Photo.findById({ _id: photo, ownerId: res.locals.userid })
+            const find = await Photo.findById({ _id: photo, ownerId: res.locals.userid })
+            if(!find)
+                throw new Error("Photo not found")
             if (!album.photos.includes(photo)) // if it doesn't already exit in album
             {
                 album.photos.push(photo);
@@ -204,6 +210,7 @@ const removePhotoFromAlbum = async (req, res) => {
 
 
     } catch (error) {
+        console.log(error);
         res.status(500).send({ error: "an error has occured" })
     }
 }
