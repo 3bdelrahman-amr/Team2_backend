@@ -12,7 +12,6 @@ module.exports.isMember = async (req, res, next) => {
     return res
       .status(422)
       .json({ message: 'User is not a member of the group.' });
-  } else {
-    next();
   }
+  next();
 };
