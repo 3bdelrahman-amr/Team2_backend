@@ -10,8 +10,6 @@ COPY . .
 
 EXPOSE 4000
 
-VOLUME [ "/src/photos" ]
-
 RUN npm run seeds
 # Default command for start-prod build
 CMD ["npm", "run", "start-prod"]
