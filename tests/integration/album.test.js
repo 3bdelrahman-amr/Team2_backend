@@ -9,6 +9,7 @@ const config = require('config');
 const { response } = require('../../src/app');
 
 const user = {
+    _id: "608834536de13632903701b7",
     Email: 'Moustafa.Achraf@hotmail.com',
     UserName: 'test',
     Fname: 'test',
@@ -39,6 +40,7 @@ const album2 = {
 }
 
 const photo = {
+    _id: "608834536de13632903701b7",
     title: 'test',
     photoUrl: 'test',
     description: 'test',
@@ -69,18 +71,11 @@ describe('Should create a new album', function () {
 
     test("Should create album successfully", async () => {
         const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwYjE5MDJiNTM3NmU1MDExYzI2ZWI4MiIsImlhdCI6MTYyMjI5MDAwMywiZXhwIjoxNjIyMzc2NDAzfQ.Dslk9nUs3xMTbvSDNCDCk2PcXa9uk0U1BnP-c-sDI4A"; // the token that shall be used in authentication
-        const image  = await Photo.find(photo);
-        const photo_id = image[0]._id
-        console.log("The image")
-        console.log(image);
-        console.log("The photo id")
-        console.log(photo_id)
         const body = {
-            photos: photo_id,
+            photos: photo._id,
             title: 'album',
             description: 'Nature'
         }
-        console.log(body)
         const response = await request(app)
             .post(baseUrl + '/album')
             .set({ token: token })
