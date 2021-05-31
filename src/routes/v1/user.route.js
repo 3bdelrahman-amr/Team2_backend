@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const UserController=require("../../controllers/user.controller");
 const auth=require("../../middlewares/auth");
-const { use } = require('./album.route');
+const { use, route } = require('./album.route');
 //schemas
 /**
  * @swagger
@@ -378,6 +378,10 @@ const { use } = require('./album.route');
    router.get("/following",auth.authentication,UserController.GetFollowing)
    // return list of user photos
    router.get("/photos",auth.authentication,UserController.UserPhotos);
+   //check if user
+   router.get("/check/:peopleid",auth.authentication,auth.IfUser);
+   //explore/android
+   router.get("/explore",auth.authentication,UserController.Explore);
 
    
   
