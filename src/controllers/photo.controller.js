@@ -203,8 +203,9 @@ exports.getPhotosExplore = async (req, res) => {
         var photos = [];
         const allPhotos = await Photo.find();
         for (photo of allPhotos) {
-            if (photo.Fav.length > 20 && photo.privacy === 'public') {
-                await photo.populate('ownerId comments.user Fav ownerId.Avatar').execPopulate();
+            if (photo.privacy === 'public') {
+                await photo.populate('ownerId comments.user Fav').execPopulate();
+                await photo.populate('ownerId.Avatar').execPopulate();
                 var arrNumfollowing = [];
                 var arrNumPhotos = [];
                 var i = 0;
@@ -220,7 +221,6 @@ exports.getPhotosExplore = async (req, res) => {
                     await user.populate("Avatar").execPopulate();
                 }
                 var result = photo.toObject();
-
                 //remove unwanted fields from ownerId
                 result.ownerId = (({ _id, Fname, Lname, UserName, Avatar, Email }) => ({ _id, Lname, Fname, UserName, Avatar, Email }))(result.ownerId);
                 result.ownerId.Avatar = result.ownerId.Avatar.photoUrl
@@ -255,8 +255,8 @@ exports.getPhotosExplore = async (req, res) => {
 }
 
 exports.addTag = async (req, res) => {
-    if(!req.body.photos)
-        return res.status(400).send({error: "Please enter photos"})
+    if (!req.body.photos)
+        return res.status(400).send({ error: "Please enter photos" })
     try {
         for (element of req.body.photos) {
             const photo = await Photo.findById({ _id: element });
@@ -376,7 +376,7 @@ exports.deleteComment = async (req, res) => {
 //     .select('Group');
 //     await user.populate('albums').execPopulate();
 //     const albums=user.albums;
-    
+
 //     let numErrors=0;
 //     let errormsg;
 //     req.body.photos.forEach(async function (photo) {
@@ -420,8 +420,8 @@ exports.deleteComment = async (req, res) => {
 
 
 //     await user.save();
-    
-   
+
+
 //     try {
 //         req.body.photos.forEach(async function (photo) {
 //             photodeleted = await Photo.findById(photo);
@@ -441,7 +441,7 @@ exports.deleteComment = async (req, res) => {
 //                         }  
 //                     })
 //                 }
-                
+
 //                 await Photo.findByIdAndRemove(photo);
 //             }
 
@@ -504,7 +504,7 @@ module.exports.GetPhototitle = async (req, res) => {
 
 
 
-   
+
     const allPhotos = await Photo.find({});
 
     for (photo of allPhotos) {
