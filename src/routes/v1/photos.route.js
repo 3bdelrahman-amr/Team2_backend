@@ -45,7 +45,7 @@ const photoController = require('../../controllers/photo.controller')
  *       200:
  *         description: photo added successfully
  *         schema:
- *           $ref: "#definitions/Photo"
+ *           $ref: "#definitions/Photoo"
  *       403:
  *         description: Unauthorized
  *         examples:
@@ -109,7 +109,7 @@ router.post('/', authentication, photoController.upload.single("photo"), photoCo
  *           200:
  *             description: Tag added successfully
  *             schema:
- *               $ref: "#definitions/Photo"
+ *               $ref: "#definitions/Photoo"
  *           403:
  *             description: Unauthorized
  *             examples:
@@ -171,7 +171,7 @@ router.post('/peopletag/:id', authentication, photoController.tagPeople);
  *           200:
  *             description: Tag removed successfully
  *             schema:
- *               $ref: "#definitions/Photo"
+ *               $ref: "#definitions/Photoo"
  *           403:
  *             description: Unauthorized
  *             examples:
@@ -257,7 +257,7 @@ router.get('/', authentication, photoController.getUserPhotos)
  *         schema:
  *            type: array
  *            items:
- *             $ref: "#definitions/Photo"
+ *             $ref: "#definitions/Photoo"
  *       403:
  *         description: Unauthorized
  *         examples:
@@ -301,7 +301,7 @@ router.get('/', authentication, photoController.getUserPhotos)
  *         schema:
  *            type: array
  *            items:
- *             $ref: "#defintions/Photo"
+ *             $ref: "#responses/explore"
  *       403:
  *         description: Unauthorized
  *         examples:
@@ -872,7 +872,7 @@ router.get('/:title',authentication,photoController.GetPhototitle)
  *         schema:
  *           type: array
  *           items:
- *             $ref: '#/definitions/Photo'
+ *             $ref: '#/definitions/Photoo'
  *       404:
  *         description: Not found
  *         examples:
@@ -889,94 +889,160 @@ router.get('/:title',authentication,photoController.GetPhototitle)
  *            {
  *                     "message": "Unauthorized",
  *            }
- *
  */
 
 /**
  * @swagger
- *Photo:
- *    type: object
- *    properties:
- *      _id:
- *        example: "60b222e537838723b02201fd"
- *      title:
- *        example: "photo1"
- *      description:
- *        example: "my photo"
- *      photoUrl:
- *        example: "localhost:3000/photos\\2021-05-29T11-17-57.298ZFCFS.PNG"
- *      Fav:
- *        type: array
- *        items:
+ * definitions:
+ *   Photoo:
+ *      type: object
+ *      properties:
+ *        _id:
  *          example: "60b222e537838723b02201fd"
- *      privacy:
- *        example: "private"
- *      ownerId:
- *        example: "60b222e537838723b02201fd"
- *      tags:
- *        type: array
- *        items:
- *          example: "Nature"
- *      peopleTags:
- *        type: array
- *        items:
- *          $ref: '#/definitions/peopleTag'
- *      comments:
- *        type: array
- *        items:
- *          $ref: '#/definitions/Comment'
- *      createdAt: 
- *        example: "2021-05-29T11:17:57.326Z"
- *      updatedAt:
- *        example: "2021-05-29T11:17:57.326Z"
- * 
- *peopleTag:
- *    type: object
- *    properties:
- *      tagging:
- *        example: "60b29b3c13791c05a09afd5e"
- *      tagged:
- *        type: array
- *        items:
- *          example: "60b222e537838723b02201fd"  
- *      createdAt: 
- *        example: "2021-05-29T11:17:57.326Z"
- *      updatedAt:
- *        example: "2021-05-29T11:17:57.326Z"
- * 
- *Comment:
- *    type: object
- *    properties:
- *      comment:
- *        example: "this is a comment"
- *      user:
- *        example: "60b222e537838723b02201fd"
- *      createdAt: 
- *        example: "2021-05-29T11:17:57.326Z"
- *      updatedAt:
- *        example: "2021-05-29T11:17:57.326Z"
- * 
+ *        title:
+ *          example: "photo1"
+ *        description:
+ *          example: "my photo"
+ *        photoUrl:
+ *          example: "localhost:3000/photos\\2021-05-29T11-17-57.298ZFCFS.PNG"
+ *        Fav:
+ *          type: array
+ *          items:
+ *            example: "609dd9ac9a52002aa498befe"
+ *        privacy:
+ *          example: "public"
+ *        ownerId:
+ *          example: "609dd9ac9a52002aa498befe"
+ *        tags:
+ *          type: array
+ *          items:
+ *            example: "Nature"
+ *        peopleTags:
+ *          type: array
+ *          items:
+ *            $ref: '#/definitions/peopleTagPhoto'
+ *        comments:
+ *          type: array
+ *          items:
+ *            $ref: '#/definitions/CommentPhoto'
+ *        createdAt: 
+ *          example: "2021-05-29T11:17:57.326Z"
+ *        updatedAt:
+ *          example: "2021-05-29T11:17:57.326Z"
+ *   peopleTagPhoto:
+ *      type: object
+ *      properties:
+ *        tagging:
+ *          example: "60b29b3c13791c05a09afd5e"
+ *        tagged:
+ *          type: array
+ *          items:
+ *            example: "60b222e537838723b02201fd"  
+ *        createdAt: 
+ *          example: "2021-05-29T11:17:57.326Z"
+ *        updatedAt:
+ *          example: "2021-05-29T11:17:57.326Z"
+ *   UserModelPhoto:
+ *      type: object
+ *      properties:
+ *        _id:
+ *          example: "609dd9ac9a52002aa498befe"
+ *        Fname:
+ *          example: "Mostafa"
+ *        Lname:
+ *          example: "Ashraf"
+ *        UserName:
+ *          example: "Mostafa123"
+ *        Email:
+ *          example: "test@test.com"
+ *        Avatar:
+ *          example: "localhost:3000/photos\\2021-05-29T11-17-57.298ZFCFS.PNG" 
+ *   CommentPhoto:
+ *      type: object
+ *      properties:
+ *        comment:
+ *          example: "this is a comment"
+ *        user:
+ *          example: "60b222e537838723b02201fd"
+ *        createdAt: 
+ *          example: "2021-05-29T11:17:57.326Z"
+ *        updatedAt:
+ *          example: "2021-05-29T11:17:57.326Z"
+ *   CommentExplore:
+ *      type: object
+ *      properties:
+ *        comment:
+ *          example: "this is a comment"
+ *        user:
+ *          $ref: '#/definitions/UserModelPhoto'
+ *        createdAt: 
+ *          example: "2021-05-29T11:17:57.326Z"
+ *        updatedAt:
+ *          example: "2021-05-29T11:17:57.326Z"
  */
 
 /**
  * @swagger
  * responses:
  *   addPhoto:
- *    type: object
- *    properties:
- *      title:
- *        example: "photo1"
- *      description:
- *        example: "my photo"
- *      file:
- *        example: "Forest.PNG"
- *      privacy:
- *        example: "private"
- *      tags:
- *        type: array
- *        items:
- *          example: "Nature"
- *  
+ *     type: object
+ *     properties:
+ *       title:
+ *         example: "photo1"
+ *       description:
+ *         example: "my photo"
+ *       file:
+ *         example: "Forest.PNG"
+ *       privacy:
+ *         example: "public"
+ *       tags:
+ *         type: array
+ *         items:
+ *           example: "Nature"
+ *   explore:
+ *     type: object
+ *     properties:
+ *       _id:
+ *         example: "60b222e537838723b02201fd"
+ *       title:
+ *         example: "photo1"
+ *       description:
+ *         example: "my photo"
+ *       photoUrl:
+ *         example: "localhost:3000/photos\\2021-05-29T11-17-57.298ZFCFS.PNG"
+ *       Fav:
+ *         type: array
+ *         items:
+ *           type: object
+ *           properties:
+ *             numPhotos:
+ *               example: 5
+ *             numFollowing:
+ *               example: 5
+ *             Fname:
+ *               example: "Mostafa"
+ *             Lname:
+ *               example: "Ashraf"
+ *             UserName:
+ *               example: "Mostafa123"
+ *             Avatar:
+ *               example: "localhost:3000/photos\\2021-05-29T11-17-57.298ZFCFS.PNG"
+ *       privacy:
+ *         example: "public"
+ *       ownerId:
+ *         $ref: '#/definitions/UserModelPhoto'
+ *       tags:
+ *         type: array
+ *         items:
+ *           example: "Nature"
+ *       comments:
+ *         type: array
+ *         items:
+ *           $ref: '#/definitions/CommentExplore'
+ *       createdAt: 
+ *         example: "2021-05-29T11:17:57.326Z"
+ *       updatedAt:
+ *         example: "2021-05-29T11:17:57.326Z"    
  */
 
 module.exports = router

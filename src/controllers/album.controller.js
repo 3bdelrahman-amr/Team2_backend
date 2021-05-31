@@ -40,13 +40,10 @@ const createAlbum = async (req, res) => {
             ownerId: res.locals.userid
         });
         await album.save();
-        //The following lines to modify the properties in the response object to match the documentation
-        const albumObject = album.toObject()
-        delete albumObject.ownerId;
-        delete albumObject.updatedAt;
-        delete albumObject.__v;
-        res.status(201).send(albumObject);
+        
+        res.status(201).send(album);
     } catch (error) {
+        console.log(error);
         res.status(500).send({ error: "Internal Server error" })
     }
 };
@@ -107,12 +104,8 @@ const getAlbumbyId = async (req, res) => {
         const album = await Album.findById({ _id, ownerId: res.locals.userid });
         if (!album)
             return res.status(404).send({ error: "Album not found" });
-        await album.populate('photos').execPopulate();
-        await album.populate('coverPhoto').execPopulate();
-        const albumObject = album.toObject();
-        delete albumObject.ownerId;
-        delete albumObject.__v;
-        res.status(200).send(albumObject);
+        await album.populate('photos coverPhoto ownerId').execPopulate();
+        res.status(200).send(album);
     } catch (error) {
         res.status(500).send({ error: "Album id not sent" });
     }
@@ -122,11 +115,10 @@ const getUserAlbums = async (req, res) => {
     const user = await UserModel.findById(res.locals.userid);
     try {
         await user.populate('albums').execPopulate();
-        console.log(user);
         const albums = user.albums;
         for(album of albums)
         {
-            await album.populate('photos').execPopulate();
+            await album.populate('photos coverPhoto ownerId').execPopulate();
         }
         res.status(200).send(albums);
 
@@ -142,16 +134,8 @@ const getAlbumbyUsername = async (req, res) => {
         if (!user)
             res.status(404).send({ error: "User is not found" });
 
-        await user.populate('albums').execPopulate();
-        const albums = user.albums;
-        var albumsObj = [];
-        Array.prototype.forEach.call(albums, (album) => {
-            const albumObj = album.toObject();
-            delete albumObj.ownerId
-            delete albumObj.__v
-            albumsObj.push(albumObj);
-        })
-        res.status(200).send(albumsObj);
+        res.locals.userid= user._id;
+        getUserAlbums(req,res);
     } catch (error) {
         res.status(500).send({ error: "Username is not sent correctly" });
     }

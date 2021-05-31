@@ -526,14 +526,14 @@ router.get('/user/:username', authentication, albumController.getAlbumbyUsername
  *      photos:
  *        type: array
  *        items:
- *          $ref: '#/definitions/Photo'
+ *          $ref: '#/definitions/PhotoAlbum'
  *      coverPhoto:
- *        $ref: '#/definitions/Photo'
+ *        $ref: '#/definitions/PhotoAlbum'
  *      createdAt: 
  *        example: "2021-05-29T11:17:57.326Z"
  *      updatedAt:
  *        example: "2021-05-29T11:17:57.326Z"
- *  Photo:
+ *  PhotoAlbum:
  *    type: object
  *    properties:
  *      _id:
@@ -551,7 +551,7 @@ router.get('/user/:username', authentication, albumController.getAlbumbyUsername
  *      privacy:
  *        example: "private"
  *      ownerId:
- *        example: "60b222e537838723b02201fd"
+ *        $ref: '#/definitions/UserModelAlbum'
  *      tags:
  *        type: array
  *        items:
@@ -559,17 +559,17 @@ router.get('/user/:username', authentication, albumController.getAlbumbyUsername
  *      peopleTags:
  *        type: array
  *        items:
- *          $ref: '#/definitions/peopleTag'
+ *          $ref: '#/definitions/peopleTagAlbum'
  *      comments:
  *        type: array
  *        items:
- *          $ref: '#/definitions/Comment'
+ *          $ref: '#/definitions/CommentAlbum'
  *      createdAt: 
  *        example: "2021-05-29T11:17:57.326Z"
  *      updatedAt:
  *        example: "2021-05-29T11:17:57.326Z"
  * 
- *  peopleTag:
+ *  peopleTagAlbum:
  *    type: object
  *    properties:
  *      tagging:
@@ -583,7 +583,7 @@ router.get('/user/:username', authentication, albumController.getAlbumbyUsername
  *      updatedAt:
  *        example: "2021-05-29T11:17:57.326Z"
  * 
- *  Comment:
+ *  CommentAlbum:
  *    type: object
  *    properties:
  *      comment:
@@ -594,8 +594,21 @@ router.get('/user/:username', authentication, albumController.getAlbumbyUsername
  *        example: "2021-05-29T11:17:57.326Z"
  *      updatedAt:
  *        example: "2021-05-29T11:17:57.326Z"
- * 
- *      
+ *  UserModelAlbum:
+ *    type: object
+ *    properties:
+ *      _id:
+ *        example: "609dd9ac9a52002aa498befe"
+ *      Fname:
+ *        example: "Mostafa"
+ *      Lname:
+ *        example: "Ashraf"
+ *      UserName:
+ *        example: "Mostafa123"
+ *      Email:
+ *        example: "test@test.com"
+ *      Avatar:
+ *        example: "609dd9ac9a52002aa498befe"   
  */
 /**
  * @swagger
@@ -622,7 +635,26 @@ router.get('/user/:username', authentication, albumController.getAlbumbyUsername
  *      coverPhoto:
  *        example: "60b222e537838723b02201fd"
  *  getAlbumByID: 
- *      $ref: '#/definitions/Album'
+ *    type: object
+ *    properties:
+ *      _id:
+ *        example: "60b222e537838723b02201fd"
+ *      title:
+ *        example: "Album1"
+ *      description:
+ *        example: "my album"
+ *      ownerId:
+ *        $ref: '#/definitions/UserModelAlbum'
+ *      photos:
+ *        type: array
+ *        items:
+ *          $ref: '#/definitions/PhotoAlbum'
+ *      coverPhoto:
+ *        $ref: '#/definitions/PhotoAlbum'
+ *      createdAt: 
+ *        example: "2021-05-29T11:17:57.326Z"
+ *      updatedAt:
+ *        example: "2021-05-29T11:17:57.326Z"
  *  CreateAlbumRequest:
  *    type: object
  *    properties:
