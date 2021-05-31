@@ -215,7 +215,7 @@ router.get('/photos/:id', (req, res) => {
 /**
  * @swagger
  * /group/{group_id}/join:
- *   get:
+ *   post:
  *     description: Join group
  *     tags: [Group]
  *     parameters:
@@ -254,7 +254,7 @@ router.get('/photos/:id', (req, res) => {
  *
  *
  */
-router.get('/:group_id/join', (req, res) => groupsController.join(req, res));
+router.post('/:group_id/join', (req, res) => groupsController.join(req, res));
 
 /**
  * @swagger
