@@ -2,7 +2,6 @@
 const { UserModel,validateId } = require('../models/user.model');
 const photo =require('../models/photo.model');
 const mongoose = require('mongoose');
-const { use } = require('../routes/v1/people.route');
 exports.getFollowing=async (req, res) => {
     const { error } = validateId({id:req.params.userId});
 
@@ -73,25 +72,30 @@ exports.getfaves = async (req, res) => {
 }
 
 
-module.exports.GetPeopleByUserName_ID_Email= async(req,res)=>{
+module.exports.GetPeopleByUserName_ID_Email = async(req,res)=>{
     
     if(!mongoose.Types.ObjectId.isValid(req.params.title))
     {
-        let user = await UserModel.find({UserName:req.params.title},{Password:0,isActive : 0});
+        let user = await UserModel.findOne({UserName:req.params.title},{Password:0,isActive : 0});
         
-        if(user.length==0)
+        if(!user)
         {
-            user = await UserModel.find({Email:req.params.title},{Password:0,isActive : 0});
+            user = await  UserModel.findOne({Email:req.params.title},{Password:0,isActive : 0});
         }
-
+  
         if(!user) return res.status(404).send({message:'user not found'});
-
+  
         try {
-            const avatarurl = await photo.Photo.findById(user[0].Avatar);
-            const backgroundurl = await photo.Photo.findById(user[0].BackGround);
-            user[0].BackGround = backgroundurl.photoUrl;
-            user[0].Avatar = avatarurl.photoUrl;
-            res.status(200).send(user[0]);
+            let USER = user.toObject();
+            const avatarurl = await photo.Photo.findById(user.Avatar);
+            const backgroundurl = await photo.Photo.findById(user.BackGround);
+            USER.BackGround = backgroundurl.photoUrl;
+            USER.Avatar = avatarurl.photoUrl;
+            USER.Follow = false;
+            const loginuser = await  UserModel.findById(res.locals.userid);
+            if(loginuser.Following.includes(USER._id))
+                USER.Follow = true;
+            res.status(200).send(USER);
         } catch (error) {
             console.log(error);
             return res.status(500).send({message:'internal server error'});
@@ -101,13 +105,21 @@ module.exports.GetPeopleByUserName_ID_Email= async(req,res)=>{
     {
         const userByid = await UserModel.findById({_id:req.params.title},{Password:0,isActive : 0});
         if(!userByid) return res.status(404).send({message:'user not found'});
-
+  
         try {
-            const avatarurl = await photo.Photo.findById(userByid[0].Avatar);
-            const backgroundurl = await photo.Photo.findById(userByid[0].BackGround);
-            userByid[0].BackGround = backgroundurl.photoUrl;
-            userByid[0].Avatar = avatarurl.photoUrl;
-            res.status(200).send(userByid[0]);
+  
+            let USER = userByid.toObject();
+            const avatarurl = await photo.Photo.findById(userByid.Avatar);
+            const backgroundurl = await photo.Photo.findById(userByid.BackGround);
+            USER.BackGround = backgroundurl.photoUrl;
+            USER.Avatar = avatarurl.photoUrl;
+  
+            
+            USER.Follow = false;
+            const loginuser = await UserModel.findById(res.locals.userid);
+            if(loginuser.Following.includes(USER._id))
+                USER.Follow = true;
+            res.status(200).send(USER);
         } catch (error) {
             console.log(error);
             return res.status(500).send({message:'internal server error'});
