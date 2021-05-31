@@ -57,7 +57,7 @@ describe('Favs Controller Add fav', () => {
   });
   describe('Add to Favs with no photoId', () => {
     it('Should Fail when req contains no photoId', async () => {
-      await favController.add_fav(req, res);
+      await favController.addFav(req, res);
       expect(res.statusCode).toBe(422);
       expect(res.response.message).toBe('Missing photo parameter');
     });
@@ -65,7 +65,7 @@ describe('Favs Controller Add fav', () => {
   describe('Add to Favs with photo that doesnt exist', () => {
     it('Should Fail when req contains an incorrect photoId', async () => {
       req.body.photo_id = '608834536de13632903701b9';
-      await favController.add_fav(req, res);
+      await favController.addFav(req, res);
       expect(res.statusCode).toBe(404);
       expect(res.response.message).toBe('Photo not found');
     });
@@ -73,7 +73,7 @@ describe('Favs Controller Add fav', () => {
   describe('Add to Favs successful request', () => {
     it('Should succeed', async () => {
       req.body.photo_id = '608834536de13632903701b7';
-      await favController.add_fav(req, res);
+      await favController.addFav(req, res);
       expect(res.statusCode).toBe(200);
       expect(res.response.message).toBe(
         'Photo added to favourites list successfully'
@@ -83,8 +83,8 @@ describe('Favs Controller Add fav', () => {
   describe('Add photo to favourites which is already in favourites', () => {
     it('Should fail with error 500', async () => {
       req.body.photo_id = '608834536de13632903701b7';
-      await favController.add_fav(req, res);
-      await favController.add_fav(req, res);
+      await favController.addFav(req, res);
+      await favController.addFav(req, res);
       expect(res.statusCode).toBe(500);
       expect(res.response.message).toBe('Photo is already in favorites');
     });
@@ -157,7 +157,7 @@ describe('Favs Controller Remove Fav', () => {
   });
   describe('Remove from favs no photoId', () => {
     it('Should Fail when req contains no photoId', async () => {
-      await favController.remove_fav(req, res);
+      await favController.removeFav(req, res);
       expect(res.statusCode).toBe(422);
       expect(res.response.message).toBe('Missing photo parameter');
     });
@@ -165,7 +165,7 @@ describe('Favs Controller Remove Fav', () => {
   describe('Remove from Favs with photo that doesnt exist', () => {
     it('Should Fail when req contains an incorrect photoId', async () => {
       req.params.photoid = '608834536de13632903701b9';
-      await favController.remove_fav(req, res);
+      await favController.removeFav(req, res);
       expect(res.statusCode).toBe(404);
       expect(res.response.message).toBe('Photo not found');
     });
@@ -173,7 +173,7 @@ describe('Favs Controller Remove Fav', () => {
   describe('Remove photo that is not on favs list', () => {
     it('Should fail as photo is not favourite', async () => {
       req.params.photoid = '608834536de13632903701b5';
-      await favController.remove_fav(req, res);
+      await favController.removeFav(req, res);
       expect(res.statusCode).toBe(500);
       expect(res.response.message).toBe('Photo not in favourites list');
     });
@@ -181,7 +181,7 @@ describe('Favs Controller Remove Fav', () => {
   describe('Remove photo Successfully', () => {
     it('Should successfully remove photo', async () => {
       req.params.photoid = '608834536de13632903701b7';
-      await favController.remove_fav(req, res);
+      await favController.removeFav(req, res);
       expect(res.statusCode).toBe(200);
       expect(res.response.message).toBe(
         'Photo deleted from favourites list and removed from likes'
