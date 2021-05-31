@@ -132,10 +132,7 @@ router.get('/:group_id', (req, res) => {
  *             }
  *
  */
-router.post('/photo', (req, res, next) => {
-  isMember(req, res, next);
-  groupsController.addPhoto(req, res);
-});
+router.post('/photo', isMember, groupsController.addPhoto);
 /**
 * @swagger
 * /group/members/{group_id}:
