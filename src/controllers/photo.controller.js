@@ -1,6 +1,8 @@
 const { Photo, Comment, Tag, validatePhoto, validateComment, validateId } = require('../models/photo.model')
 const multer = require('multer');
 const { UserModel } = require('../models/user.model');
+const { Group } = require('../models/groups.model');
+const { Album } = require('../models/album.model');
 const config = require('config');
 const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
@@ -370,7 +372,78 @@ exports.deleteComment = async (req, res) => {
 };
 
 exports.deletePhoto = async (req, res) => {
+    const user = await UserModel.findById(res.locals.userid)
+    .select('Group');
+    await user.populate('albums').execPopulate();
+    const albums=user.albums;
+    
+    let numErrors=0;
+    let errormsg;
+    req.body.photos.forEach(async function (photo) {
+        const { error } = validateId({ id: photo });
+        if (error) 
+        {
+            numErrors++;
+            errormsg=error.details[0].message
+        }
+    })
+    if (numErrors>0) return res.status(400).send(errormsg);
+    let photodeleted = await Photo.findById(req.body.photos[0]);
+    if (!photodeleted) return res.status(404).send({ error: "photo not found" });
+    if (res.locals.userid != photodeleted.ownerId)
+        return res.status(403).send('Access denied');
 
+    console.log(user.Group);
+    if(user.Group)
+    {
+        user.Group.forEach(async function (group) {
+            group = await Group.findById(group);
+
+            req.body.photos.forEach(async function (photo) {
+                group.Photos.remove(photo);
+            })
+            await group.save();
+        })
+    }
+
+    console.log(albums);    
+    if(user.albums)
+    {
+        user.albums.forEach(async function (album) {
+            album = await Album.findById(album);
+            req.body.photos.forEach(async function (photo) {
+                    album.photos.remove(photo);
+            })
+            await album.save();
+        })
+    }
+
+
+    await user.save();
+    
+   
+    try {
+        req.body.photos.forEach(async function (photo) {
+            photodeleted = await Photo.findById(photo);
+            if (!photodeleted) return
+            else {
+                favespoeple = photodeleted.Fav;
+
+                const users = await UserModel.find({ _id: { $in: favespoeple } })
+                .select('Fav');
+                if(users)
+                {
+                    users.forEach(async function (user) {
+                        if(user.Fav)
+                        {
+                            user.Fav.remove(photo);
+                        await user.save();
+                        }  
+                    })
+                }
+                
+                await Photo.findByIdAndRemove(photo);
+            }
 
 
     const photodeleted = await Photo.findById(req.body.photos[0]);
@@ -426,22 +499,61 @@ module.exports.GetPhototitle = async (req, res) => {
     const { error } = schema.validate(req.params);
     if (error) return res.status(400).send({ message: error.details[0].message });
 
-    const photos = await Photo.find({ title: req.params.title, privacy: 'public' })
 
+    const photos = await Photo.find({ title: req.params.title, privacy: 'public' });
+
+
+
+   
     const allPhotos = await Photo.find({});
-    console.log(req.params.title);
 
     for (photo of allPhotos) {
-        console.log(photo.tags);
+
         if (photo.tags.includes(req.params.title) && !photos.includes(photo))
             photos.push(photo)
     }
+
+    let photoindex;
+    const all_photos = new Array();
+    for (var ii = 0; ii < photos.length; ii++) {
+        photoindex = photos[ii];
+        const user = await UserModel.findById(photos[ii].ownerId);
+
+        var image = photoindex.toObject();
+        image.no_comments = photoindex.comments.length;
+        image.no_fav = photoindex.Fav.length;
+        image.UserName = user.UserName;
+        all_photos.push(image);
+    }
+
     try {
-        if (photos.length == 0) {
-            return res.status(404).send({ message: "Image not found" });
+        if (all_photos.length == 0) {
+            return res.status(404).send({ message: "Images not found" });
         }
-        res.status(200).send(photos);
+        res.status(200).send(all_photos);
     } catch (error) {
         res.status(500).send({ message: "internal server error" });
     }
 }
+
+module.exports.GetPhoto = async (req, res) => {
+    if (!mongoose.Types.ObjectId.isValid(req.params.photo_id))
+        return res.status(404).send({ message: 'Invalid Photo ID' });
+
+    const photo = await Photo.findById(req.params.photo_id);
+
+    if (!photo)
+        return res.status(404).send({ message: 'Photo not found' });
+
+    if (photo.privacy == 'private' && res.locals.userid != photo.ownerId) {
+        return res.status(401).send({ message: 'Unauthorized request' });
+    }
+
+    try {
+        res.status(200).send(photo);
+
+    } catch (ex) {
+        console.log(ex);
+        res.status(500).send({ message: "internal server error" });
+    }
+};

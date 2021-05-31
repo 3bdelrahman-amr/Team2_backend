@@ -138,6 +138,9 @@ router.get('/findByUsername/:username', authentication,async (req, res) => {
  *
  */
 
+
+router.get('/:title',authentication, peopleController.GetPeopleByUserName_ID_Email);
+
 router.get('/people', (req, res) => {
     console.log(req.body.name)
 })
@@ -173,6 +176,7 @@ router.get('/people', (req, res) => {
  */
 
  router.get('/search/:string',authentication, peopleController.searchUsers)
+
 
 /**
  * @swagger

@@ -829,12 +829,9 @@ router.delete('/tag/:id', authentication, photoController.removeTag)
  *     responses:
  *       200:
  *         description: Success
- *         examples:
- *          application/json:
- *
- *            {
- *                     "message": "Success",
- *            }
+ *         schema:
+ *           items:
+ *             $ref: '#/definitions/Photo'
  *       404:
  *         description: Not found
  *         examples:
@@ -854,11 +851,10 @@ router.delete('/tag/:id', authentication, photoController.removeTag)
  *
  */
 
-router.get('/:title',authentication,photoController.GetPhototitle)
-
+router.get('/:photo_id',authentication,photoController.GetPhoto);
 /**
  * @swagger
- * /photo/{title}:
+ * /photo/getbytitle/{title}:
  *   get:
  *     description: get a photo by title
  *     tags: [Photo]
@@ -895,6 +891,7 @@ router.get('/:title',authentication,photoController.GetPhototitle)
  *            }
  */
 
+ router.get('/getbytitle/:title',authentication,photoController.GetPhototitle)
 /**
  * @swagger
  * definitions:
