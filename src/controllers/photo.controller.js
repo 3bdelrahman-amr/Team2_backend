@@ -203,8 +203,9 @@ exports.getPhotosExplore = async (req, res) => {
         var photos = [];
         const allPhotos = await Photo.find();
         for (photo of allPhotos) {
-            if (photo.Fav.length > 20 && photo.privacy === 'public') {
-                await photo.populate('ownerId comments.user Fav ownerId.Avatar').execPopulate();
+            if (photo.privacy === 'public') {
+                await photo.populate('ownerId comments.user Fav').execPopulate();
+                await photo.populate('ownerId.Avatar').execPopulate();
                 var arrNumfollowing = [];
                 var arrNumPhotos = [];
                 var i = 0;
@@ -220,7 +221,6 @@ exports.getPhotosExplore = async (req, res) => {
                     await user.populate("Avatar").execPopulate();
                 }
                 var result = photo.toObject();
-
                 //remove unwanted fields from ownerId
                 result.ownerId = (({ _id, Fname, Lname, UserName, Avatar, Email }) => ({ _id, Lname, Fname, UserName, Avatar, Email }))(result.ownerId);
                 result.ownerId.Avatar = result.ownerId.Avatar.photoUrl
@@ -255,8 +255,8 @@ exports.getPhotosExplore = async (req, res) => {
 }
 
 exports.addTag = async (req, res) => {
-    if(!req.body.photos)
-        return res.status(400).send({error: "Please enter photos"})
+    if (!req.body.photos)
+        return res.status(400).send({ error: "Please enter photos" })
     try {
         for (element of req.body.photos) {
             const photo = await Photo.findById({ _id: element });
@@ -371,6 +371,7 @@ exports.deleteComment = async (req, res) => {
     };
 };
 
+
 exports.deletePhoto = async (req, res) => {
     const user = await UserModel.findById(res.locals.userid)
     .select('Group');
@@ -450,7 +451,6 @@ exports.deletePhoto = async (req, res) => {
         console.log(ex.message);
     };
 };
-
 exports.updatePhoto = async (req, res) => {
     let photoUpdated = await Photo.findById(req.body.photos[0]);
     if (!photoUpdated) return res.status(404).send({ error: "photo not found" });
@@ -492,7 +492,7 @@ module.exports.GetPhototitle = async (req, res) => {
 
 
 
-   
+
     const allPhotos = await Photo.find({});
 
     for (photo of allPhotos) {
