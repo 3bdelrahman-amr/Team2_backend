@@ -1,33 +1,14 @@
 const express = require('express')
 const router = express.Router()
-const {authentication}= require('../../middlewares/auth')
-const photoController=require('../../controllers/photo.controller')
+const { authentication } = require('../../middlewares/auth')
+const photoController = require('../../controllers/photo.controller')
 //schemas
-/**
- * @swagger
- * definitions:
- *   photo:
- *     type: object
- *     properties:
- *       title:
- *         type: string
- *       description:
- *         type: string
- *         required: false
- *       privacy:
- *          type: string
- *          required: false
- *       file:
- *         type: string
- *         format: base64
- *
- */
 /**
  * @swagger
  *  /photo:
  *   post:
  *     description: Add photo
- *     tags: [photo]
+ *     tags: [Photo]
  *     parameters:
  *       - name: title
  *         in: body
@@ -43,19 +24,29 @@ const photoController=require('../../controllers/photo.controller')
  *         in: body
  *         required: false
  *         description: photo's privacy
+ *         schema:
+ *       - name: tags
+ *         in: body
+ *         required: false
+ *         description: photo's tags
+ *         schema:
+ *       - name: peopleTags
+ *         in: body
+ *         required: false
+ *         description: photo's tagged people
  *         schema: 
  *       - name: file
  *         in: body
  *         required: true
  *         description: photo's file
  *         schema:
- *           $ref: "#/definitions/photo"
+ *           $ref: "#/responses/addPhoto"
  *     responses:
  *       200:
  *         description: photo added successfully
  *         schema:
- *           $ref: "#responses/user_photo"
- *       401:
+ *           $ref: "#definitions/Photo"
+ *       403:
  *         description: Unauthorized
  *         examples:
  *          application/json:
@@ -81,7 +72,7 @@ const photoController=require('../../controllers/photo.controller')
  *            }
  */
 
-router.post('/',authentication,photoController.upload.single("photo"),photoController.AddPhoto)
+router.post('/', authentication, photoController.upload.single("photo"), photoController.addPhoto)
 
 
 
@@ -91,57 +82,264 @@ router.post('/',authentication,photoController.upload.single("photo"),photoContr
 
 /**
  * @swagger
- *  /photo/tag:
+ *  /photo/peopletag/{photo_id}:
  *   post:
- *     description: Add tag to photo
- *     tags: [photo]
+ *     description: Tag other people in a photo
+ *     tags: [Photo]
  *     parameters:
- *       - name: data
- *         in: body
+ *       - name: photo_id
+ *         in: url
  *         required: true
- *         description: photo id to add tag to the corresponding photo
- *         type: object
- *         properties:
- *           photo_id:
- *             type: integer
- *             format: int64
- *             description: Tag to add to photo
- *           tag:
- *             required: true
- *             type: string
- *             description: Tag to add to photo
+ *         description: photo id
+ *         type: id
+ *         schema:
+ *       - name: tagged
+ *         required: true
+ *         description: Array of the usernames people that are being tagged
+ *         in: body
+ *         type : string
+ *         schema:
+ *           type: object
+ *           properties:
+ *             tagged:
+ *               type: array
+ *               items:
+ *                 example: "60b222e537838723b02201fd" 
  *     responses:
- *       200:
- *         description: Success
- *         examples:
- *          application/json:
- *
- *            {
- *                     "photo_id": 0,
- *            }
- *       401:
- *         description: Unauthorized
- *         examples:
- *          application/json:
- *
- *            {
- *                     "message": "Unauthorized request",
- *            }
+ *           200:
+ *             description: Tag added successfully
+ *             schema:
+ *               $ref: "#definitions/Photo"
+ *           403:
+ *             description: Unauthorized
+ *             examples:
+ *              application/json:
+ *  
+ *                {
+ *                         "error": "Unauthorized request",
+ *                }
+ *           400:
+ *             description: Bad request
+ *             examples:
+ *              application/json:
+ *  
+ *                {
+ *                         "error": "Bad request",
+ *                }
+ *           500:
+ *             description: internal server error
+ *             examples:
+ *              application/json:
+ *  
+ *                {
+ *                         "error": "Internal server error",
+ *                }
  */
 
-router.put('/tag', (req, res) => {})
+router.post('/peopletag/:id', authentication, photoController.tagPeople);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * @swagger
+ *  /photo/peopletag/{photo_id}:
+ *   delete:
+ *     description: Remove tagged person in a photo
+ *     tags: [Photo]
+ *     parameters:
+ *       - name: photo_id
+ *         in: url
+ *         required: true
+ *         description: photo id
+ *         type: id
+ *         schema:
+ *       - name: tagged
+ *         required: true
+ *         description: Array of the usernames people that are being removed
+ *         in: body
+ *         type : string
+ *         schema:
+ *           type: object
+ *           properties:
+ *             tagged:
+ *               type: array
+ *               items:
+ *                 example: "60b222e537838723b02201fd" 
+ *     responses:
+ *           200:
+ *             description: Tag removed successfully
+ *             schema:
+ *               $ref: "#definitions/Photo"
+ *           403:
+ *             description: Unauthorized
+ *             examples:
+ *              application/json:
+ *  
+ *                {
+ *                         "error": "Unauthorized request",
+ *                }
+ *           400:
+ *             description: Bad request
+ *             examples:
+ *              application/json:
+ *  
+ *                {
+ *                         "error": "Bad request",
+ *                }
+ *           500:
+ *             description: internal server error
+ *             examples:
+ *              application/json:
+ *  
+ *                {
+ *                         "error": "Internal server error",
+ *                }
+ */
+
+ router.delete('/peopletag/:id', authentication, photoController.removeTagPeople);
+ ////////////////////////////////////////////////////////////////////////
+ ////////////////////////////////////////////////////////////////////////
+ ////////////////////////////////////////////////////////////////////////
+ ////////////////////////////////////////////////////////////////////////
+
+
+// /**
+//  * @swagger
+//  * /photo:
+//  *   get:
+//  *     description: Get all the user's photos.
+//  *     tags: [Photo]
+//  *     responses:
+//  *       200:
+//  *         description: Success
+//  *         schema:
+//  *            type: array
+//  *            items:
+//  *              $ref: '#/responses/user_photo'
+//  *       403:
+//  *         description: Unauthorized request
+//  *         examples:
+//  *          application/json:
+//  *
+//  *            {
+//  *                     "error": "Unauthorized",
+//  *            }
+//  *       500:
+//  *        description: internal server error
+//  *        examples:
+//  *         application/json:
+//  *  
+//  *           {
+//  *                    "error": "Internal server error",
+//  *           }
+//  *
+//  */
+
+router.get('/', authentication, photoController.getUserPhotos)
+
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+
+
+/**
+ * @swagger
+ * /photo/home:
+ *   get:
+ *     description: Return list of photos in home, The photos of the people you are following.
+ *     tags: [Photo]
+ *     responses:
+ *       200:
+ *         description: Success
+ *         schema:
+ *            type: array
+ *            items:
+ *             $ref: "#definitions/Photo"
+ *       403:
+ *         description: Unauthorized
+ *         examples:
+ *          application/json: 
+ *            {
+ *                     "error": "Unauthorized request",
+ *            }
+ *       404:
+ *         description: Not found
+ *         examples:
+ *          application/json:
+ *            {
+ *                     "error": "photos not found",
+ *            }
+ *       500:
+ *         description: internal server error
+ *         examples:
+ *          application/json:
+ *  
+ *            {
+ *                     "error": "Internal server error",
+ *            }
+ */
+
+ router.get('/home',authentication, photoController.getPhotosHome)
+
+ ///////////////////////////////////////////////////////////////////////////////
+ ///////////////////////////////////////////////////////////////////////////////
+ ///////////////////////////////////////////////////////////////////////////////
+ ///////////////////////////////////////////////////////////////////////////////
+
+ /**
+ * @swagger
+ * /photo/explore:
+ *   get:
+ *     description: Return list of photos in explore, The photos of the people with Fav more than 20.
+ *     tags: [Photo]
+ *     responses:
+ *       200:
+ *         description: Success
+ *         schema:
+ *            type: array
+ *            items:
+ *             $ref: "#definitions/Photo"
+ *       403:
+ *         description: Unauthorized
+ *         examples:
+ *          application/json:
+ *            {
+ *                     "error": "Unauthorized request",
+ *            }
+ *       404:
+ *         description: Not found
+ *
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                     "error": "photos not found",
+ *            }
+ *       500:
+ *         description: internal server error
+ *         examples:
+ *          application/json:
+ *  
+ *            {
+ *                     "error": "Internal server error",
+ *            }
+ */
+
+  router.get('/explore',authentication, photoController.getPhotosExplore)
+
+  //////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////
 
 /**
  * @swagger
  * /{photo_id}/comments:
  *   get:
  *     description: return list of comments for a given photo.
- *     tags: [photo]
+ *     tags: [Photo]
  *     parameters:
  *       - name: photo_id
  *         in: path
@@ -152,7 +350,6 @@ router.put('/tag', (req, res) => {})
  *
  * 
  *     responses:
- * 
  *       200:
  *         description: Success
  *         examples:
@@ -163,7 +360,8 @@ router.put('/tag', (req, res) => {})
  *                     "_id": "123456",
  *                     "user": {
  *                                  "Fname":"John",
- *                                  "Lname":"Smith"
+ *                                  "Lname":"Smith",
+ *                                  "_id": "123456"
  *                             },
  *                     "createdAt":"2020-5-23",
  *                     "updatedAt":"2021-4-2"
@@ -192,23 +390,25 @@ router.put('/tag', (req, res) => {})
  *
  */
 
- router.get('/:photoId/comments',authentication,photoController.getComments);
+router.get('/:photoId/comments', authentication, photoController.getComments);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * @swagger
- *  /photo/{photo_id}:
+ *  /photo/:
  *   delete:
  *     description: Delete a photo
- *     tags: [photo]
+ *     tags: [Photo]
  *     parameters:
- *       - name: photo_id
- *         in: path
+ *       - name: body
+ *         in: body
  *         required: true
- *         description: photo id to add tag to the corresponding photo
- *         schema:
- *           type: integer
+ *         description: array of photo ids to delete corresponding photo 
+ *         type: object
+ *         properties:
+ *           photos:
+ *             type: integer  
  * 
  *     responses:
  *       200:
@@ -237,7 +437,7 @@ router.put('/tag', (req, res) => {})
  *            }
  */
 
-router.delete('/delete/:photo_id', (req, res) => {})
+router.delete('/',authentication ,photoController.deletePhoto);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -248,7 +448,7 @@ router.delete('/delete/:photo_id', (req, res) => {})
  * /{photo_id}/comments:
  *   post:
  *     description: Add comment to photo
- *     tags: [photo]
+ *     tags: [Photo]
  *     parameters:
  *       - name: photo_id
  *         in: path
@@ -256,8 +456,12 @@ router.delete('/delete/:photo_id', (req, res) => {})
  *         description: photo id to add comment to the corresponding photo
  *         schema:
  *           type: integer
- *
- *     properties:
+ *       - name: comment
+ *         in: body
+ *         required: true
+ *         description: comment added to the corresponding photo
+ *         type: object
+ *         properties:
  *           comment:
  *             type: string
  *     responses:
@@ -288,7 +492,7 @@ router.delete('/delete/:photo_id', (req, res) => {})
  *
  */
 
- router.post('/:photoId/comments',authentication,photoController.addComment);
+router.post('/:photoId/comments', authentication, photoController.addComment);
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -300,7 +504,7 @@ router.delete('/delete/:photo_id', (req, res) => {})
  * /{photo_id}/comments/{comment_id}:
  *   put:
  *     description: edit comment on a given photo
- *     tags: [photo]
+ *     tags: [Photo]
  *     parameters:
  *       - name: photo_id
  *         in: path
@@ -355,7 +559,7 @@ router.delete('/delete/:photo_id', (req, res) => {})
  *
  */
 
- router.put('{photo_id}/comment', (req, res) => {})
+router.put('{photo_id}/comment', (req, res) => { })
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -364,55 +568,28 @@ router.delete('/delete/:photo_id', (req, res) => {})
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/**
- * @swagger
- * /photo/explore:
- *   get:
- *     description: return list of photos that are public and above certain number of likes.
- *     tags: [photo]
- *
- *
- *     responses:
- *       200:
- *         description: Success
- *         schema:
- *           $ref: '#/responses/photo'
- *
- *       404:
- *         description: Not found
- *
- *         examples:
- *          application/json:
- *
- *            {
- *                     "message": "photos not found",
- *            }
- *
- *
- */
-
-router.get('/photo/explore', (req, res) => {})
 
 /**
  * @swagger
- * /photo/{photo_id}:
+ * /photo/:
  *   put:
- *     description: change photo mode between { private public friends}
- *     tags: [photo]
+ *     description: change photo mode between { private public}
+ *     tags: [Photo]
  *     parameters:
- *       - name: photo_id
- *         in: path
- *         required: true
- *         description: photo_id to edit it
- *         schema:
- *           type: integer
- *       - name: privacy
+ *       - name: body
  *         in: body
  *         required: true
- *         description: mode of photo
- *         schema:
- *           type: string
- *
+ *         description: edit photo object
+ *         type: object
+ *         properties:
+ *           title:
+ *             type: string 
+ *           privacy:
+ *             type: string 
+ *           description:
+ *             type: string 
+ *           photos:
+ *             type: integer  
  *     responses:
  *       200:
  *         description: Success
@@ -445,7 +622,7 @@ router.get('/photo/explore', (req, res) => {})
  *
  */
 
-router.put('/photo/{photo_id}', (req, res) => {})
+router.put('/', authentication, photoController.updatePhoto)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -456,7 +633,7 @@ router.put('/photo/{photo_id}', (req, res) => {})
  * /photo/{photo_id}/comments/{comment_id}:
  *   delete:
  *     description: delete comment from a photo
- *     tags: [photo]
+ *     tags: [Photo]
  *     parameters:
  *       - name: comment_id
  *         in: path
@@ -506,23 +683,29 @@ router.put('/photo/{photo_id}', (req, res) => {})
  */
 
 router.delete('/:photoId/comments/:commentId', authentication, photoController.deleteComment)
+///////////////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * @swagger
- * /photo/{photo_id}/tag/{tag_id}:
+ * /photo/tag/{photo_id}:
  *   delete:
- *     description: delete a tag from a photo
- *     tags: [photo]
+ *     description: Delete a tag from a photo
+ *     tags: [Photo]
  *     parameters:
- *       - name: tag_id
- *         in: path
- *         required: true
- *         description: tag_id to delete a comment from a photo
  *       - name: photo_id
  *         in: path
  *         required: true
- *         description: photo_id to delete a comment from a it
- *
+ *         description: The id of the photo that the tag will be removed from
+ *       - name: tag
+ *         in: body
+ *         required: true
+ *         description: the tag that you want to add
+ *         schema:
+ *           type: object
+ *           properties:
+ *              tag:
+ *                 example: "Nature"
  *     responses:
  *       200:
  *         description: Success
@@ -530,7 +713,7 @@ router.delete('/:photoId/comments/:commentId', authentication, photoController.d
  *          application/json:
  *
  *            {
- *                     "message": "Success",
+ *                     "message": "Tag removed successfully",
  *            }
  *       404:
  *         description: Not found
@@ -538,27 +721,100 @@ router.delete('/:photoId/comments/:commentId', authentication, photoController.d
  *          application/json:
  *
  *            {
- *                     "message": "photo not found",
+ *                     "error": "photo not found",
  *            }
- *       401:
+ *       403:
  *         description: Unauthorized request
  *         examples:
  *          application/json:
  *
  *            {
- *                     "message": "Unauthorized",
+ *                     "error": "Unauthorized",
  *            }
- *
+ *       500:
+ *         description: internal server error
+ *         examples:
+ *          application/json:
+ *  
+ *            {
+ *                     "error": "Internal server error",
+ *            }
  */
 
-router.put('/photo/:photo_id/tag/{tag_id}', (req, res) => {})
+router.delete('/tag/:id', authentication, photoController.removeTag)
+
+///////////////////////////////////////////////////////////////////////////
+/**
+ * @swagger
+ * /photo/tag:
+ *   post:
+ *     description: Add a tag to multiple photos
+ *     tags: [Photo]
+ *     parameters:
+ *       - name: photos_ids
+ *         in: body
+ *         required: true
+ *         description: the photos ot which you want to add the tag for
+ *         schema:
+ *       - name: tag
+ *         in: body
+ *         required: true
+ *         description: the tag that you want to add
+ *         schema:
+ *           type: object
+ *           properties:
+ *              photos: 
+ *                 type: array
+ *                 items:
+ *                   example: "60b26635803c23246cdd376a"
+ *              tag:
+ *                 example: "Nature"
+ *              
+ *     responses:
+ *       200:
+ *         description: Success
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                     "message": "Tag added successfully",
+ *            }
+ *       404:
+ *         description: Not found
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                     "error": "photo not found",
+ *            }
+ *       403:
+ *         description: Unauthorized request
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                     "error": "Unauthorized",
+ *            }
+ *       500:
+ *         description: internal server error
+ *         examples:
+ *          application/json:
+ *  
+ *            {
+ *                     "error": "Internal server error",
+ *            }
+ */
+
+ router.post('/tag/',authentication, photoController.addTag)
+
+ //////////////////////////////////////////////////////////////////////////////////
 
 /**
  * @swagger
  * /photo/{photo_id}:
  *   get:
  *     description: get a photo by id
- *     tags: [photo]
+ *     tags: [Photo]
  *     parameters:
  *
  *       - name: photo_id
@@ -583,7 +839,7 @@ router.put('/photo/:photo_id/tag/{tag_id}', (req, res) => {})
  *            {
  *                     "message": "photo not found",
  *            }
- *       401:
+ *       403:
  *         description: Unauthorized request
  *         examples:
  *          application/json:
@@ -594,20 +850,21 @@ router.put('/photo/:photo_id/tag/{tag_id}', (req, res) => {})
  *
  */
 
-router.get('/photo/:photo_id', (req, res) => {})
+router.get('/:title',authentication,photoController.GetPhototitle)
 
 /**
  * @swagger
  * /photo/{title}:
  *   get:
  *     description: get a photo by title
- *     tags: [photo]
+ *     tags: [Photo]
  *     parameters:
  *
  *       - name: photo_title
  *         in: path
  *         required: true
- *         description: photo id
+ *         description: photo title
+ *         schema:
  *
  *     responses:
  *       200:
@@ -615,7 +872,7 @@ router.get('/photo/:photo_id', (req, res) => {})
  *         schema:
  *           type: array
  *           items:
- *             $ref: '#/responses/photo'
+ *             $ref: '#/definitions/Photo'
  *       404:
  *         description: Not found
  *         examples:
@@ -635,87 +892,91 @@ router.get('/photo/:photo_id', (req, res) => {})
  *
  */
 
-router.get('/photo/:photo_id', (req, res) => {})
+/**
+ * @swagger
+ *Photo:
+ *    type: object
+ *    properties:
+ *      _id:
+ *        example: "60b222e537838723b02201fd"
+ *      title:
+ *        example: "photo1"
+ *      description:
+ *        example: "my photo"
+ *      photoUrl:
+ *        example: "localhost:3000/photos\\2021-05-29T11-17-57.298ZFCFS.PNG"
+ *      Fav:
+ *        type: array
+ *        items:
+ *          example: "60b222e537838723b02201fd"
+ *      privacy:
+ *        example: "private"
+ *      ownerId:
+ *        example: "60b222e537838723b02201fd"
+ *      tags:
+ *        type: array
+ *        items:
+ *          example: "Nature"
+ *      peopleTags:
+ *        type: array
+ *        items:
+ *          $ref: '#/definitions/peopleTag'
+ *      comments:
+ *        type: array
+ *        items:
+ *          $ref: '#/definitions/Comment'
+ *      createdAt: 
+ *        example: "2021-05-29T11:17:57.326Z"
+ *      updatedAt:
+ *        example: "2021-05-29T11:17:57.326Z"
+ * 
+ *peopleTag:
+ *    type: object
+ *    properties:
+ *      tagging:
+ *        example: "60b29b3c13791c05a09afd5e"
+ *      tagged:
+ *        type: array
+ *        items:
+ *          example: "60b222e537838723b02201fd"  
+ *      createdAt: 
+ *        example: "2021-05-29T11:17:57.326Z"
+ *      updatedAt:
+ *        example: "2021-05-29T11:17:57.326Z"
+ * 
+ *Comment:
+ *    type: object
+ *    properties:
+ *      comment:
+ *        example: "this is a comment"
+ *      user:
+ *        example: "60b222e537838723b02201fd"
+ *      createdAt: 
+ *        example: "2021-05-29T11:17:57.326Z"
+ *      updatedAt:
+ *        example: "2021-05-29T11:17:57.326Z"
+ * 
+ */
 
 /**
  * @swagger
  * responses:
- *   photo:
- *     type: object
- *     properties:
- *       photo_id:
- *         type: integer
- *       photo_url:
- *         type: string
- *       photo_owner_id:
- *         type: integer
- *       tag:
- *         type: array
- *         items:
- *           $ref: '#/responses/tag'
- *       comment:
- *         type: array
- *         items:
- *           $ref: '#/responses/comment'
- *       description:
- *         type: string
- *
- */
-/**
- * @swagger
- * responses:
- *   comment:
- *     type: object
- *     properties:
- *       id:
- *         type: string
- *       comment:
- *         type: string
- *       photo_id:
- *         type: integer
- *       commented_user_id:
- *         type: integer
- *       userName:
- *          typre:string
- *       createdAt:
- *          type:date
- *       updatedAt:
- *          type:date
- *   tag:
- *     type: object
- *     properties:
- *       id:
- *         type: integer
- *       comment:
- *         type: string
- *       photo_id:
- *         type: integer
- *       taged_user_id:
- *         type: integer
- *
- *   user_photo:
- *     type: object
- *     properties:
- *       _id:
- *         type: integer
- *       title:
- *          type: string
- *       description:
- *          type: string
- *       photo_url:
- *         type: string
- *       privacy:
- *         type: string
- *       
- *
- *
- *
- *
- *
- *
- *
- *
- *
+ *   addPhoto:
+ *    type: object
+ *    properties:
+ *      title:
+ *        example: "photo1"
+ *      description:
+ *        example: "my photo"
+ *      file:
+ *        example: "Forest.PNG"
+ *      privacy:
+ *        example: "private"
+ *      tags:
+ *        type: array
+ *        items:
+ *          example: "Nature"
+ *  
  */
 
 module.exports = router

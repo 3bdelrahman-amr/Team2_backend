@@ -1,6 +1,6 @@
-const { Album, validateAlbumId, validateCreateAlbum, validateUpdateAlbum } = require('../models/album.model');
-const Photo = require('../models/photo.model');
-const {UserModel} = require('../models/user.model');
+const { Album, validateAlbumId, validateCreateAlbum, validateUpdateAlbum, validatePhotosIds } = require('../models/album.model');
+const { Photo } = require('../models/photo.model');
+const { UserModel } = require('../models/user.model');
 
 const createAlbum = async (req, res) => {
 
@@ -13,20 +13,27 @@ const createAlbum = async (req, res) => {
         return res.status(400).send(error.details[0].message);
     try {
 
-        if (req.body.photos.length != 0)
-            req.body.photos.forEach(async (photo_id) => await Photo.findById(photo_id));
+        if (req.body.photos.length != 0) {
+            for (photo_id of req.body.photos) {
+                const photo =  await Photo.findById({ _id: photo_id, ownerId: res.locals.userid });
+                if(!photo)
+                    return res.status(404).send({error: "Photo doesn't exist"});
+            }
+        }
+        else {
+            throw new Error("Array of photos must not be empty");
+        }
 
         if (req.body.coverPhoto) { // if the cover photo was passed
             if (req.body.photos.length == 0 || !req.body.photos.includes(coverPhoto)) // and it is not included in the photos array or it is passed and the array of photos is empty
                 throw new Error("cover Photo must be a included in photos array");
         } else { // if the cover photo was not passed
-            if (req.body.photos.length != 0) // and the photos array is not empty
-            {
-                req.body = {
-                    ...req.body,
-                    coverPhoto: req.body.photos[0] // the default cover photo is the first photo in the array
-                }
+
+            req.body = {
+                ...req.body,
+                coverPhoto: req.body.photos[0] // the default cover photo is the first photo in the array
             }
+
         }
         const album = new Album({
             ...req.body,
@@ -40,7 +47,7 @@ const createAlbum = async (req, res) => {
         delete albumObject.__v;
         res.status(201).send(albumObject);
     } catch (error) {
-        res.status(500).send({ error: "An error has occured" })
+        res.status(500).send({ error: "Internal Server error" })
     }
 };
 
@@ -68,7 +75,7 @@ const updateAlbum = async (req, res) => {
             album[update] = req.body[update];
         })
         await album.save();
-        res.send({ message: 'Album updated successfully' });
+        res.status(200).send(album);
     } catch (error) {
         res.status(500).send({ error: "An error occured" });
     }
@@ -87,9 +94,8 @@ const deleteAlbum = async (req, res) => {
         res.status(200).send({ message: "Album successfully deleted" });
     }
     catch (error) {
-        res.status(500).send({ error: "An error has occured" });
+        res.status(500).send({ error: "Internal Server Error" });
     }
-
 };
 
 const getAlbumbyId = async (req, res) => {
@@ -102,6 +108,7 @@ const getAlbumbyId = async (req, res) => {
         if (!album)
             return res.status(404).send({ error: "Album not found" });
         await album.populate('photos').execPopulate();
+        await album.populate('coverPhoto').execPopulate();
         const albumObject = album.toObject();
         delete albumObject.ownerId;
         delete albumObject.__v;
@@ -115,17 +122,16 @@ const getUserAlbums = async (req, res) => {
     const user = await UserModel.findById(res.locals.userid);
     try {
         await user.populate('albums').execPopulate();
+        console.log(user);
         const albums = user.albums;
-        var albumsObj = [];
-        Array.prototype.forEach.call(albums, (album) => {
-            const albumObj = album.toObject();
-            delete albumObj.ownerId
-            delete albumObj.__v
-            albumsObj.push(albumObj);
-        })
-        res.status(200).send(albumsObj);
+        for(album of albums)
+        {
+            await album.populate('photos').execPopulate();
+        }
+        res.status(200).send(albums);
 
     } catch (error) {
+        console.log(error);
         res.status(500).send({ error: "Internal server Error" });
     }
 }
@@ -151,12 +157,81 @@ const getAlbumbyUsername = async (req, res) => {
     }
 }
 
+const addPhotoToAlbum = async (req, res) => {
+    try {
+        const _id = req.params.id;
+        const { error } = validateAlbumId({ id: _id });
+        if (error)
+            return res.status(400).send(error.details[0].message);
+        const { error2 } = validatePhotosIds({ photos: req.body.photos })
+        if (error2)
+            return res.status(400).send(error2.details[0].message);
+        const album = await Album.findById({ _id, ownerId: res.locals.userid });
+        if (!album)
+            return res.status(404).send({ error: "Not found" });
+        const photos = req.body.photos;
+        for (photo of photos) // make sure that all hte passed photo really exists
+        {
+            await Photo.findById({ _id: photo, ownerId: res.locals.userid })
+            if (!album.photos.includes(photo)) // if it doesn't already exit in album
+            {
+                album.photos.push(photo);
+            }
+        }
+        await album.save();
+        res.status(200).send(album.photos);
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).send({ error: "Internal Server error" });
+    }
+}
+
+const removePhotoFromAlbum = async (req, res) => {
+    const _id = req.params.id;
+    const { error } = validateAlbumId({ id: _id })
+    if (error)
+        return res.status(400).send(error.details[0].message);
+    const { error2 } = validatePhotosIds({ photos: req.body.photos })
+    if (error2)
+        return res.status(400).send(error2.details[0].message);
+    try {
+        const album = await Album.findById({ _id, ownerId: res.locals.userid });
+        if (!album)
+            return res.status(404).send({ error: "Not found" });
+        const photos = req.body.photos;
+        for (photo of photos) // make sure that all hte passed photo really exists
+        {
+            await Photo.findById({ _id: photo, ownerId: res.locals.userid })
+            if (album.photos.includes(photo)) // if it doesn't already exit in album
+            {
+                album.photos = album.photos.filter((element) => {
+                    return element != photo
+                })
+            }
+        }
+
+        await album.save();
+
+        if (album.photos.length == 0)
+            deleteAlbum(req, res);
+        else
+            res.status(200).send(album.photos)
+
+
+    } catch (error) {
+        res.status(500).send({ error: "an error has occured" })
+    }
+}
+
 module.exports = {
     createAlbum,
     updateAlbum,
     deleteAlbum,
     getAlbumbyId,
     getUserAlbums,
-    getAlbumbyUsername
+    getAlbumbyUsername,
+    addPhotoToAlbum,
+    removePhotoFromAlbum
 };
 

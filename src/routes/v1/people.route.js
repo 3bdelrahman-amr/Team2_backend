@@ -1,5 +1,9 @@
 const express = require('express')
 const router = express.Router()
+const { authentication } = require('../../middlewares/auth');
+const peopleController = require('../../controllers/people.controller')
+const { UserModel, validateId } = require('../../models/user.model');
+
 /**
  * @swagger
  * /people/groups/{userid}:
@@ -57,7 +61,7 @@ router.get('/getgroups/:userid', (req, res) => {
  *         schema:
  *           type: array
  *           items:
- *             $ref: '#/responses/user_photo'
+ *             $ref: '#/responses/photoInfo'
  *       404:
  *         description: Not found
  *         examples:
@@ -74,12 +78,7 @@ router.get('/getgroups/:userid', (req, res) => {
  *
  */
 
-router.get('/getgroups/:userid', (req, res) => {
-    console.log(req.params.id)
-    res.send({
-        id: 'route',
-    })
-})
+router.get('/photos/:userId', authentication,peopleController.getPhotos);
 /**
  * @swagger
  * /people/{username|email|id}:
@@ -108,7 +107,7 @@ router.get('/getgroups/:userid', (req, res) => {
  *
  */
 
-router.get('/findByUsername/:username', (req, res) => {
+router.get('/findByUsername/:username', authentication,async (req, res) => {
     console.log(req.body.name)
 })
 /**
@@ -142,6 +141,39 @@ router.get('/findByUsername/:username', (req, res) => {
 router.get('/people', (req, res) => {
     console.log(req.body.name)
 })
+
+/**
+ * @swagger
+ * /people/search/{username|email|fName|Lname}:
+ *   get:
+ *     tags: [People]
+ *     description: search for user using name,username or email.
+ *     responses:
+ *       200:
+ *         description: Success
+ *         schema:
+ *           type: array
+ *           items:
+ *             $ref:  '#/responses/peopleinfo'
+ *       404:
+ *         description: Not found
+ *         examples:
+ *          application/json:
+ *
+ *            {
+ *                       "message": "User not found",
+ *            }
+ *     parameters:
+ *       - name: identifier
+ *         in: path
+ *         required: true
+ *         description: user identifier (username/email/name) to search on it
+ *
+ *
+ */
+
+ router.get('/search/:string',authentication, peopleController.searchUsers)
+
 /**
  * @swagger
  * /people/following/{user_id}:
@@ -154,7 +186,7 @@ router.get('/people', (req, res) => {
  *         schema:
  *           type: array
  *           items:
- *             $ref:  '#/responses/peopleinfo'
+ *             $ref:  '#/responses/Followinginfo'
  *
  *       404:
  *         description: Not found
@@ -173,9 +205,9 @@ router.get('/people', (req, res) => {
  *
  */
 
-router.get('/findByUsername/:username', (req, res) => {
-    console.log(req.body.name)
-})
+router.get('/following/:userId', authentication, peopleController.getFollowing)
+
+
 
 /**
  * @swagger
@@ -193,7 +225,7 @@ router.get('/findByUsername/:username', (req, res) => {
  *         schema:
  *           type: array
  *           items:
- *             $ref: '#/responses/photo'
+ *             $ref: '#/responses/favesinfo'
  *
  *       404:
  *         description: Not found
@@ -216,9 +248,7 @@ router.get('/findByUsername/:username', (req, res) => {
  *
  */
 
-router.post('user/fav', (req, res) => {
-    console.log(req.body.name)
-})
+router.get('/fav/:username', authentication,peopleController.getfaves );
 
 /**
  *@swagger
@@ -230,25 +260,94 @@ router.post('user/fav', (req, res) => {
  *       type: string
  *     Lname:
  *       type: string
- *     username:
+ *     UserName:
+ *       type: string
+ *     _id:
+ *       type: integer
+ *       format: int32
+ *     Date_joined:
+ *       type: string
+ *       format: date
+ *     numberOfPublicPhotos:
+ *       type: integer
+ *       format: int32
+ *     numberOfFollowers:
+ *       type: integer
+ *       format: int32
+ *     avatarUrl:
+ *       type: string
+ *     isFollowed:
+ *       type: boolean
+ *
+ *
+ *  photoInfo:
+ *    type: object
+ *    properties:
+ *     userName:
+ *       type: string
+ *     tags:
+ *       type: string
+ *     title:
+ *       type: string
+ *     description:
+ *       type: string
+ *     photoUrl:
+ *       type: string
+ *     peopleTags:
+ *       type: string
+ *     _id:
+ *       type: integer
+ *       format: int32
+ *     ownerId:
+ *       type: integer
+ *       format: int32
+ *     privacy:
+ *       type: string
+ *     createdAt:
+ *       type: string
+ *       format: date
+ *     updatedAt:
+ *       type: string
+ *       format: date
+ *     numberOfFavs:
+ *       type: integer
+ *       format: int32
+ *     numberOfComments:
+ *       type: integer
+ *       format: int32
+ * 
+ *  Followinginfo:
+ *    type: object
+ *    properties:
+ *     Fname:
+ *       type: string
+ *     Lname:
+ *       type: string
+ *     UserName:
  *       type: string
  *     id:
  *       type: integer
  *       format: int32
- *     email:
- *       type: string
- *     date_joined:
- *       type: string
- *       format: date
- *     num_photos:
- *       type: integer
- *       format: int32
- *     num_following:
+ *     numberOfPublicPhotos:
  *       type: integer
  *       format: int32
  *
- *
+ *  favesinfo:
+ *    type: object
+ *    properties:
+ *     userName:
+ *       type: string
+ *     _id:
+ *       type: integer
+ *       format: int32
+ *     title:
+ *       type: string
+ *     photoUrl:
+ *       type: string
+ *     numberOfComments:
+ *       type: integer
+ *       format: int32
  *
  *
  */
-modules.exports = router
+module.exports = router
