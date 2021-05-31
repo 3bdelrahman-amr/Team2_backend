@@ -333,10 +333,10 @@ exports.deletePhoto = async (req, res) => {
         }
     })
     if (numErrors>0) return res.status(400).send(errormsg);
-    // let photodeleted = await Photo.findById(req.body.photos[0]);
-    // if (!photodeleted) return res.status(404).send({ error: "photo not found" });
-    // if (res.locals.userid != photodeleted.ownerId)
-    //     return res.status(403).send('Access denied');
+    let photodeleted = await Photo.findById(req.body.photos[0]);
+    if (!photodeleted) return res.status(404).send({ error: "photo not found" });
+    if (res.locals.userid != photodeleted.ownerId)
+        return res.status(403).send('Access denied');
 
     console.log(user.Group);
     if(user.Group)
