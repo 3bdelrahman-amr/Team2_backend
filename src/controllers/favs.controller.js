@@ -1,6 +1,6 @@
 const { Photo } = require('../models/photo.model');
 const { UserModel: User } = require('../models/user.model');
-exports.add_fav = async function (req, res) {
+exports.addFav = async function (req, res) {
   const photoId = req.body.photo_id;
   const userId = res.locals.userid;
   const photo = await Photo.findById(photoId).exec();
@@ -31,7 +31,7 @@ exports.add_fav = async function (req, res) {
     });
   }
 };
-exports.remove_fav = async function (req, res) {
+exports.removeFav = async function (req, res) {
   const photoId = req.params.photoid;
   const photo = await Photo.findById(photoId).exec();
   const userId = res.locals.userid;

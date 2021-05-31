@@ -1,10 +1,11 @@
-const express = require('express')
-const router = express.Router()
-//const groupsController = require('../../controllers/group.controller')
-const { checkAuth } = require('../../middlewares/auth')
-router.use(function (req, res, next) {
-    checkAuth(req, res, next)
-})
+const express = require('express');
+const groupsController = require('../../controllers/group.controller');
+const { authentication } = require('../../middlewares/auth');
+const { isMember } = require('../../middlewares/group');
+const router = express.Router();
+router.use((req, res, next) => {
+  authentication(req, res, next);
+});
 /**
  * @swagger
  * /group:
@@ -41,8 +42,8 @@ router.use(function (req, res, next) {
  */
 
 router.post('/', (req, res) => {
-    groupsController.create_group(req, res)
-})
+  groupsController.createGroup(req, res);
+});
 
 /**
  * @swagger
@@ -64,11 +65,13 @@ router.post('/', (req, res) => {
  *           application/json:
  *              {
  *                  "_id": "608c80ce54e3d74b34d9bb5a",
- *                  "Photos": [],
  *                  "privacy": "public",
  *                  "visibility": "public",
  *                  "name": "ABC",
- *                  "role": "member"
+ *                  "createdAt": "2021-05-30T14:14:40.691Z",
+ *                  "role": "admin",
+ *                  "count_members": 1,
+ *                  "count_photos": 0
  *             }
  *       401:
  *         description: Unauthorized request
@@ -82,8 +85,8 @@ router.post('/', (req, res) => {
  */
 
 router.get('/:group_id', (req, res) => {
-    groupsController.get_group(req, res)
-})
+  groupsController.getGroup(req, res);
+});
 /**
  * @swagger
  * /group/photo:
@@ -129,59 +132,10 @@ router.get('/:group_id', (req, res) => {
  *             }
  *
  */
-router.post('/photo', (req, res) => {})
-
-/**
- * @swagger
- * /group:
- *   delete:
- *     description: Leave group
- *     tags: [Group]
- *     parameters:
- *       - name: data
- *         in: body
- *         required: true
- *         description: User and group data
- *         type: object
- *         properties:
- *           group_id:
- *             type: integer
- *     responses:
- *       200:
- *         description: Success
- *         examples:
- *          application/json:
- *
- *            {
- *                     "message": "Group left successfully",
- *            }
- *       401:
- *         description: Unauthorized request
- *         examples:
- *          application/json:
- *
- *            {
- *                     "message": "Unauthorized",
- *            }
- *       404:
- *         description: Not found
- *         examples:
- *           application/json:
- *
- *             {
- *                     "message": "Group not found",
- *             }
- *       500:
- *         description: User is not a member of the group
- *         examples:
- *          application/json:
- *
- *            {
- *                     "message": "User is not a member of the group",
- *            }
- *
- */
-router.delete('/', (req, res) => {})
+router.post('/photo', (req, res, next) => {
+  isMember(req, res, next);
+  groupsController.addPhoto(req, res);
+});
 /**
 * @swagger
 * /group/members/{group_id}:
@@ -213,11 +167,13 @@ router.delete('/', (req, res) => {})
 *             {
 *                     "message": "Group not found",
 *             }
-*        
-*       
+*
+*
 *
 */
-router.get('/members/:id', (req, res) => {})
+router.get('/members/:id', (req, res) => {
+  groupsController.getGroupMembers(req, res);
+});
 /**
 * @swagger
 * /group/photos/{group_id}:
@@ -253,11 +209,13 @@ router.get('/members/:id', (req, res) => {})
 *       
 *
 */
-router.get('/photos/:id', (req, res) => {})
+router.get('/photos/:id', (req, res) => {
+  groupsController.getGroupPhotos(req, res);
+});
 /**
  * @swagger
  * /group/{group_id}/join:
- *   get:
+ *   post:
  *     description: Join group
  *     tags: [Group]
  *     parameters:
@@ -296,7 +254,7 @@ router.get('/photos/:id', (req, res) => {})
  *
  *
  */
-router.get('/:group_id/join', (req, res) => groupsController.join(req, res))
+router.post('/:group_id/join', (req, res) => groupsController.join(req, res));
 
 /**
  * @swagger
@@ -349,8 +307,52 @@ router.get('/:group_id/join', (req, res) => groupsController.join(req, res))
  *
  */
 router.delete('/:group_id/leave', (req, res) => {
-    groupsController.leave(req, res)
-})
+  groupsController.leave(req, res);
+});
+/**
+ * @swagger
+ * /group/{keyword}/search:
+ *   get:
+ *     description: Search groups
+ *     tags: [Group]
+ *     parameters:
+ *       - name: keyword
+ *         in: path
+ *         required: true
+ *         description: search keyword
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Success
+ *         examples:
+ *           application/json:
+ *            [
+ *              {
+ *                description: null,
+ *                privacy: 'public',
+ *                visibility: 'public',
+ *                id: '608c80ce54e3d74b34d9bb5a',
+ *               name: 'ABC',
+ *                num_photos: 0,
+ *                num_members: 1,
+ *               role: 'member'
+ *              }
+ *            ]
+ *
+ *       404:
+ *         description: Not found
+ *         examples:
+ *           application/json:
+ *
+ *             {
+ *                     "message": "Group not found",
+ *             }
+ *
+ */
+router.get('/:keyword/search', (req, res) => {
+  groupsController.searchGroup(req, res);
+});
 
 /**
  * @swagger
@@ -389,4 +391,4 @@ router.delete('/:group_id/leave', (req, res) => {
  *        format: int32
  *
  */
-module.exports = router
+module.exports = router;

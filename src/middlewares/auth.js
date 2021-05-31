@@ -1,9 +1,11 @@
 const jwt = require("jsonwebtoken");
 const configure = require("../config/default.json")
 const nodemailer = require('nodemailer');
+const config=require('config');
 const emailExisyence = require('email-existence');
 const Model = require('../models/user.model')
-const secret = configure.JWT_KEY;
+const secret = config.get('JWT_KEY');
+const host=config.get("HOST_ADDR")+':'+config.get("PORT");
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 module.exports.authorization = (req, res) => {
@@ -20,15 +22,15 @@ module.exports.authentication = (req, res, next) => {
 
   let token = req.headers['token'];
   if (!token)
-    res.status(403).send({ message: "no token" });
+   return res.status(403).send({ message: "no token" });
 
   jwt.verify(token, secret, (err, decoded) => {
 
     if (err)
-      res.status(500).send({ message: "error while trying to decode the token" });
+      return res.status(500).send({ message: "error while trying to decode the token" });
 
     if (!decoded)
-      res.status(401).send({ message: "failed to authenticate" });
+      return res.status(401).send({ message: "failed to authenticate" });
     res.locals.userid = decoded.id;
     next();
   });
@@ -70,14 +72,16 @@ module.exports.SendVerification = async (req, res) => {
     to: req.body.email, // list of receivers
     subject: "Mail confirmation", // Subject line
     text: "confirm please your mail", // plain text body
-    html: '<a href="' + req.protocol + '://' + req.get('host') + req.originalUrl + '/' + token + '">link of confirmation</a>', // html body
+    html: '<a href="http://' + host + '/api/v1/user/verify' + '/' + token + '">link of confirmation</a>', // html body
   }
 
 
   let info = await transporter.sendMail(option, (err, data) => {
 
-    if (err)
+    if (err){ 
+      console.log(err);
       return res.status(400).send({ message: 'failed to sent verification mail please fill with a valid email' });
+    }
     else
       return res.status(200).send({ message: 'email verification has been sent to you' });
 

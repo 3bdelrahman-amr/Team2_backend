@@ -1,30 +1,30 @@
+
 const { UserModel,validateId } = require('../models/user.model');
 const photo =require('../models/photo.model');
 const mongoose = require('mongoose');
 const { use } = require('../routes/v1/people.route');
 exports.getFollowing=async (req, res) => {
     const { error } = validateId({id:req.params.userId});
+
     if (error) return res.status(400).send(error.details[0].message);
 
     const users = await UserModel.findById(req.params.userId)
         .populate('Following', 'Fname Lname UserName Avatar photos')
         .select('Following');
     let following = users.Following;
-    let result=[];
+    let result = [];
     if (!users) return res.status(404).send('user has no following');
     try {
-        for(fol of following)
-        {
+        for (fol of following) {
             await fol.populate('photos').execPopulate();
-            const photos=fol.photos;
-            let count=0;
-            for(photo of photos)
-            {
-                if(photo.privacy ==='public')
-                count++;
+            const photos = fol.photos;
+            let count = 0;
+            for (photo of photos) {
+                if (photo.privacy === 'public')
+                    count++;
             }
-            fol={
-                numberOfPublicPhotos:count,
+            fol = {
+                numberOfPublicPhotos: count,
                 ...fol._doc
             }
             result.push(fol);
@@ -36,7 +36,7 @@ exports.getFollowing=async (req, res) => {
     };
 }
 
-exports.getfaves=async (req, res) => {
+exports.getfaves = async (req, res) => {
 
     // const user = await UserModel.find({UserName:req.params.username})
     //     .populate('Fav', 'photoUrl title ownerId comments')
@@ -48,8 +48,8 @@ exports.getfaves=async (req, res) => {
     else {
         let Faves = [];
         for (fav of user.Fav) {
-            userName=await UserModel.findById(fav.ownerId)
-            .select('UserName');
+            userName = await UserModel.findById(fav.ownerId)
+                .select('UserName');
             count = fav.comments.length;
             fav = {
                 userName: userName.UserName,
@@ -71,6 +71,7 @@ exports.getfaves=async (req, res) => {
         }
     }
 }
+
 
 module.exports.GetPeopleByUserName_ID_Email= async(req,res)=>{
     
@@ -113,3 +114,89 @@ module.exports.GetPeopleByUserName_ID_Email= async(req,res)=>{
         }
     }
 };
+
+exports.getPhotos = async (req, res) => {
+    const { error } = validateId({ id: req.params.userId });
+    if (error) return res.status(400).send(error.details[0].message);
+
+    const user = await UserModel.findById(req.params.userId);
+    if (!user) return res.status(404).send('user has no following');
+    await user.populate('photos').execPopulate();
+    const photos = user.photos;
+    let Photos = [];
+    for (photo of photos) {
+        // userName=await UserModel.findById(photo.ownerId)
+        // .select('UserName');
+        countcomment = photo.comments.length;
+        countfavs = photo.Fav.length;
+        photo = {
+            userName: user.UserName,
+            numberOfFavs: countfavs,
+            numberOfComments: countcomment,
+            ...photo._doc
+        }
+        delete photo.Fav;
+        delete photo.comments;
+        delete photo.__v;
+        Photos.push(photo);
+    }
+    console.log(Photos);
+    try {
+        res.status(201).send(Photos);
+    }
+    catch (ex) {
+        console.log(ex.message);
+    };
+}
+
+
+exports.searchUsers = async (req, res) => {
+
+    const users = await UserModel.find({ _id: { $ne: res.locals.userid } })
+        .or([{ UserName: { $regex: req.params.string, $options: "i" } }, { Fname: { $regex: req.params.string, $options: "i" } }, { Lname: { $regex: req.params.string, $options: "i" } }, { Email: { $regex: req.params.string, $options: "i" } }])
+        .populate('Avatar', 'photoUrl -_id')
+        .select('Avatar UserName Fname Lname Date_joined Followers');
+    if (!users) return res.status(404).send('no users match the required input');
+    else {
+        let Users = [];
+        
+        for (user of users) {
+            let followed = false;
+            index=user.Followers.indexOf(res.locals.userid);
+            console.log(index);
+            if (index != -1 ) 
+                followed = true;
+            await user.populate('photos').execPopulate();
+            const photos = user.photos;
+            let count = 0;
+            for (photo of photos) {
+                if (photo.privacy === 'public')
+                    count++;
+            }
+            countFollowers = user.Followers.length;
+            user = {
+                isFollowed:followed,
+                numberOfFollowers: countFollowers,
+                numberOfPublicPhotos: count,
+                ...user._doc
+            }
+            if (user.Avatar && user.Avatar.photoUrl) {
+                user = {
+                    avatarUrl: user.Avatar.photoUrl,
+                    ...user
+                }
+            }
+            delete user.Followers;
+            delete user.Avatar;
+            delete user.__v;
+            Users.push(user);
+        }
+        try {
+            res.status(201).send(Users);
+        }
+        catch (ex) {
+            console.log(ex.message);
+        }
+    }
+}
+
