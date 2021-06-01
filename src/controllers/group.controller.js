@@ -297,6 +297,13 @@ exports.getGroupMembers = async function (req, res) {
       member.ref.num_following = member.ref.Followers.length;
       delete member.ref.Photos;
       delete member.ref.Followers;
+      delete member.ref.__v;
+      delete member.ref.Password;
+      delete member.ref.Age;
+      delete member.ref.isActive;
+      delete member.ref.views;
+      delete member.ref.About;
+      delete member.ref.Date_joinedt;
       finalArray.push(member.ref);
     });
     res.status(200).json(finalArray);
