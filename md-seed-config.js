@@ -1,5 +1,6 @@
 const User = require("./seeders/User.seeder");
 const Photo = require("./seeders/photos.seeder");
+const Album = require("./seeders/album.seeder");
 
 const mongoose = require("mongoose");
 const config = require("config");
@@ -9,7 +10,7 @@ const db = config.get("db");
  * order is important
  * @type {Object}
  */
-module.exports.seedersList = { User, Photo };
+module.exports.seedersList = { User, Photo,Album };
 /**
  * Connect to mongodb implementation
  * @return {Promise}

@@ -36,6 +36,7 @@
     "mongoose": "^5.7.7",
     "mongoose-data-seed": "^2.1.6",
     "multer": "^1.4.2",
+    "node-mocks-http": "^1.10.1",
     "nodemailer": "^6.6.0",
     "streamifier": "^0.1.1",
     "supertest": "^5.0.0",
@@ -62,5 +63,4 @@
   "mdSeed": {
     "seedersFolder": "./seeders"
   }
-  
 }

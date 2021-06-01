@@ -4,14 +4,42 @@ const { Seeder } = require("mongoose-data-seed");
 const mongoose = require("mongoose");
 
 var id = mongoose.Types.ObjectId("608834536de13632903701b7");
+var coverurl='https://legiit-service.s3.amazonaws.com/b6d3c0588a849c40ba45345f27f113b6/d716466c7645baa49f4f4edd3e62e792.jpg';
 
 const data = [
+  {
+    _id: "608834536de13632903701b2",
+    ownerId: "60b4692859dd7f45e0c19119",
+    photoUrl: 'https://www.montanusphotography.com/coverphotos/FairportNY-MontanusPhoto.jpg',
+  },
+  {
+    _id: "608834536de13632903701b3",
+    ownerId: "60b4692859dd7f45e0c19119",
+    photoUrl: 'https://www.montanusphotography.com/coverphotos/CharlottePier3-MontanusPhoto.jpg',
+  },
+  {
+    _id: "608834536de13632903701b4",
+    ownerId: "60b4692859dd7f45e0c19119",
+    photoUrl: 'https://www.montanusphotography.com/coverphotos/WiscoyFalls-DowntownRochesterNY-MontanusPhoto.jpg',
+  },
+  {
+    _id: "608834536de13632903701b5",
+    ownerId: "60b4692859dd7f45e0c19119",
+    photoUrl: 'https://www.montanusphotography.com/coverphotos/WiscoyFalls-CharlotteNY-MontanusPhoto.jpg',
+  },
+
+  {
+    _id: "608834536de13632903701b6",
+    ownerId: "60b4692859dd7f45e0c19119",
+    photoUrl: coverurl,
+  },
   {
     _id: id,
     ownerId: "60b4692859dd7f45e0c19119",
     photoUrl: "https://upload.wikimedia.org/wikipedia/ar/d/d4/Mickey_Mouse.png",
   },
   {
+
     Fav: ["60b4692859dd7f45e0c19119"],
     ownerId: "60b4692859dd7f45e0c19119",
     photoUrl:
@@ -47,6 +75,7 @@ const data = [
   {
     Fav: ["60b4692859dd7f45e0c19119"],
     ownerId: "60b4692859dd7f45e0c19119",
+    
     photoUrl:
       "https://cdn.mos.cms.futurecdn.net/PQkLFCAiLV4bknjnhqNDyW-1024-80.jpg.webp",
     comments: [

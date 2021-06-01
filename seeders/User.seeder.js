@@ -4,11 +4,21 @@ const { Seeder } = require("mongoose-data-seed");
 const data = [
   {
     _id: "60b4692859dd7f45e0c19119",
+    Fname: "Admin",
+    Lname: "AboAdmin",
+    Email: "Admin@gmail.com",
+    UserName: "Admin123",
+    Password: '$2y$10$fZwYxct70W59lpO6rZ8I3.rWmNY41Lso.r9SERdk5WYvVJkV862OG' ,
+    Age: 102,
+    isActive:true,
+  },
+  {
+    _id: "60b4692859dd7f45e0c19118",
     Fname: "default",
     Lname: "default",
     Email: "default@gmail.com",
     UserName: "default123",
-    Password: "1234",
+    Password: '$2y$10$fZwYxct70W59lpO6rZ8I3.rWmNY41Lso.r9SERdk5WYvVJkV862OG',
     Age: 102,
     isActive:true,
   },
