@@ -10,5 +10,6 @@ COPY . .
 
 EXPOSE 4000
 
+RUN npm run seeds
 # Default command for start-prod build
 CMD ["npm", "run", "start-prod"]

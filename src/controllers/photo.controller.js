@@ -1,71 +1,64 @@
-const { Photo, Comment, Tag, validatePhoto, validateComment, validateId } = require('../models/photo.model')
-const multer = require('multer');
-const { UserModel } = require('../models/user.model');
-const { Group } = require('../models/groups.model');
-const { Album } = require('../models/album.model');
-const config = require('config');
-const Joi = require('joi');
-Joi.objectId = require('joi-objectid')(Joi);
-const mongoose = require('mongoose');
-var port;
-if (config.util.getEnv('NODE_ENV') === 'development')
-    port = "localhost:" + config.get('PORT') + "/";
-else
-    port = "http://dropoids.me/";
+const {
+    Photo,
+    Comment,
+    validatePhoto,
+    validateComment,
+    validateId,
+  } = require("../models/photo.model");
+  const multer = require("multer");
+  const { cloudinary } = require("./cloudinary");
+  let streamifier = require("streamifier");
 
 
-var mkdirp = require('mkdirp');
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        var dest = './photos/';
-        mkdirp.sync(dest);
-        cb(null, './photos/'); // This is the destination folder where the photos shall be stored
-    },
-    filename: function (req, file, cb) {
-        cb(null, new Date().toISOString().replace(/:/g, '-') + file.originalname); //reaplce allows to change ":" to an accepted character '-'
-    }
-})
-
-exports.upload = multer({
-    storage: storage,
-    limits: {
-        fileSize: 1024 * 1024 * 10 // the maximum file size is 10 mega
-    },
-    fileFiler(req, file, cb) {
-        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
-            return cb(new Error('Please enter a JPG, JPEG, PNG format'))
-        }
-    }
-})
-
-
-exports.addPhoto = async (req, res) => {
+  exports.AddPhoto = async (req, res) => {
     const _id = res.locals.userid;
-    if (!req.file)
-        return res.status(400).send({ error: "You must add a file" });
-    const photo = new Photo({
-        ...req.body,
-        ownerId: _id,
-        photoUrl: port + req.file.path
-    })
+    if (!req.files[0]||req.files[0].buffer.length==0)
+    return res.status(400).send({ error: "You must add a file" });
+  
+
+    var buffer = req.files[0].buffer;
+    
+    let uploadFromBuffer = (buffer) => {
+      return new Promise((resolve, reject) => {
+        let cld_upload_stream = cloudinary.uploader.upload_stream(
+          {
+            folder: "samples/dropoid",
+          },
+          (error, result) => {
+            if (result) {
+              resolve(result);
+            } else {
+              reject(error);
+            }
+          }
+        );
+  
+        streamifier.createReadStream(buffer).pipe(cld_upload_stream);
+      });
+    };
+    let result = await uploadFromBuffer(buffer);
+   
+        const photo = new Photo({
+            ...req.body,
+            ownerId: _id,
+            photoUrl:result.url
+        })
+  
     const { error } = validatePhoto(req.body);
     if (error) {
-        return res.status(400).send({ error: error });
+      console.log(error.details[0].message);
+      return res.status(400).send({ error: "Bad request parameters" });
     }
     try {
-        req.params.id = photo._id; // this is will be used in tagPeople function
-        await photo.save()
-        if (!req.body.tagged || req.body.tagged.length === 0)
-            return res.status(200).send(photo);
-        this.tagPeople(req, res);
+      await photo.save()
+      return res.status(200).send(photo);
+    } catch (error) {
+      console.log(error);
+  
+      res.status(500).send({ error: "Internal Server error" });
     }
-    catch (error) {
-        console.log(error);
-        res.status(500).send({ error: "Internal Server error" })
-    }
-
-}
+  };
 
 exports.tagPeople = async (req, res) => {
     if (!req.body.photos || !req.body.tagged)
@@ -301,18 +294,15 @@ exports.getComments = async (req, res) => {
     if (!photo) return res.status(404).send('Photo not found');
     if (photo.privacy === 'private' && res.locals.userid != photo.ownerId)
         return res.status(403).send('Access denied');
-
+  
     try {
-        res.status(201).send(photo.comments);
+      res.status(201).send(photo.comments);
+    } catch (ex) {
+      console.log(ex.message);
     }
-    catch (ex) {
-        console.log(ex.message);
-
-    };
-}
-
-exports.addComment = async (req, res) => {
-
+  };
+  
+  exports.addComment = async (req, res) => {
     const { error } = validateId({ id: req.params.photoId });
     if (error) return res.status(400).send(error.details[0].message);
 
@@ -323,30 +313,28 @@ exports.addComment = async (req, res) => {
         return res.status(403).send('Access denied');
 
     const result = validateComment(req.body);
-    if (result.error) return res.status(400).send(result.error.details[0].message);
-
+    if (result.error)
+      return res.status(400).send(result.error.details[0].message);
+  
     const comment = new Comment({
-        comment: req.body.comment,
-        user: res.locals.userid
+      comment: req.body.comment,
+      user: res.locals.userid,
     });
     try {
-        photo.comments.push(comment);
-        await photo.save();
-        res.status(201).send('comment added successfully');
+      photo.comments.push(comment);
+      await photo.save();
+      res.status(201).send("comment added successfully");
+    } catch (ex) {
+      console.log(ex.message);
     }
-    catch (ex) {
-        console.log(ex.message);
-
-    };
-};
-
-
-exports.deleteComment = async (req, res) => {
-
+  };
+  
+  exports.deleteComment = async (req, res) => {
     const { error } = validateId({ id: req.params.photoId });
     if (error) return res.status(400).send(error.details[0].message);
-
+  
     const photo = await Photo.findById(req.params.photoId);
+
     if (!photo) return res.status(404).send('photo not found');
 
     if (photo.privacy === 'private' && res.locals.userid != photo.ownerId)
@@ -356,15 +344,22 @@ exports.deleteComment = async (req, res) => {
     if (result.error) return res.status(400).send(result.error.details[0].message);
 
     const comment = await photo.comments.id(req.params.commentId);
-    if (!comment) return res.status(404).send('Comment not found');
-
-    if (res.locals.userid != comment.user._id && res.locals.userid != photo.ownerId)
-        return res.status(403).send('Access denied. User not authorized to delete comment');
-
+    if (!comment) return res.status(404).send("Comment not found");
+  
+    if (
+      res.locals.userid != comment.user._id &&
+      res.locals.userid != photo.ownerId
+    )
+      return res
+        .status(403)
+        .send("Access denied. User not authorized to delete comment");
+  
     try {
-        comment.remove();
-        photo.save();
-        res.status(201).send('comment deleted successfully');
+      comment.remove();
+      photo.save();
+      res.status(201).send("comment deleted successfully");
+    } catch (ex) {
+      console.log(ex.message);
     }
     catch (ex) {
         console.log(ex.message);

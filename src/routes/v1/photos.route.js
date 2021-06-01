@@ -1,7 +1,9 @@
 const express = require('express')
 const router = express.Router()
-const { authentication } = require('../../middlewares/auth')
-const photoController = require('../../controllers/photo.controller')
+const {authentication}= require('../../middlewares/auth')
+const photoController=require('../../controllers/photo.controller')
+const fileparser=require('express-multipart-file-parser');
+router.use(fileparser);
 //schemas
 /**
  * @swagger
@@ -72,7 +74,7 @@ const photoController = require('../../controllers/photo.controller')
  *            }
  */
 
-router.post('/', authentication, photoController.upload.single("file"), photoController.addPhoto)
+router.post('/',authentication,photoController.AddPhoto)
 
 
 

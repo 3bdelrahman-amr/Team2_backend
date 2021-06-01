@@ -2,3 +2,7 @@ node_modules
 
 coverage/
 deploy_key
+package-lock.json
+
+
+
