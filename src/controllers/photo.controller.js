@@ -4,61 +4,61 @@ const {
     validatePhoto,
     validateComment,
     validateId,
-  } = require("../models/photo.model");
-  const multer = require("multer");
-  const { cloudinary } = require("./cloudinary");
-  let streamifier = require("streamifier");
+} = require("../models/photo.model");
+const multer = require("multer");
+const { cloudinary } = require("./cloudinary");
+let streamifier = require("streamifier");
 
 
 
-  exports.AddPhoto = async (req, res) => {
+exports.AddPhoto = async (req, res) => {
     const _id = res.locals.userid;
-    if (!req.files[0]||req.files[0].buffer.length==0)
-    return res.status(400).send({ error: "You must add a file" });
-  
+    if (!req.files[0] || req.files[0].buffer.length == 0)
+        return res.status(400).send({ error: "You must add a file" });
+
 
     var buffer = req.files[0].buffer;
-    
+
     let uploadFromBuffer = (buffer) => {
-      return new Promise((resolve, reject) => {
-        let cld_upload_stream = cloudinary.uploader.upload_stream(
-          {
-            folder: "samples/dropoid",
-          },
-          (error, result) => {
-            if (result) {
-              resolve(result);
-            } else {
-              reject(error);
-            }
-          }
-        );
-  
-        streamifier.createReadStream(buffer).pipe(cld_upload_stream);
-      });
+        return new Promise((resolve, reject) => {
+            let cld_upload_stream = cloudinary.uploader.upload_stream(
+                {
+                    folder: "samples/dropoid",
+                },
+                (error, result) => {
+                    if (result) {
+                        resolve(result);
+                    } else {
+                        reject(error);
+                    }
+                }
+            );
+
+            streamifier.createReadStream(buffer).pipe(cld_upload_stream);
+        });
     };
     let result = await uploadFromBuffer(buffer);
-   
-        const photo = new Photo({
-            ...req.body,
-            ownerId: _id,
-            photoUrl:result.url
-        })
-  
+
+    const photo = new Photo({
+        ...req.body,
+        ownerId: _id,
+        photoUrl: result.url
+    })
+
     const { error } = validatePhoto(req.body);
     if (error) {
-      console.log(error.details[0].message);
-      return res.status(400).send({ error: "Bad request parameters" });
+        console.log(error.details[0].message);
+        return res.status(400).send({ error: "Bad request parameters" });
     }
     try {
-      await photo.save()
-      return res.status(200).send(photo);
+        await photo.save()
+        return res.status(200).send(photo);
     } catch (error) {
-      console.log(error);
-  
-      res.status(500).send({ error: "Internal Server error" });
+        console.log(error);
+
+        res.status(500).send({ error: "Internal Server error" });
     }
-  };
+};
 
 exports.tagPeople = async (req, res) => {
     if (!req.body.photos || !req.body.tagged)
@@ -294,15 +294,15 @@ exports.getComments = async (req, res) => {
     if (!photo) return res.status(404).send('Photo not found');
     if (photo.privacy === 'private' && res.locals.userid != photo.ownerId)
         return res.status(403).send('Access denied');
-  
+
     try {
-      res.status(201).send(photo.comments);
+        res.status(201).send(photo.comments);
     } catch (ex) {
-      console.log(ex.message);
+        console.log(ex.message);
     }
-  };
-  
-  exports.addComment = async (req, res) => {
+};
+
+exports.addComment = async (req, res) => {
     const { error } = validateId({ id: req.params.photoId });
     if (error) return res.status(400).send(error.details[0].message);
 
@@ -314,25 +314,25 @@ exports.getComments = async (req, res) => {
 
     const result = validateComment(req.body);
     if (result.error)
-      return res.status(400).send(result.error.details[0].message);
-  
+        return res.status(400).send(result.error.details[0].message);
+
     const comment = new Comment({
-      comment: req.body.comment,
-      user: res.locals.userid,
+        comment: req.body.comment,
+        user: res.locals.userid,
     });
     try {
-      photo.comments.push(comment);
-      await photo.save();
-      res.status(201).send("comment added successfully");
+        photo.comments.push(comment);
+        await photo.save();
+        res.status(201).send("comment added successfully");
     } catch (ex) {
-      console.log(ex.message);
+        console.log(ex.message);
     }
-  };
-  
-  exports.deleteComment = async (req, res) => {
+};
+
+exports.deleteComment = async (req, res) => {
     const { error } = validateId({ id: req.params.photoId });
     if (error) return res.status(400).send(error.details[0].message);
-  
+
     const photo = await Photo.findById(req.params.photoId);
 
     if (!photo) return res.status(404).send('photo not found');
@@ -345,53 +345,48 @@ exports.getComments = async (req, res) => {
 
     const comment = await photo.comments.id(req.params.commentId);
     if (!comment) return res.status(404).send("Comment not found");
-  
+
     if (
-      res.locals.userid != comment.user._id &&
-      res.locals.userid != photo.ownerId
+        res.locals.userid != comment.user._id &&
+        res.locals.userid != photo.ownerId
     )
-      return res
-        .status(403)
-        .send("Access denied. User not authorized to delete comment");
-  
+        return res
+            .status(403)
+            .send("Access denied. User not authorized to delete comment");
+
     try {
-      comment.remove();
-      photo.save();
-      res.status(201).send("comment deleted successfully");
+        comment.remove();
+        photo.save();
+        res.status(201).send("comment deleted successfully");
     } catch (ex) {
-      console.log(ex.message);
-    }
-    catch (ex) {
         console.log(ex.message);
-    };
+    }
 };
 
 
 exports.deletePhoto = async (req, res) => {
     const user = await UserModel.findById(res.locals.userid)
-    .select('Group');
+        .select('Group');
     await user.populate('albums').execPopulate();
-    const albums=user.albums;
-    
-    let numErrors=0;
+    const albums = user.albums;
+
+    let numErrors = 0;
     let errormsg;
     req.body.photos.forEach(async function (photo) {
         const { error } = validateId({ id: photo });
-        if (error) 
-        {
+        if (error) {
             numErrors++;
-            errormsg=error.details[0].message
+            errormsg = error.details[0].message
         }
     })
-    if (numErrors>0) return res.status(400).send(errormsg);
+    if (numErrors > 0) return res.status(400).send(errormsg);
     let photodeleted = await Photo.findById(req.body.photos[0]);
     if (!photodeleted) return res.status(404).send({ error: "photo not found" });
     if (res.locals.userid != photodeleted.ownerId)
         return res.status(403).send('Access denied');
 
     console.log(user.Group);
-    if(user.Group)
-    {
+    if (user.Group) {
         user.Group.forEach(async function (group) {
             group = await Group.findById(group);
 
@@ -402,21 +397,20 @@ exports.deletePhoto = async (req, res) => {
         })
     }
 
-    console.log(albums);    
-    if(user.albums)
-    {
+    console.log(albums);
+    if (user.albums) {
         user.albums.forEach(async function (album) {
             album = await Album.findById(album);
             req.body.photos.forEach(async function (photo) {
-                    album.photos.remove(photo);
+                album.photos.remove(photo);
             })
             await album.save();
         })
     }
 
     await user.save();
-    
-   
+
+
     try {
         req.body.photos.forEach(async function (photo) {
             photodeleted = await Photo.findById(photo);
@@ -425,18 +419,16 @@ exports.deletePhoto = async (req, res) => {
                 favespoeple = photodeleted.Fav;
 
                 const users = await UserModel.find({ _id: { $in: favespoeple } })
-                .select('Fav');
-                if(users)
-                {
+                    .select('Fav');
+                if (users) {
                     users.forEach(async function (user) {
-                        if(user.Fav)
-                        {
+                        if (user.Fav) {
                             user.Fav.remove(photo);
-                        await user.save();
-                        }  
+                            await user.save();
+                        }
                     })
                 }
-                
+
                 await Photo.findByIdAndRemove(photo);
             }
         })
