@@ -19,7 +19,7 @@ app.options('*', cors())
 
 // simple route for testing api is working:
 app.get("/api/test", (req, res) => {
-    res.json({ message: "Welcome to dropoids backend application V101" });
+    res.json({ message: "Welcome to dropoids backend application V102" });
   });
 
 
