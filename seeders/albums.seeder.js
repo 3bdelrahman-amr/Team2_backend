@@ -2,30 +2,30 @@ const { Album } = require('../src/models/album.model');
 const { Seeder } = require('mongoose-data-seed');
 const mongoose = require('mongoose');
 
-var id = mongoose.Types.ObjectId('608834536de13632903701b7');
-
 const data = [
     {
-        _id: "608834536de13632903701b7",
+        _id: "608834536de13632903701b0",
         title: "Album1",
         description: "album number 1",
         ownerId: "60b4692859dd7f45e0c19119",
-        photos: [""],
-        coverPhoto: ""
+        photos: ["608834536de13632903701b7"],
+        coverPhoto: "608834536de13632903701b7"
     },
     {
-        _id: '60b51093f85b283d3cea6f70',
-        Photos: ['608834536de13632903701b7'],
-        description: null,
-        privacy: 'public',
-        visibility: 'public',
-        name: 'Group 1',
-        Members: [
-            {
-                role: 'admin',
-                ref: '60b4692859dd7f45e0c19119',
-            },
-        ]
+        _id: "608834536de13632903701b1",
+        title: "Album2",
+        description: "album number 2",
+        ownerId: "60b4692859dd7f45e0c19119",
+        photos: ["608834536de13632903701b7"],
+        coverPhoto: "608834536de13632903701b7"
+    },
+    {
+        _id: "608834536de13632903701b2",
+        title: "Album3",
+        description: "album number 3",
+        ownerId: "60b4692859dd7f45e0c19119",
+        photos: ["608834536de13632903701b7"],
+        coverPhoto: "608834536de13632903701b7"
     }
 ];
 
