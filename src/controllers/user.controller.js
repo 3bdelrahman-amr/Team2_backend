@@ -481,6 +481,7 @@ module.exports.GetFav = async (req, res) => {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 module.exports.Explore = async (req, res) => {
+    try{ 
   var photos = await PhotoModel.Photo.find({});
 
   var PhotosArray = [];
@@ -540,4 +541,8 @@ module.exports.Explore = async (req, res) => {
   }
 
   res.status(200).send(PhotosArray);
+}
+catch(err){
+    res.status(500).send({message:'no photos to  send for explore'});
+}
 };
