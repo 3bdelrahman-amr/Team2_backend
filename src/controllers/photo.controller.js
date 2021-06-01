@@ -361,9 +361,7 @@ exports.getComments = async (req, res) => {
     } catch (ex) {
       console.log(ex.message);
     }
-    catch (ex) {
-        console.log(ex.message);
-    };
+    
 };
 
 

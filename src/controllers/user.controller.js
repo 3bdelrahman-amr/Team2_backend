@@ -528,7 +528,7 @@ module.exports.Explore = async (req, res) => {
       like = like.toObject();
       if (like.photos) likejs.num_photos = like.photos.length;
       else likejs.num_photos = 0;
-      likesjs.id=like._id;
+      likejs.id=like._id;
       likejs.username = like.UserName;
       likejs.num_following = like.Following.length;
       let likeavatar = await PhotoModel.Photo.findById({ _id: like.Avatar });
