@@ -1,10 +1,17 @@
+const PhotoModel = require('../src/models/photo.model');
+const { Seeder } = require('mongoose-data-seed');
+const mongoose = require('mongoose');
 
+<<<<<<< HEAD
 const PhotoModel = require("../src/models/photo.model");
 const { Seeder } = require("mongoose-data-seed");
 const mongoose = require("mongoose");
 
 var id = mongoose.Types.ObjectId("608834536de13632903701b7");
 var coverurl='https://legiit-service.s3.amazonaws.com/b6d3c0588a849c40ba45345f27f113b6/d716466c7645baa49f4f4edd3e62e792.jpg';
+=======
+var id = mongoose.Types.ObjectId('608834536de13632903701b7');
+>>>>>>> 01d6642d7227b00d04cd70e7fee61dfa59da462e
 
 const data = [
   {
@@ -35,175 +42,190 @@ const data = [
   },
   {
     _id: id,
-    ownerId: "60b4692859dd7f45e0c19119",
-    photoUrl: "https://upload.wikimedia.org/wikipedia/ar/d/d4/Mickey_Mouse.png",
+    ownerId: '60b4692859dd7f45e0c19119',
+    photoUrl: 'https://upload.wikimedia.org/wikipedia/ar/d/d4/Mickey_Mouse.png',
   },
   {
+<<<<<<< HEAD
 
     Fav: ["60b4692859dd7f45e0c19119"],
     ownerId: "60b4692859dd7f45e0c19119",
+=======
+    Fav: ['60b4692859dd7f45e0c19119'],
+    ownerId: '60b4692859dd7f45e0c19119',
+>>>>>>> 01d6642d7227b00d04cd70e7fee61dfa59da462e
     photoUrl:
-      "https://iresizer.devops.arabiaweather.com/resize?url=https://adminassets.devops.arabiaweather.com/sites/default/files/field/image/moon_2.jpg&size=850x478&force_jpg=1",
+      'https://iresizer.devops.arabiaweather.com/resize?url=https://adminassets.devops.arabiaweather.com/sites/default/files/field/image/moon_2.jpg&size=850x478&force_jpg=1',
     comments: [
       {
-        comment: "ya hala ya hala",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'ya hala ya hala',
+        user: '60b4692859dd7f45e0c19119',
       },
       {
-        comment: "ew3a ba",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'ew3a ba',
+        user: '60b4692859dd7f45e0c19119',
       },
       {
-        comment: "yarab n5las",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'yarab n5las',
+        user: '60b4692859dd7f45e0c19119',
       },
       {
-        comment: "we are strong",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'we are strong',
+        user: '60b4692859dd7f45e0c19119',
       },
       {
-        comment: "time bomb",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'time bomb',
+        user: '60b4692859dd7f45e0c19119',
       },
 
       {
-        comment: "ya hala ya hala",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'ya hala ya hala',
+        user: '60b4692859dd7f45e0c19119',
       },
     ],
+    privacy: 'public',
   },
   {
+<<<<<<< HEAD
     Fav: ["60b4692859dd7f45e0c19119"],
     ownerId: "60b4692859dd7f45e0c19119",
     
+=======
+    Fav: ['60b4692859dd7f45e0c19119'],
+    ownerId: '60b4692859dd7f45e0c19119',
+>>>>>>> 01d6642d7227b00d04cd70e7fee61dfa59da462e
     photoUrl:
-      "https://cdn.mos.cms.futurecdn.net/PQkLFCAiLV4bknjnhqNDyW-1024-80.jpg.webp",
+      'https://cdn.mos.cms.futurecdn.net/PQkLFCAiLV4bknjnhqNDyW-1024-80.jpg.webp',
     comments: [
       {
-        comment: "ya hala ya hala",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'ya hala ya hala',
+        user: '60b4692859dd7f45e0c19119',
       },
       {
-        comment: "ew3a ba",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'ew3a ba',
+        user: '60b4692859dd7f45e0c19119',
       },
       {
-        comment: "yarab n5las",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'yarab n5las',
+        user: '60b4692859dd7f45e0c19119',
       },
       {
-        comment: "we are strong",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'we are strong',
+        user: '60b4692859dd7f45e0c19119',
       },
       {
-        comment: "time bomb",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'time bomb',
+        user: '60b4692859dd7f45e0c19119',
       },
 
       {
-        comment: "ya hala ya hala",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'ya hala ya hala',
+        user: '60b4692859dd7f45e0c19119',
       },
     ],
+    privacy: 'public',
   },
   {
-    Fav: ["60b4692859dd7f45e0c19119"],
-    ownerId: "60b4692859dd7f45e0c19119",
-    photoUrl: "https://www.jeasonline.org/frontend/images/NewImage1.jpeg",
+    Fav: ['60b4692859dd7f45e0c19119'],
+    ownerId: '60b4692859dd7f45e0c19119',
+    photoUrl: 'https://www.jeasonline.org/frontend/images/NewImage1.jpeg',
     comments: [
       {
-        comment: "ya hala ya hala",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'ya hala ya hala',
+        user: '60b4692859dd7f45e0c19119',
       },
       {
-        comment: "ew3a ba",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'ew3a ba',
+        user: '60b4692859dd7f45e0c19119',
       },
       {
-        comment: "yarab n5las",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'yarab n5las',
+        user: '60b4692859dd7f45e0c19119',
       },
       {
-        comment: "we are strong",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'we are strong',
+        user: '60b4692859dd7f45e0c19119',
       },
       {
-        comment: "time bomb",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'time bomb',
+        user: '60b4692859dd7f45e0c19119',
       },
 
       {
-        comment: "ya hala ya hala",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'ya hala ya hala',
+        user: '60b4692859dd7f45e0c19119',
       },
     ],
+    privacy: 'public',
   },
   {
-    Fav: ["60b4692859dd7f45e0c19119"],
-    ownerId: "60b4692859dd7f45e0c19119",
+    Fav: ['60b4692859dd7f45e0c19119'],
+    ownerId: '60b4692859dd7f45e0c19119',
     photoUrl:
-      "https://play-lh.googleusercontent.com/-B4OMUAx3roQaksfWFZlyk8kHNU8raITHAm5_4BBbiQb7dyrlxTkYLWs3W6eb-CkjDQ=s180-rw",
+      'https://play-lh.googleusercontent.com/-B4OMUAx3roQaksfWFZlyk8kHNU8raITHAm5_4BBbiQb7dyrlxTkYLWs3W6eb-CkjDQ=s180-rw',
     comments: [
       {
-        comment: "ya hala ya hala",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'ya hala ya hala',
+        user: '60b4692859dd7f45e0c19119',
       },
       {
-        comment: "ew3a ba",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'ew3a ba',
+        user: '60b4692859dd7f45e0c19119',
       },
       {
-        comment: "yarab n5las",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'yarab n5las',
+        user: '60b4692859dd7f45e0c19119',
       },
       {
-        comment: "we are strong",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'we are strong',
+        user: '60b4692859dd7f45e0c19119',
       },
       {
-        comment: "time bomb",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'time bomb',
+        user: '60b4692859dd7f45e0c19119',
       },
 
       {
-        comment: "ya hala ya hala",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'ya hala ya hala',
+        user: '60b4692859dd7f45e0c19119',
       },
     ],
+    privacy: 'public',
   },
 
   {
-    Fav: ["60b4692859dd7f45e0c19119"],
-    ownerId: "60b4692859dd7f45e0c19119",
+    Fav: ['60b4692859dd7f45e0c19119'],
+    ownerId: '60b4692859dd7f45e0c19119',
     photoUrl:
-      "https://www.cairowaterweek.eg/wp-content/uploads/2018/05/Hesham-Bekhit.jpg",
+      'https://www.cairowaterweek.eg/wp-content/uploads/2018/05/Hesham-Bekhit.jpg',
     comments: [
       {
-        comment: "ya hala ya hala",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'ya hala ya hala',
+        user: '60b4692859dd7f45e0c19119',
       },
       {
-        comment: "ew3a ba",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'ew3a ba',
+        user: '60b4692859dd7f45e0c19119',
       },
       {
-        comment: "yarab n5las",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'yarab n5las',
+        user: '60b4692859dd7f45e0c19119',
       },
       {
-        comment: "we are strong",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'we are strong',
+        user: '60b4692859dd7f45e0c19119',
       },
       {
-        comment: "time bomb",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'time bomb',
+        user: '60b4692859dd7f45e0c19119',
       },
 
       {
-        comment: "ya hala ya hala",
-        user: "60b4692859dd7f45e0c19119",
+        comment: 'ya hala ya hala',
+        user: '60b4692859dd7f45e0c19119',
       },
     ],
+    privacy: 'public',
   },
 ];
 
@@ -220,4 +242,3 @@ class PhotosSeeder extends Seeder {
 }
 
 module.exports = PhotosSeeder;
-
