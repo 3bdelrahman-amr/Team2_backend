@@ -481,68 +481,70 @@ module.exports.GetFav = async (req, res) => {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 module.exports.Explore = async (req, res) => {
-    try{ 
-  var photos = await PhotoModel.Photo.find({});
+//     try{ 
+//   var photos = await PhotoModel.Photo.find({});
 
-  var PhotosArray = [];
-  for (var i = 0; i < photos.length; i++) {
-    if (photos[i].Fav.length == 0) continue;
-    let photojs = photos[i].toObject();
-    const owner = await Model.UserModel.findById({ _id: photos[i].ownerId });
-    photojs.ownerName =
-      (owner.Fname == null ? "" : owner.Fname) +
-      " " +
-      (owner.Lname == null ? "" : owner.Lname);
-    photojs.ownerUsername = owner.UserName;
-    const avatar = await PhotoModel.Photo.findById(owner.Avatar);
-    photojs.Avatar = avatar.photoUrl;
+//   var PhotosArray = [];
+//   for (var i = 0; i < photos.length; i++) {
+//     if (photos[i].Fav.length == 0) continue;
+//     let photojs = photos[i].toObject();
+//     const owner = await Model.UserModel.findById({ _id: photos[i].ownerId });
+//     photojs.ownerName =
+//       (owner.Fname == null ? "" : owner.Fname) +
+//       " " +
+//       (owner.Lname == null ? "" : owner.Lname);
+//     photojs.ownerUsername = owner.UserName;
+//     const avatar = await PhotoModel.Photo.findById(owner.Avatar);
+//     photojs.Avatar = avatar.photoUrl;
 
-    photojs.comment = [];
+//     photojs.comment = [];
 
-    // process comments
-    var js = photos[i].comments.toObject();
-    for (var j = 0; j < js.length; j++) {
+//     // process comments
+//     var js = photos[i].comments.toObject();
+//     for (var j = 0; j < js.length; j++) {
       
-      const user = photos[i].comments[j].user;
-      var comentowner = await Model.UserModel.findById({ _id: user });
-      comentowner = comentowner.toObject();
-      let commentjs = {};
-      commentjs.comment=photos[i].comments[j]
-      commentjs.ownerusername = comentowner.UserName;
-      var commentavatarowner = await PhotoModel.Photo.findById({
-        _id: comentowner.Avatar,
-      });
-      commentjs.avatar = commentavatarowner.photoUrl;
-      photojs.comment.push(commentjs);
-    }
-    delete photojs.comments;
+//       const user = photos[i].comments[j].user;
+//       var comentowner = await Model.UserModel.findById({ _id: user });
+//       comentowner = comentowner.toObject();
+//       let commentjs = {};
+//       commentjs.comment=photos[i].comments[j]
+//       commentjs.ownerusername = comentowner.UserName;
+//       var commentavatarowner = await PhotoModel.Photo.findById({
+//         _id: comentowner.Avatar,
+//       });
+//       commentjs.avatar = commentavatarowner.photoUrl;
+//       photojs.comment.push(commentjs);
+//     }
+//     delete photojs.comments;
 
-    photojs.fav = [];
-    // process fav
-    for (var j = 0; j < photos[i].Fav.length; j++) {
-      var like = await Model.UserModel.findById(
-        { _id: photos[i].Fav[j] },
-        { password: 0, isActive: 0, Folowing: 0, Followers: 0 }
-      );
-      await like.populate("photos").execPopulate();
-      let likejs = {};
-      like = like.toObject();
-      if (like.photos) likejs.num_photos = like.photos.length;
-      else likejs.num_photos = 0;
-      likejs.id=like._id;
-      likejs.username = like.UserName;
-      likejs.num_following = like.Following.length;
-      let likeavatar = await PhotoModel.Photo.findById({ _id: like.Avatar });
-      likejs.avatar = likeavatar.photoUrl;
-      photojs.fav.push(likejs);
-    }
-    delete photojs.Fav;
-    PhotosArray.push(photojs);
-  }
+//     photojs.fav = [];
+//     // process fav
+//     for (var j = 0; j < photos[i].Fav.length; j++) {
+//       var like = await Model.UserModel.findById(
+//         { _id: photos[i].Fav[j] },
+//         { password: 0, isActive: 0, Folowing: 0, Followers: 0 }
+//       );
+//       await like.populate("photos").execPopulate();
+//       let likejs = {};
+//       like = like.toObject();
+//       if (like.photos) likejs.num_photos = like.photos.length;
+//       else likejs.num_photos = 0;
+//       likejs.id=like._id;
+//       likejs.username = like.UserName;
+//       likejs.num_following = like.Following.length;
+//       let likeavatar = await PhotoModel.Photo.findById({ _id: like.Avatar });
+//       likejs.avatar = likeavatar.photoUrl;
+//       photojs.fav.push(likejs);
+//     }
+//     delete photojs.Fav;
+//     PhotosArray.push(photojs);
+//   }
 
-  res.status(200).send(PhotosArray);
-}
-catch(err){
-    res.status(500).send({message:'no photos to  send for explore'});
-}
+//   res.status(200).send(PhotosArray);
+// }
+// catch(err){
+
+//     res.status(500).send({message:'no photos to  send for explore'});
+// }
+res.status(200).send({message:'passed '});
 };
