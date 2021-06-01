@@ -278,7 +278,7 @@ const { use, route } = require('./album.route');
   */
   
   router.post("/",UserController.register,auth.SendVerification );
-  
+
   router.get('/verify/:token',UserController.VerifyEmail);
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -309,7 +309,7 @@ const { use, route } = require('./album.route');
    //check if user
    router.get("/check/:peopleid",auth.authentication,auth.IfUser);
    //explore/android
-   router.get("/house",auth.authentication,UserController.Explore);
+   router.get("/house",UserController.Explore);
 
    
   
