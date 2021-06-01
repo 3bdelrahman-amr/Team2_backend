@@ -27,9 +27,6 @@ script:
 # Run tests with built Docker images:
 - echo Run api tests..
 #- docker run -e CI=true loaymoh99/api-test
-
-
-after_success:
 #Buildng and then pushing the new images to docker hub
 - echo Building the production Docker image..
 - docker build -t loaymoh99/dkr-dropoids-api .
@@ -38,6 +35,7 @@ after_success:
 - echo Pushing the Docker images..
 - docker push loaymoh99/dkr-dropoids-api
 
+after_success:
 #deploying the new containers
 - echo Deploy here..
 - "./deploy.sh"
