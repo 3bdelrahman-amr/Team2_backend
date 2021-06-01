@@ -543,6 +543,9 @@ module.exports.Explore = async (req, res) => {
   res.status(200).send(PhotosArray);
 }
 catch(err){
+
     res.status(500).send({message:'no photos to  send for explore'});
 }
+// res.status(200).send({message:'passed '});
+
 };
