@@ -313,6 +313,7 @@ const { use, route } = require('./album.route');
    //update user about
    router.put("/about",auth.authentication,UserController.UpdateAbout);
    router.get("/fav",auth.authentication,UserController.GetFav);
+   router.get("/album",auth.authentication,UserController.Album);
 
    
   
