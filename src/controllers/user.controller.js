@@ -9,6 +9,7 @@ const config = require("config");
 ////const { use } = require("../routes/v1");
 const secret = config.get("JWT_KEY");
 const PhotoModel = require("../models/photo.model");
+const { object } = require("joi");
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -360,7 +361,7 @@ module.exports.UserPhotos = async (req, res) => {
             );
             photos.push(photo);
           }
-          res.status(200).send({ PhotoList: photos });
+          res.status(200).send({  photos });
 
         })
         .catch((err) => {
@@ -546,6 +547,31 @@ catch(err){
 
     res.status(500).send({message:'no photos to  send for explore'});
 }
-// res.status(200).send({message:'passed '});
-
 };
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module.exports.UpdateAbout=async(req,res)=>{
+    if(!req.body)
+    return res.status(400).send({message:'req body is empty'});
+    var about = ["Description", "Hometown", "Occupation", "CurrentCity"];
+    var update=Object.keys(req.body);
+    var valid=update.every(up=>about.includes(up));
+    
+    if(!valid)
+    return res.status(403).send({message:'req body is'});
+
+          const user = await Model.UserModel.findById({ _id: res.locals.userid });
+          
+          update.forEach((key) => {
+            user.About[key] = req.body[key];
+          });
+
+          //user.About=userabout;
+          await user.save();
+          res.status(200).send({message:'updated successfully'});
+
+
+
+
+}

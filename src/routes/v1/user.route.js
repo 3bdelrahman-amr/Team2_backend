@@ -310,6 +310,9 @@ const { use, route } = require('./album.route');
    router.get("/check/:peopleid",auth.authentication,auth.IfUser);
    //explore/android
    router.get("/explore",auth.authentication,UserController.Explore);
+   //update user about
+   router.put("/about",auth.authentication,UserController.UpdateAbout);
+   router.get("/fav",auth.authentication,UserController.GetFav);
 
    
   
