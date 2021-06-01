@@ -48,7 +48,7 @@ function validateCreateAlbum(album)
     const schema = Joi.object({
         title: Joi.string().required().max(255),
         description: Joi.string().max(1024).allow(null,''),
-        photos: Joi.array().items(Joi.objectId().required).required(),
+        photos: Joi.array().items(Joi.objectId().required()).required(),
         coverPhoto: Joi.objectId()
     });
     const result = schema.validate(album);
@@ -66,6 +66,15 @@ function validateUpdateAlbum(album)
     return result;
 }
 
+function validatePhotosIds(photos)
+{
+    const schema = Joi.object({
+        photos: Joi.array().items(Joi.objectId().required()).required()
+    })
+    const result = schema.validate(photos);
+    return result;
+}
+
 
 const Album = mongoose.model('Album', albumSchema);
 
@@ -74,5 +83,6 @@ module.exports = {
     Album,
     validateAlbumId,
     validateCreateAlbum,
-    validateUpdateAlbum
+    validateUpdateAlbum,
+    validatePhotosIds
 }

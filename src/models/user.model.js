@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
 const schema = mongoose.Schema;
+
 Joi.objectId = require("joi-objectid")(Joi);
 const id = mongoose.Types.ObjectId("608834536de13632903701b7");
 
@@ -31,6 +32,7 @@ const UserSchema = new schema({
   },
   About: {
     Description: {
+
       type: String,
       min: 1,
       default: "",
@@ -163,6 +165,7 @@ module.exports.validateLogin = (body) => {
   });
 
   return schema.validate(body);
+
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -173,7 +176,8 @@ module.exports.validateId = (id) => {
   });
   const result = schema.validate(id);
   return result;
-};
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 module.exports.UserModel = mongoose.model("User", UserSchema);
+

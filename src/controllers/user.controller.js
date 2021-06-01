@@ -46,12 +46,14 @@ module.exports.register = async (req, res, next) => {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
+
 module.exports.GetUser = async (req, res) => {
   try {
     const user = await Model.UserModel.findById(
       { _id: res.locals.userid },
       { Password: 0, _V: 0 }
     );
+
 
     if (!user) return res.status(404).send({ message: "user not found" });
 
@@ -343,6 +345,7 @@ module.exports.UpdateUser = async (req, res) => {
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 module.exports.UserPhotos = async (req, res) => {
   await Model.UserModel.findById({ _id: res.locals.userid })
     .then(async (user) => {
@@ -358,6 +361,7 @@ module.exports.UserPhotos = async (req, res) => {
             photos.push(photo);
           }
           res.status(200).send({ PhotoList: photos });
+
         })
         .catch((err) => {
           res
@@ -412,6 +416,7 @@ module.exports.About = async (req, res) => {
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 module.exports.Unfollow = async (req, res) => {
   await Model.UserModel.findById({ _id: res.locals.userid })
     .then(async (user) => {
@@ -435,6 +440,7 @@ module.exports.Unfollow = async (req, res) => {
             return res
               .status(404)
               .send({ message: "not found in the following list" });
+
         })
         .catch((err) => {
           return res.status(404).send({ message: "user(people) not found " });

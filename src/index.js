@@ -4,10 +4,9 @@ const config = require('config');
 const { util } = require('config');
 
 
-
 let server;
-const db=config.get('db');
-const port=config.get('PORT');
+const db = config.get('db');
+const port = config.get('PORT');
 
 mongoose.connect(db, {
   useNewUrlParser: true,

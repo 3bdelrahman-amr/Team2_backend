@@ -1,3 +1,4 @@
+
 const PhotoModel = require("../src/models/photo.model");
 const { Seeder } = require("mongoose-data-seed");
 const mongoose = require("mongoose");
@@ -190,3 +191,4 @@ class PhotosSeeder extends Seeder {
 }
 
 module.exports = PhotosSeeder;
+
