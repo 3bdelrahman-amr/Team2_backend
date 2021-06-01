@@ -294,7 +294,6 @@ exports.getGroupMembers = async function (req, res) {
       member.ref.role = member.role;
       member.ref.email = member.ref.Email;
       delete member.ref.Email;
-      member.ref.num_photos = member.ref.Photos.length;
       member.ref.num_following = member.ref.Followers.length;
       delete member.ref.Photos;
       delete member.ref.Followers;

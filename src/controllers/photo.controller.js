@@ -359,8 +359,9 @@ exports.deleteComment = async (req, res) => {
         photo.save();
         res.status(201).send("comment deleted successfully");
     } catch (ex) {
-        console.log(ex.message);
+      console.log(ex.message);
     }
+    
 };
 
 

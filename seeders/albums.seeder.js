@@ -1,11 +1,15 @@
 const { Album } = require('../src/models/album.model');
 const { Seeder } = require('mongoose-data-seed');
+const mongoose = require('mongoose');
+
+var id = mongoose.Types.ObjectId('608834536de13632903701b7');
 
 const data = [
     {
+        _id: "608834536de13632903701b7",
         title: "Album1",
         description: "album number 1",
-        ownerId: "",
+        ownerId: "60b4692859dd7f45e0c19119",
         photos: [""],
         coverPhoto: ""
     },
