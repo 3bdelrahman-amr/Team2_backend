@@ -1,19 +1,19 @@
-const userModel = require("../src/models/user.model");
-const { Seeder } = require("mongoose-data-seed");
+const userModel = require('../src/models/user.model');
+const { Seeder } = require('mongoose-data-seed');
 
 const data = [
   {
-    _id: "60b4692859dd7f45e0c19119",
-    Fname: "default",
-    Lname: "default",
-    Email: "default@gmail.com",
-    UserName: "default123",
-    Password: "1234",
+    _id: '60b4692859dd7f45e0c19119',
+    Fname: 'default',
+    Lname: 'default',
+    Email: 'default@gmail.com',
+    UserName: 'default123',
+    Password: '1234',
     Age: 102,
-    isActive:true,
+    isActive: true,
+    Group: ['60b51093f85b283d3cea6f75'],
   },
 ];
-
 
 class UsersSeeder extends Seeder {
   async shouldRun() {

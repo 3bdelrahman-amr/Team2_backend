@@ -57,10 +57,10 @@
     "jest": "^26.0.1",
     "lint-staged": "^10.0.7",
     "nodemon": "^2.0.0",
-    "prettier": "^2.0.5"
+    "prettier": "^2.0.5",
+    "node-mocks-http": "^1.8.0"
   },
   "mdSeed": {
     "seedersFolder": "./seeders"
   }
-  
 }
