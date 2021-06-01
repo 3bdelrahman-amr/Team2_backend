@@ -309,7 +309,7 @@ const { use, route } = require('./album.route');
    //check if user
    router.get("/check/:peopleid",auth.authentication,auth.IfUser);
    //explore/android
-   router.get("/house",UserController.Explore);
+   router.get("/explore",auth.authentication,UserController.Explore);
 
    
   
