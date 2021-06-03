@@ -1,11 +1,10 @@
-const {
-    Photo,
-    Comment,
-    validatePhoto,
-    validateComment,
-    validateId,
-  } = require("../models/photo.model");
-  const multer = require("multer");
+const { Photo, Comment, Tag, validatePhoto, validateComment, validateId } = require('../models/photo.model')
+const { UserModel } = require('../models/user.model');
+const { Group } = require('../models/groups.model');
+const { Album } = require('../models/album.model');
+const Joi = require('joi');
+Joi.objectId = require('joi-objectid')(Joi);
+
   const { cloudinary } = require("./cloudinary");
   let streamifier = require("streamifier");
   const mongoose=require('mongoose');
@@ -210,8 +209,11 @@ exports.getPhotosExplore = async (req, res) => {
                     arrNumPhotos[i] = fav.photos.length;
                     i++;
                 }
+                console.log(photo);
                 for (comment of photo.comments) {
+                    
                     const user = comment.user;
+                    
                     await user.populate("Avatar").execPopulate();
                 }
                 var result = photo.toObject();
