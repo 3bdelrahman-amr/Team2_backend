@@ -1,6 +1,6 @@
 
 const { UserModel,validateId } = require('../models/user.model');
-const photo =require('../models/photo.model');
+const {Photo} =require('../models/photo.model');
 const mongoose = require('mongoose');
 exports.getFollowing=async (req, res) => {
     const { error } = validateId({id:req.params.userId});
@@ -87,8 +87,8 @@ module.exports.GetPeopleByUserName_ID_Email = async(req,res)=>{
   
         try {
             let USER = user.toObject();
-            const avatarurl = await photo.Photo.findById(user.Avatar);
-            const backgroundurl = await photo.Photo.findById(user.BackGround);
+            const avatarurl = await Photo.findById(user.Avatar);
+            const backgroundurl = await Photo.findById(user.BackGround);
             USER.BackGround = backgroundurl.photoUrl;
             USER.Avatar = avatarurl.photoUrl;
             USER.Follow = false;
@@ -109,8 +109,8 @@ module.exports.GetPeopleByUserName_ID_Email = async(req,res)=>{
         try {
   
             let USER = userByid.toObject();
-            const avatarurl = await photo.Photo.findById(userByid.Avatar);
-            const backgroundurl = await photo.Photo.findById(userByid.BackGround);
+            const avatarurl = await Photo.findById(userByid.Avatar);
+            const backgroundurl = await Photo.findById(userByid.BackGround);
             USER.BackGround = backgroundurl.photoUrl;
             USER.Avatar = avatarurl.photoUrl;
   
