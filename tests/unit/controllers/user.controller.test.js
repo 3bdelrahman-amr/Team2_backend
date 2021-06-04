@@ -1,6 +1,8 @@
 const httpmocks=require('node-mocks-http');
 const mongoose=require('mongoose');
 const userModel=require('../../../src/controllers/user.controller');
+const Model = require('../../../src/models/user.model');
+const Photo = require('../../../src/models/photo.model');
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -81,4 +83,19 @@ await mongoose.connection.close();
     
     
         });
-    
+
+        
+describe('get user favs',()=>{
+    it('should return photos',()=>{
+        let req = httpmocks.createRequest();
+        let res = httpmocks.createResponse();
+        res.locals.userid = '608834536de13632903701b7';
+        Model.UserModel.findById = jest.fn();
+        Photo.Photo.findById = jest.fn();
+        userModel.GetFav(req,res);
+        res.send = jest.fn();
+        
+        expect(Model.UserModel.findById).toHaveBeenCalled();
+        expect(res._getStatusCode()).toBe(200);
+    });
+});

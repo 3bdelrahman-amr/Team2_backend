@@ -297,7 +297,7 @@ module.exports.UpdateUser = async (req, res) => {
     req.body.BackGround &&
     !mongoose.Types.ObjectId.isValid(eq.body.BackGround)
   ) {
-    delete req.body.Avatar;
+    delete req.body.BackGround;
     msg += "invalid BackGround id \\n";
     isvalid--;
   } else if (
@@ -458,7 +458,7 @@ module.exports.GetFav = async (req, res) => {
 
   try {
     var FavPhotos = new Array();
-    let Fav;
+    var Fav;
     for (var i = 0; i < LoginUser.Fav.length; i++) {
       Fav = await PhotoModel.Photo.findById(LoginUser.Fav[i]);
       if (Fav) {
@@ -466,7 +466,7 @@ module.exports.GetFav = async (req, res) => {
         var Owner = await Model.UserModel.findById(Fav.ownerId);
         fa.Username = Owner.UserName;
         fa.comments = Fav.comments.length;
-        fa.comments = Fav.Fav.length;
+        fa.Favs = Fav.Fav.length;
 
         fa.Name = Owner.Fname + " " + Owner.Lname;
         FavPhotos.push(fa);

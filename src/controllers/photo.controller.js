@@ -439,6 +439,7 @@ exports.deletePhoto = async (req, res) => {
         console.log(ex.message);
     };
 };
+
 exports.updatePhoto = async (req, res) => {
     let photoUpdated = await Photo.findById(req.body.photos[0]);
     if (!photoUpdated) return res.status(404).send({ error: "photo not found" });
@@ -465,7 +466,6 @@ exports.updatePhoto = async (req, res) => {
         console.log(ex.message);
     };
 };
-
 
 module.exports.GetPhototitle = async (req, res) => {
     const schema = Joi.object({
@@ -513,8 +513,8 @@ module.exports.GetPhototitle = async (req, res) => {
 };
 
 module.exports.GetPhoto = async (req, res) => {
-    if (!mongoose.Types.ObjectId.isValid(req.params.photo_id))
-        return res.status(404).send({ message: 'Invalid Photo ID' });
+    const { error } = validateId({ id: req.params.photo_id });
+    if (error) return res.status(400).send(error.details[0].message);
 
     const photo = await Photo.findById(req.params.photo_id);
 
