@@ -28,7 +28,7 @@ afterAll(async () => {
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-describe('Create new album', async () => {
+describe('Create new album',  () => {
     it('Should return 201, successfully created, when the passed parameters are satisfactory', async () => {
         // create fake response and request 
         const req = httpmocks.createRequest();
@@ -62,7 +62,7 @@ describe('Create new album', async () => {
     })
 });
 
-describe('get album by id', async () => {
+describe('get album by id',  () => {
     it('Should return 400 is the album id is not valid', async () => {
         // create fake response and request 
         const req = httpmocks.createRequest();
@@ -105,7 +105,7 @@ describe('get album by id', async () => {
 })
 
 
-describe('Delete Album', async () => {
+describe('Delete Album',  () => {
     it('Should return 400 if the album id is not valid', async () => {
         // create fake response and request 
         const req = httpmocks.createRequest();
