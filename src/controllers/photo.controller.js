@@ -538,9 +538,9 @@ module.exports.GetPhoto = async (req, res) => {
     if (!photo)
         return res.status(404).send({ message: 'Photo not found' });
 
-    if (photo.privacy == 'private' && res.locals.userid != photo.ownerId) {
-        return res.status(401).send({ message: 'Unauthorized request' });
-    }
+    // if (photo.privacy == 'private' && res.locals.userid != photo.ownerId) {
+    //     return res.status(401).send({ message: 'Unauthorized request' });
+    // }
 
     try {
         res.status(200).send(photo);
