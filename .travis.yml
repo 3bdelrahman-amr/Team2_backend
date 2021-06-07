@@ -38,4 +38,4 @@ script:
 after_success:
 #deploying the new containers
 - echo Deploy here.....
-- "./deploy.sh"
+#- "./deploy.sh"
