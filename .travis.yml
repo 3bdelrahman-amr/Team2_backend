@@ -1,3 +1,4 @@
+# specifing the configurations and services needed (Docker):
 sudo: required
 language: generic
 services:
