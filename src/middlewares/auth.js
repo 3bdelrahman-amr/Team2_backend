@@ -95,8 +95,12 @@ module.exports.SendVerification = async (req, res) => {
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-module.exports.IfUser = (res, req) => {
+module.exports.IfUser = (req, res) => {
+  if(req.params.peopleid=="null")
+  return res.status(200).send({ boolean: 1 });
+
   if (res.locals.userid == req.params.peopleid)
-    return res, status(200).send({ boolean: 1 });
-  else return res, status(401).send({ boolean: 0 });
+    return res. status(200).send({ boolean: 1 });
+  
+   return res. status(401).send({ boolean: 0 });
 };

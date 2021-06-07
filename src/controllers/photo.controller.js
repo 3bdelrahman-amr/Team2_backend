@@ -1,5 +1,6 @@
 const {
     Photo,
+    Tag,
     Comment,
     validatePhoto,
     validateComment,
@@ -8,6 +9,7 @@ const {
 const multer = require("multer");
 const { cloudinary } = require("./cloudinary");
 let streamifier = require("streamifier");
+const { UserModel } = require('../models/user.model');
 
 
 
@@ -113,7 +115,7 @@ exports.tagPeople = async (req, res) => {
         res.status(200).send(photos);
     } catch (error) {
         console.log(error);
-        res.status(500).send({ error: "An error has occured whole finding photo, please check the photo id" });
+        res.status(500).send({ error: "An error has occured while finding photo, please check the photo id" });
     }
 
 
