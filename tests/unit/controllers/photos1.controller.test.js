@@ -18,6 +18,7 @@ const user1 = {
     Age: 25,
     Password: 'mostafa123',
     Fav: [],
+
 };
 
 const user2 = {
@@ -43,7 +44,7 @@ const photo1 = {
     photoUrl: 'https://www.montanusphotography.com/coverphotos/WiscoyFalls-CharlotteNY-MontanusPhoto.jpg',
     Fav: [],
     privacy: 'public',
-    ownerId: '608834536de13632903701b7'
+    ownerId: '608834536de13632903701b7',
 }
 
 const photo2 = {
@@ -66,7 +67,7 @@ afterAll(async () => {
 
 })
 
-describe('explore', async () => {
+describe('explore', () => {
     beforeEach(async () => {
         const url = "mongodb://127.0.0.1:27017/jestphoto1";
         await mongoose.connect(url,
@@ -106,7 +107,7 @@ describe('explore', async () => {
     });
 });
 
-describe('add tag people', async () => {
+describe('add tag people',  () => {
     beforeEach(async () => {
         const url = "mongodb://127.0.0.1:27017/jestphoto1";
         await mongoose.connect(url,
@@ -161,7 +162,7 @@ describe('add tag people', async () => {
     });
 });
 
-describe('remove tag people', async () => {
+describe('remove tag people',  () => {
     beforeEach(async () => {
         const url = "mongodb://127.0.0.1:27017/jestphoto1";
         await mongoose.connect(url,
@@ -213,5 +214,189 @@ describe('remove tag people', async () => {
 
         // Assertions about status code
         expect(res._getStatusCode()).toBe(200);
+    });
+});
+describe('create new comment', () => {
+    beforeAll(async () => {
+        const url = "mongodb://127.0.0.1:27017/jestphoto1";
+        await mongoose.connect(url,
+            {
+                useNewUrlParser: true,
+                useCreateIndex: true,
+                useUnifiedTopology: true
+    
+            });
+        await mongoose.connection.dropDatabase();
+        req = { headers: {}, params: {}, body: {} };
+        res = {
+          locals: {userid: '608834536de13632903701b7'},
+          response: null,
+          statusCode: 0,
+          status: function (code) {
+            this.statusCode = code;
+            return this;
+          },
+          json: function (data) {
+            this.response = data;
+          },
+          send: ()=>{}
+        };
+        user = new User(user1);
+        await user.save();
+        photo = new Photo(photo1);
+        await photo.save();
+      });
+    it('should return error 400 if photoId sent in params is invalid', async () => {
+
+        // set comment data in request body
+        req.body = {
+            comment: 'Ahmed'
+        }
+        //set parameters sent in path
+        req.params = {
+            photoId: '5657'
+        }
+        //Photo.findById = jest.fn().mockReturnValue({ _id: 5657, privacy: 'private', ownerId: 56757 })
+        res.status.send = jest.fn();
+        photoController.addComment(req, res);
+        expect(res.statusCode).toBe(400);
+
+    });
+    it('should check if comment is valid and return error code 400', async ()=> {
+
+        // set comment data in request body
+        req.body.comment= 768;
+        //set parameters sent in path
+        res.status.send = jest.fn();
+        req.params.photoId= '609dda0c9a52002aa498bf01';
+        await photoController.addComment(req, res);
+        
+        expect(res.statusCode).toBe(400);
+    });
+    it('should return status 201 when inputs are valid',  async ()=> {
+        // set comment data in request body
+        req.body.comment= "great";
+        //set parameters sent in path
+        res.status.send = jest.fn();
+        req.params.photoId= '609dda0c9a52002aa498bf01';
+        await photoController.getComments(req, res);
+        expect(res.statusCode).toBe(201);
+    });
+});
+
+describe('get comments',  () => {
+    beforeAll(async () => {
+        const url = "mongodb://127.0.0.1:27017/jestphoto1";
+        await mongoose.connect(url,
+            {
+                useNewUrlParser: true,
+                useCreateIndex: true,
+                useUnifiedTopology: true
+    
+            });
+        await mongoose.connection.dropDatabase();
+        req = { headers: {}, params: {}, body: {} };
+        res = {
+          locals: {userid: '608834536de13632903701b7'},
+          response: null,
+          statusCode: 0,
+          status: function (code) {
+            this.statusCode = code;
+            return this;
+          },
+          json: function (data) {
+            this.response = data;
+          },
+          send: ()=>{}
+        };
+        user = new User(user1);
+        await user.save();
+        photo = new Photo(photo1);
+        await photo.save();
+      });
+    it('should return error 400 if photoId sent in params is invalid', async() => {
+        //set parameters sent in path
+        req.params = {
+            photoId: '5657'
+        }
+        
+        await photoController.getComments(req, res);
+        expect(res.statusCode).toBe(400);
+
+    });
+    it('should check if photo is found and return status code 404', async ()=> {
+
+        //set parameters sent in path
+        req.params.photoId= '608f4985780a9381560f77e1';
+        await photoController.getComments(req, res);
+        //expect(photoModel.validateComment).toHaveBeenCalled();
+        expect(res.statusCode).toBe(404);
+    });
+    it('should return status 201 when inputs are valid',  async()=> {
+
+        //set parameters sent in path
+        req.params.photoId= '609dda0c9a52002aa498bf01';
+        await photoController.getComments(req, res);
+        expect(res.statusCode).toBe(201);
+    });
+});
+
+describe('delete comments',  () => {
+    beforeAll(async () => {
+        const url = "mongodb://127.0.0.1:27017/jestphoto1";
+        await mongoose.connect(url,
+            {
+                useNewUrlParser: true,
+                useCreateIndex: true,
+                useUnifiedTopology: true
+    
+            });
+        await mongoose.connection.dropDatabase();
+        user = new User(user1);
+        await user.save();
+        photo = new Photo(photo1);
+        await photo.save();
+      });
+    beforeEach(async () => {
+        req = { headers: {}, params: {}, body: {} };
+        res = {
+          locals: {userid: '608834536de13632903701b7'},
+          response: null,
+          statusCode: 0,
+          status: function (code) {
+            this.statusCode = code;
+            return this;
+          },
+          json: function (data) {
+            this.response = data;
+          },
+          send: ()=>{}
+        };
+      });
+
+    it('should return error 400 if photoId sent in params is invalid', async () => {
+        //set parameters sent in path
+        req.params = {
+            photoId: '5657'
+        }
+
+        await photoController.deleteComment(req, res);
+        expect(res.statusCode).toBe(400);
+
+    });
+    it('should check if photo is found and return status code 404', async ()=> {
+     
+        req.params.photoId= '608f4985780a9381560f77e1';
+        await photoController.deleteComment(req, res);
+        expect(res.statusCode).toBe(404);
+    });
+    it('should return status 404 when when comment is not found', async ()=> {
+    
+        req.params = {
+            photoId: '609dda0c9a52002aa498bf05',
+            commentId:'60b67a62c1cbaa6688788a8c'
+        };   
+        await photoController.deleteComment(req, res);
+        expect(res.statusCode).toBe(404);
     });
 });

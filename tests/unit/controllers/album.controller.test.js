@@ -70,7 +70,7 @@ afterAll(async () => {
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-describe('Create new album', async () => {
+describe('Create new album',  () => {
     beforeEach(async () => {
         const url = "mongodb://127.0.0.1:27017/jestalbum";
         await mongoose.connect(url,
@@ -143,7 +143,7 @@ describe('Create new album', async () => {
     })
 });
 
-describe('get album by id', async () => {
+describe('get album by id',  () => {
     beforeEach(async () => {
         const url = "mongodb://127.0.0.1:27017/jestalbum";
         await mongoose.connect(url,
@@ -223,7 +223,7 @@ describe('get album by id', async () => {
 })
 
 
-describe('Delete Album', async () => {
+describe('Delete Album',  () => {
     beforeEach(async () => {
         const url = "mongodb://127.0.0.1:27017/jestalbum";
         await mongoose.connect(url,
@@ -291,7 +291,7 @@ describe('Delete Album', async () => {
     // });
 })
 
-describe('Update Album', async () => {
+describe('Update Album',  () => {
     beforeEach(async () => {
         const url = "mongodb://127.0.0.1:27017/jestalbum";
         await mongoose.connect(url,
@@ -393,7 +393,7 @@ describe('Update Album', async () => {
     });
 })
 
-describe('Get user Albums', async () => {
+describe('Get user Albums',  () => {
     beforeEach(async () => {
         const url = "mongodb://127.0.0.1:27017/jestalbum";
         await mongoose.connect(url,
@@ -445,7 +445,7 @@ describe('Get user Albums', async () => {
 
 })
 
-describe('Get Albums by userName', async () => {
+describe('Get Albums by userName',  () => {
     beforeEach(async () => {
         const url = "mongodb://127.0.0.1:27017/jestalbum";
         await mongoose.connect(url,
@@ -505,7 +505,7 @@ describe('Get Albums by userName', async () => {
 
 })
 
-describe('AddPhoto to Album', async () => {
+describe('AddPhoto to Album',  () => {
     beforeEach(async () => {
         const url = "mongodb://127.0.0.1:27017/jestalbum";
         await mongoose.connect(url,
@@ -603,7 +603,7 @@ describe('AddPhoto to Album', async () => {
     // });
 })
 
-describe('Remove photo from Album', async () => {
+describe('Remove photo from Album',  () => {
     beforeEach(async () => {
         const url = "mongodb://127.0.0.1:27017/jestalbum";
         await mongoose.connect(url,
