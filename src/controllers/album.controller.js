@@ -122,8 +122,6 @@ const getUserAlbums = async (req, res) => {
         const albums = user.albums;
         for (album of albums) {
             await album.populate('photos coverPhoto ownerId').execPopulate();
-           
-            
         }
         res.status(200).send(albums);
 

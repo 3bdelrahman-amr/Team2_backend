@@ -2,7 +2,7 @@ const httpmocks = require('node-mocks-http');
 const mongoose = require('mongoose');
 const photoController = require('../../../src/controllers/photo.controller');
 const photoModel = require('../../../src/models/photo.model')
-
+const User = require('../../../src/models/user.model');
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 beforeAll(async () => {
@@ -27,172 +27,74 @@ afterAll(async () => {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-describe('create new comment',async () => {
-    it('should return error 400 if photoId sent in params is invalid', async () => {
-        // create fake response and request
+
+
+describe('add tag',()=>{
+    it('should return 400 if the user does not enter any photo id',async()=>{
         const req = httpmocks.createRequest();
         const res = httpmocks.createResponse();
-        // set comment data in request body
-        req.body = {
-            comment: 'Ahmed'
-        }
-        //set parameters sent in path
-        req.params = {
-            photoId: '5657'
-        }
-        //Photo.findById = jest.fn().mockReturnValue({ _id: 5657, privacy: 'private', ownerId: 56757 })
-
-        photoController.addComment(req, res);
+        res.statusCode = 0;
+        photoController.addTag(req,res);
         expect(res._getStatusCode()).toBe(400);
-
     });
-    it('should check if findById is called and return true', async ()=> {
-        // create fake response and request
-        let req = httpmocks.createRequest();
-        let res = httpmocks.createResponse();
-        // set comment data in request body
-        req.body = {};
-        //set parameters sent in path
-        req.params = {
-            photoId: '608f4985490a9381560f77e1'
-        };
-        res.locals.userid={
-            id:'608f4985490a9381560f77e1'
-        };
-        photoModel.Photo.findById=jest.fn();
-        photoModel.validateComment=jest.fn();
-        photoController.addComment(req, res);
-        //expect(photoModel.validateComment).toHaveBeenCalled();
+    it('should search for photos with the gevin ids',async()=>{
+        const req = httpmocks.createRequest();
+        const res = httpmocks.createResponse();
+        photoModel.Photo.findById = jest.fn();
+        req.body = {
+            photos:['608f4985490a9381560f77e1']
+        }; 
+        photoController.addTag(req,res);
         expect(photoModel.Photo.findById).toHaveBeenCalled();
-    });
-    it('should return status 200 when inputs are valid',  async ()=> {
-        // create fake response and request
-        let req = httpmocks.createRequest();
-        let res = httpmocks.createResponse();
-        // set comment data in request body
-        req.body = {};
-        //set parameters sent in path
-        req.params = {
-            photoId: '608f4985490a9381560f77e1'
-        };
-        res.locals.userid={
-            id:'608f4985490a9381560f77e1'
-        };
-        photoController.getComments(req, res);
         expect(res._getStatusCode()).toBe(200);
     });
 });
 
-describe('get comments', async () => {
-    it('should return error 400 if photoId sent in params is invalid', async() => {
-        // create fake response and request
+describe('remove tag',()=>{
+    it('should return 200 if the id is passed',async()=>{
         const req = httpmocks.createRequest();
         const res = httpmocks.createResponse();
-        // set comment data in request body
-        req.body = {
-            comment: 'Ahmed'
-        }
-        //set parameters sent in path
-        req.params = {
-            photoId: '5657'
-        }
-        //Photo.findById = jest.fn().mockReturnValue({ _id: 5657, privacy: 'private', ownerId: 56757 })
-
-        photoController.getComments(req, res);
-        expect(res._getStatusCode()).toBe(400);
-
-    });
-    it('should check if findById is called and return true', async ()=> {
-        // create fake response and request
-        let req = httpmocks.createRequest();
-        let res = httpmocks.createResponse();
-        // set comment data in request body
-        req.body = {};
-        //set parameters sent in path
-        req.params = {
-            photoId: '608f4985490a9381560f77e1'
-        };
-        res.locals.userid={
-            id:'608f4985490a9381560f77e1'
-        };
-        photoModel.Photo.findById=jest.fn();
-        photoModel.validateComment=jest.fn();
-        photoController.getComments(req, res);
-        //expect(photoModel.validateComment).toHaveBeenCalled();
+        req.params.id = '608f4985490a9381560f77e1';
+        photoModel.Photo.findById = jest.fn();
+        photoController.removeTag(req,res);
         expect(photoModel.Photo.findById).toHaveBeenCalled();
-    });
-    it('should return status 200 when inputs are valid',  async()=> {
-        // create fake response and request
-        let req = httpmocks.createRequest();
-        let res = httpmocks.createResponse();
-        // set comment data in request body
-        req.body = {};
-        //set parameters sent in path
-        req.params = {
-            photoId: '608f4985490a9381560f77e1'
-        };
-        res.locals.userid={
-            id:'608f4985490a9381560f77e1'
-        };
-        photoController.getComments(req, res);
         expect(res._getStatusCode()).toBe(200);
     });
 });
 
-describe('delete comments', async () => {
-    it('should return error 400 if photoId sent in params is invalid', async () => {
-        // create fake response and request
+describe('get photo by title',()=>{
+    it('should return array of photos ',async()=>{
         const req = httpmocks.createRequest();
         const res = httpmocks.createResponse();
-        // set comment data in request body
-        req.body = {
-            comment: 'Ahmed'
-        }
-        //set parameters sent in path
         req.params = {
-            photoId: '5657'
-        }
-        //Photo.findById = jest.fn().mockReturnValue({ _id: 5657, privacy: 'private', ownerId: 56757 })
+            title : 'prfile'
+        };
+        photoModel.Photo.find = jest.fn();
+        User.UserModel.findById = jest.fn();
+        photoController.GetPhototitle(req,res);
+        expect(res._getStatusCode()).toBe(200);
+    });
+});
 
-        photoController.deleteComment(req, res);
+describe('get photo by id',()=>{
+    it('should failed if the passed id is not a valid id',async()=>{
+        let req = httpmocks.createRequest();
+        let res = httpmocks.createResponse();
+        req.params = {
+            photo_id:'1234'
+        }
+        photoController.GetPhoto(req,res);
         expect(res._getStatusCode()).toBe(400);
-
     });
-    it('should check if findById is called and return true', async ()=> {
-        // create fake response and request
+    it('should return the photo with status 200 if the passed id is a valid id',async()=>{
         let req = httpmocks.createRequest();
         let res = httpmocks.createResponse();
-        // set comment data in request body
-        req.body = {};
-        //set parameters sent in path
         req.params = {
-            photoId: '608f4985490a9381560f77e1'
-        };
-        res.locals.userid={
-            id:'608f4985490a9381560f77e1'
-        };
-        photoModel.Photo.findById=jest.fn()
-            .mockReturnValue({id:req.params.photoId,comments:[{id:3242,comments:'hey'}]});
-        photoModel.validateComment=jest.fn();
-        
-        photoController.deleteComment(req, res);
-        //expect(photoModel.validateComment).toHaveBeenCalled();
+            photo_id:'608f4985490a9381560f77e1'
+        }
+        photoModel.Photo.findById = jest.fn();
+        photoController.GetPhoto(req,res);
         expect(photoModel.Photo.findById).toHaveBeenCalled();
-    });
-    it('should return status 200 when inputs are valid', async ()=> {
-        // create fake response and request
-        let req = httpmocks.createRequest();
-        let res = httpmocks.createResponse();
-        // set comment data in request body
-        req.body = {};
-        //set parameters sent in path
-        req.params = {
-            photoId: '608f4985490a9381560f77e1'
-        };
-        res.locals.userid={
-            id:'608f4985490a9381560f77e1'
-        };
-        photoController.deleteComment(req, res);
         expect(res._getStatusCode()).toBe(200);
     });
 });
