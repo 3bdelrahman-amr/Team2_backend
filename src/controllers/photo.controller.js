@@ -1,51 +1,61 @@
-const {
-    Photo,
-    Tag,
-    Comment,
-    validatePhoto,
-    validateComment,
-    validateId,
-} = require("../models/photo.model");
-const multer = require("multer");
-const { cloudinary } = require("./cloudinary");
-let streamifier = require("streamifier");
+
+const { Photo, Comment, Tag, validatePhoto, validateComment, validateId } = require('../models/photo.model')
 const { UserModel } = require('../models/user.model');
+const { Group } = require('../models/groups.model');
+const { Album } = require('../models/album.model');
+const Joi = require('joi');
+Joi.objectId = require('joi-objectid')(Joi);
+
+  const { cloudinary } = require("./cloudinary");
+  let streamifier = require("streamifier");
+  const mongoose=require('mongoose');
+const { string } = require('joi');
+
 
 
 
 exports.AddPhoto = async (req, res) => {
     const _id = res.locals.userid;
-    if (!req.files[0] || req.files[0].buffer.length == 0)
-        return res.status(400).send({ error: "You must add a file" });
 
+    if (!req.body.file)
+    return res.status(400).send({ error: "You must add a file" });
+    var buffer=Uint8Array.from (req.body.file);
+//    try{ 
 
-    var buffer = req.files[0].buffer;
-
+//      buffer =Uint8Array.from (  req.body.file);        
+//    }
+//    catch(err){
+//        console.log(err);
+//    }
     let uploadFromBuffer = (buffer) => {
-        return new Promise((resolve, reject) => {
-            let cld_upload_stream = cloudinary.uploader.upload_stream(
-                {
-                    folder: "samples/dropoid",
-                },
-                (error, result) => {
-                    if (result) {
-                        resolve(result);
-                    } else {
-                        reject(error);
-                    }
-                }
-            );
 
-            streamifier.createReadStream(buffer).pipe(cld_upload_stream);
-        });
+      return new Promise((resolve, reject) => {
+        let cld_upload_stream =  cloudinary.uploader.upload_stream(
+          {
+            folder: "samples/dropoid",
+          },
+          (error, result) => {
+            if (result) {
+              resolve(result);
+            } else {
+              reject(error);
+            }
+          }
+        );
+  
+        streamifier.createReadStream(buffer).pipe(cld_upload_stream);
+      });
     };
     let result = await uploadFromBuffer(buffer);
-
-    const photo = new Photo({
-        ...req.body,
-        ownerId: _id,
-        photoUrl: result.url
-    })
+   
+        const photo = new Photo({
+            title:req.body.title,
+            privacy:req.body.privacy,
+            ownerId: _id,
+            photoUrl:result.url
+        })
+  
+        delete req.body.file;
 
     const { error } = validatePhoto(req.body);
     if (error) {
@@ -61,6 +71,7 @@ exports.AddPhoto = async (req, res) => {
         res.status(500).send({ error: "Internal Server error" });
     }
 };
+
 
 exports.tagPeople = async (req, res) => {
     if (!req.body.photos || !req.body.tagged)
@@ -211,8 +222,11 @@ exports.getPhotosExplore = async (req, res) => {
                     arrNumPhotos[i] = fav.photos.length;
                     i++;
                 }
+               // console.log(photo);
                 for (comment of photo.comments) {
+                    
                     const user = comment.user;
+                    
                     await user.populate("Avatar").execPopulate();
                 }
                 var result = photo.toObject();
@@ -523,9 +537,9 @@ module.exports.GetPhoto = async (req, res) => {
     if (!photo)
         return res.status(404).send({ message: 'Photo not found' });
 
-    if (photo.privacy == 'private' && res.locals.userid != photo.ownerId) {
-        return res.status(401).send({ message: 'Unauthorized request' });
-    }
+    // if (photo.privacy == 'private' && res.locals.userid != photo.ownerId) {
+    //     return res.status(401).send({ message: 'Unauthorized request' });
+    // }
 
     try {
         res.status(200).send(photo);

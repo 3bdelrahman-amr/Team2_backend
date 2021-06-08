@@ -17,6 +17,7 @@ mongoose.connect(db, {
   server = app.listen(port, () => {
     console.log(`Listening to port ${port}\n  `);
     console.log('NODE_ENV=',config.util.getEnv('NODE_ENV'));
+    console.log("db",db)
     
   });
 }).catch(err => {

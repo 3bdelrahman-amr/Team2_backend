@@ -2,14 +2,27 @@ const express = require('express')
 const mongoSanitize = require('express-mongo-sanitize')
 const cors = require('cors')
 const routes = require('./routes/v1')
-
+const { fileParser } = require('express-multipart-file-parser')
+const bytes=require('bytes');
 const app = express()
 
 // parse json request body
-app.use(express.json())
+app.use(express.json({ extended: true ,limit:bytes('100 mb')}))
+
+
+app.use(fileParser({
+  rawBodyOptions: {
+    limit: '15mb',
+  },
+  busboyOptions: {
+    limits: {
+      fields: 2
+    }
+  },
+}))
 
 // parse urlencoded request body
-app.use(express.urlencoded({ extended: true }))
+app.use(express.urlencoded({ extended: true ,limit:bytes('100 mb')}))
 
 app.use(mongoSanitize())
 

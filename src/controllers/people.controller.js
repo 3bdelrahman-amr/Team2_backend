@@ -1,4 +1,3 @@
-
 const { UserModel,validateId } = require('../models/user.model');
 const {Photo} =require('../models/photo.model');
 const mongoose = require('mongoose');
@@ -211,4 +210,3 @@ exports.searchUsers = async (req, res) => {
         }
     }
 }
-

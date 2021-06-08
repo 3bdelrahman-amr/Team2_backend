@@ -1,3 +1,4 @@
+# specifing the configurations and services needed (Docker):
 sudo: required
 language: generic
 services:
@@ -38,4 +39,4 @@ script:
 after_success:
 #deploying the new containers
 - echo Deploy here.....
-- "./deploy.sh"
+#- "./deploy.sh"
